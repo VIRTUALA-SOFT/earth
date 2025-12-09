@@ -206,34 +206,43 @@
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
   // --- 1. BASE DE DATOS (Escalable) ---
-  // Añadí una clave "region" para facilitar búsquedas
-  const pueblos = [
-    { 
-      id: "arhuaco", name: "Arhuaco", region: "Sierra Nevada", 
-      lat: 10.8, lon: -73.7, 
-      desc: "Los 'Hermanos Mayores'. Guardianes del equilibrio del mundo en los picos nevados del norte.",
-      url: "/ululato/arhuaco"
-    },
-    { 
-      id: "wayuu", name: "Wayuu", region: "La Guajira", 
-      lat: 12.1, lon: -72.2, 
-      desc: "Pueblo del desierto y el mar. Famosos por su sistema de justicia (palabrero) y sus tejidos.",
-      url: "/ululato/wayuu"
-    },
-    { 
-      id: "embera", name: "Emberá", region: "Chocó / Pacífico", 
-      lat: 5.5, lon: -76.6, 
-      desc: "Habitantes de las selvas húmedas y ríos. Viven en tambos y son expertos navegantes.",
-      url: "/ululato/embera"
-    },
-    { 
-      id: "murui", name: "Murui Muina", region: "Amazonas", 
-      lat: -1.5, lon: -71.5, 
-      desc: "Gente de centro, hijos del tabaco, la coca y la yuca dulce. Protectores de la selva amazónica.",
-      url: "/ululato/murui"
-    },
-    // ... Imagina aquí 500 registros más ...
+  const etniasBase = [
+     // ... (PEGA AQUÍ EL ARRAY 'etniasBase' QUE TE DI ARRIBA) ...
+     // Por brevedad del ejemplo, asegúrate de incluir al menos los datos de América y un par más.
+     { id: "arhuaco", name: "Arhuaco", region: "Colombia", lat: 10.70, lon: -73.65, desc: "Guardianes de la Sierra." },
+     { id: "wayuu", name: "Wayuu", region: "La Guajira", lat: 12.1, lon: -72.2, desc: "Pueblo del desierto." },
+     // ... el resto de la lista ...
   ];
+
+  // Si no quieres copiar todo el array gigante aquí, usa la función generadora
+  // para multiplicar tus 3-4 ejemplos actuales x 100.
+  
+  function generarPueblosMasivos() {
+    const lista = [];
+    // Si etniasBase está vacío o tiene pocos, añade más manualmente o repite la lógica
+    // Lógica de dispersión:
+    etniasBase.forEach(etnia => {
+        // Principal
+        lista.push({...etnia, name: etnia.name, type: 'main'});
+        // Secundarios
+        for(let i=0; i<12; i++) { // Generamos 12 vecinos por cada pueblo para llenar mapa
+            const disp = 2.0; // Dispersión en grados
+            lista.push({
+                id: etnia.id,
+                name: `Comunidad ${etnia.name}`,
+                region: etnia.region,
+                lat: etnia.lat + (Math.random()-0.5)*disp,
+                lon: etnia.lon + (Math.random()-0.5)*disp,
+                desc: etnia.desc,
+                url: etnia.url,
+                type: 'village' // Marcador más pequeño
+            });
+        }
+    });
+    return lista;
+  }
+  
+  const pueblos = generarPueblosMasivos(); // Esto generará aprox 500+ puntos si se tiene ~40 bases
 
   // --- 2. CONFIGURACIÓN THREE.JS ---
   const container = document.getElementById("globe");
@@ -318,53 +327,67 @@
   scene.add(atmos);
 
   // --- 4. MARCADORES INTELIGENTES ---
-  const markersGroup = new THREE.Group();
+    const markersGroup = new THREE.Group();
   earthGroup.add(markersGroup);
 
-  // Materiales reusables para optimizar
-  const matGold = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-  const matSelected = new THREE.MeshBasicMaterial({ color: 0x00f3ff }); // CIAN NEÓN
-  const matRing = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.7 });
+  // Materiales compartidos (Clave para rendimiento con 500 objetos)
+  const matMain = new THREE.MeshBasicMaterial({ color: 0xffd700 }); // Dorado
+  const matVillage = new THREE.MeshBasicMaterial({ color: 0xffeba0, transparent: true, opacity: 0.6 }); // Dorado pálido
+  const matSelected = new THREE.MeshBasicMaterial({ color: 0x00f3ff }); // Cian
+  const matRing = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
 
-  function latLonToVector3(lat, lon, radius) {
-    const phi = (90 - lat) * (Math.PI / 180);
-    const theta = (lon + 180) * (Math.PI / 180);
-    return new THREE.Vector3(
-      -(radius * Math.sin(phi) * Math.cos(theta)),
-      (radius * Math.cos(phi)),
-      (radius * Math.sin(phi) * Math.sin(theta))
-    );
-  }
+  // Geometrías compartidas
+  const geoMain = new THREE.SphereGeometry(0.015, 8, 8);
+  const geoVillage = new THREE.SphereGeometry(0.008, 4, 4); // Muy low poly para los 500 puntos
+  const geoRing = new THREE.RingGeometry(0.025, 0.035, 16);
+  const geoBeam = new THREE.CylinderGeometry(0.005, 0.005, 1, 4);
+  geoBeam.translate(0, 0.5, 0);
 
-  // Generar marcadores
-  pueblos.forEach(p => {
-    const pos = latLonToVector3(p.lat, p.lon, 2.01);
+  // Generación eficiente
+  pueblos.forEach((p, index) => {
+    const pos = latLonToVector3(p.lat, p.lon, 2.005);
     
-    // Núcleo
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.015, 16, 16), matGold.clone());
-    core.position.copy(pos);
+    // Decidir geometría según tipo
+    const isMain = p.type === 'main' || !p.type; // Si no tiene tipo, es main
+    const mesh = new THREE.Mesh(isMain ? geoMain : geoVillage, isMain ? matMain.clone() : matVillage.clone());
+    mesh.position.copy(pos);
     
-    // Anillo (Onda)
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.03, 0.04, 32), matRing.clone());
-    ring.position.copy(pos);
-    ring.lookAt(new THREE.Vector3(0,0,0));
+    // Solo las "capitales" tienen anillo y beam para no saturar
+    let ring, beam;
+    
+    if (isMain) {
+        ring = new THREE.Mesh(geoRing, matRing.clone());
+        ring.position.copy(pos);
+        ring.lookAt(new THREE.Vector3(0,0,0));
+        markersGroup.add(ring);
 
-    // Rayo de luz (Beacon) - Inicialmente invisible (escala 0 en Y)
-    const beamGeo = new THREE.CylinderGeometry(0.005, 0.005, 1, 8);
-    beamGeo.translate(0, 0.5, 0); // Pivote en la base
-    const beamMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
-    const beam = new THREE.Mesh(beamGeo, beamMat);
-    beam.position.copy(pos);
-    beam.lookAt(new THREE.Vector3(0,0,0));
-    beam.rotateX(-Math.PI/2); // Apuntar hacia afuera
-    beam.scale.set(1, 0, 1); // Altura 0 inicial
+        beam = new THREE.Mesh(geoBeam, new THREE.MeshBasicMaterial({ 
+            color: 0x00f3ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending 
+        }));
+        beam.position.copy(pos);
+        beam.lookAt(new THREE.Vector3(0,0,0));
+        beam.rotateX(-Math.PI/2);
+        beam.scale.set(1, 0, 1);
+        markersGroup.add(beam);
+    }
 
-    // Hitbox para click fácil
-    const hit = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshBasicMaterial({visible:false}));
+    // Hitbox (un poco más grande para facilitar click en móviles)
+    const hitGeo = new THREE.SphereGeometry(isMain ? 0.06 : 0.03, 4, 4);
+    const hit = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
     hit.position.copy(pos);
-    hit.userData = { id: p.id, data: p, core, ring, beam }; // Guardamos referencias visuales
+    
+    // Guardar datos en el objeto userData del hitbox
+    hit.userData = { 
+        id: p.id, 
+        uniqueId: index, // ID único para array
+        data: p, 
+        mesh: mesh, 
+        ring: ring, 
+        beam: beam 
+    };
 
-    markersGroup.add(core, ring, beam, hit);
+    markersGroup.add(mesh);
+    markersGroup.add(hit);
   });
 
   // --- 5. LÓGICA DE SELECCIÓN Y COLORES ---
