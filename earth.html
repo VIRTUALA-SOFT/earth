@@ -3,78 +3,245 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ULULATO – Earth 3D</title>
+  <title>ULULATO – Earth Experience</title>
+  <!-- Fuente Premium: Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <!-- GSAP para animaciones de cine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
   <style>
-    html, body { margin:0; padding:0; height:100%; background:#050b15; font-family:system-ui, sans-serif; overflow: hidden; }
-    #app { display:flex; height:100%; width: 100%; }
+    :root {
+      --primary: #ffd700; /* Dorado Premium */
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --glass-blur: blur(12px);
+      --text-main: #ffffff;
+      --text-secondary: #aaaaaa;
+    }
+
+    body { margin: 0; overflow: hidden; background: #020205; font-family: 'Montserrat', sans-serif; }
     
-    /* Panel lateral */
-    #ui { 
-      width:280px; 
-      padding:20px; 
-      color:#f5f5f5; 
-      box-sizing:border-box; 
-      background: rgba(5, 11, 21, 0.95); 
-      border-right: 1px solid #333;
+    /* --- UI LAYOUT --- */
+    #app { position: relative; width: 100vw; height: 100vh; }
+    #globe { width: 100%; height: 100%; display: block; }
+
+    /* --- GLASS PANELS COMUNES --- */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      color: var(--text-main);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* --- PANEL IZQUIERDO (MENU) --- */
+    #ui-controls {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      width: 300px;
       z-index: 10;
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+      color: var(--primary);
+    }
+    
+    p.subtitle {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      font-weight: 300;
+    }
+
+    /* --- CUSTOM DROPDOWN --- */
+    .custom-select-wrapper {
+      position: relative;
+      user-select: none;
+    }
+    .custom-select {
+      position: relative;
       display: flex;
       flex-direction: column;
     }
-    
-    #globe { flex:1; position: relative; }
-    
-    h2 { margin-top: 0; font-size: 1.2rem; margin-bottom: 20px; color: #ffd966; }
-    label { font-size: 0.9rem; margin-bottom: 8px; display: block; }
-    select { 
-      width:100%; 
-      padding:10px; 
-      background: #1a2639; 
-      color: white; 
-      border: 1px solid #444; 
-      border-radius: 4px; 
-      outline: none;
-    }
-    select:hover { border-color: #ffd966; }
-
-    /* Pantalla de carga */
-    #loader {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: #050b15;
-      color: #ffd966;
+    .custom-select__trigger {
+      position: relative;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 1.5rem;
+      justify-content: space-between;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .custom-select__trigger:hover { background: rgba(255,255,255,0.15); }
+    .arrow { border: solid var(--primary); border-width: 0 2px 2px 0; display: inline-block; padding: 3px; transform: rotate(45deg); transition: 0.3s; margin-left: 10px;}
+    .open .arrow { transform: rotate(-135deg); }
+
+    .custom-options {
+      position: absolute;
+      display: block;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(10, 15, 30, 0.95);
+      border: var(--glass-border);
+      border-radius: 8px;
+      margin-top: 8px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-10px);
+      transition: all 0.3s;
+      z-index: 20;
+    }
+    .custom-select.open .custom-options { opacity: 1; visibility: visible; pointer-events: all; transform: translateY(0); }
+    
+    .option {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .option:last-child { border-bottom: none; }
+    .option:hover { background: rgba(255, 215, 0, 0.2); color: var(--primary); }
+    .option.selected { color: var(--primary); font-weight: 600; }
+
+    /* --- INFO CARD (DERECHA) --- */
+    #info-card {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      width: 320px;
+      max-width: 80vw;
+      transform: translateX(50px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #info-card.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+    .card-title { font-size: 1.5rem; margin: 0 0 10px 0; color: var(--primary); }
+    .card-desc { font-size: 0.9rem; line-height: 1.6; color: #ddd; margin-bottom: 20px; }
+    .btn-action {
+      display: inline-block;
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      border-radius: 30px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .btn-action:hover { background: var(--primary); color: #000; }
+
+    /* --- TOOLTIP FLOTANTE --- */
+    #tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      border: 1px solid #444;
       z-index: 100;
-      transition: opacity 0.5s ease;
+      transform: translate(-50%, -150%); /* Centrado arriba */
+    }
+
+    /* --- LOADER --- */
+    #loader {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #020205; z-index: 999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      transition: opacity 0.8s ease;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 2px solid #333; border-top: 2px solid var(--primary);
+      border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: #666; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #ui-controls { top: 20px; left: 20px; width: calc(100% - 40px); }
+      #info-card { bottom: 20px; right: 20px; left: 20px; width: auto; }
     }
   </style>
 </head>
 <body>
 
-<!-- Pantalla de Carga -->
-<div id="loader">Cargando los pueblos de orígen...</div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Inicializando Universo</div>
+</div>
 
+<!-- TOOLTIP 3D -->
+<div id="tooltip"></div>
+
+<!-- APP -->
 <div id="app">
-  <div id="ui">
-    <h2>ULULATO – Pueblos de origen</h2>
-    <label for="puebloSelect">Selecciona un pueblo:</label>
-    <select id="puebloSelect">
-      <option value="">-- Rotación Libre --</option>
-      <option value="arhuaco">Arhuaco (Sierra Nevada)</option>
-      <option value="wayuu">Wayuu (La Guajira)</option>
-      <option value="embera">Emberá (Chocó/Antioquia)</option>
-    </select>
+  
+  <!-- PANEL IZQUIERDO -->
+  <div id="ui-controls" class="glass-panel">
+    <h1>Ululato</h1>
+    <p class="subtitle">Explora los pueblos de origen</p>
     
-    <div style="margin-top: auto; font-size: 0.8rem; color: #666;">
-      <p>Usa el mouse para rotar y hacer zoom.</p>
+    <div class="custom-select-wrapper">
+      <div class="custom-select">
+        <div class="custom-select__trigger">
+          <span id="select-label">Rotación Libre</span>
+          <div class="arrow"></div>
+        </div>
+        <div class="custom-options">
+          <span class="option selected" data-value="">Rotación Libre</span>
+          <span class="option" data-value="arhuaco">Arhuaco (Sierra Nevada)</span>
+          <span class="option" data-value="wayuu">Wayuu (La Guajira)</span>
+          <span class="option" data-value="embera">Emberá (Chocó)</span>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- TARJETA DE INFORMACIÓN (DINÁMICA) -->
+  <div id="info-card" class="glass-panel">
+    <h2 class="card-title" id="card-title">Título</h2>
+    <p class="card-desc" id="card-desc">Descripción corta del pueblo...</p>
+    <a href="#" id="card-link" class="btn-action">Explorar Cultura</a>
+    <button id="close-card" style="background:none; border:none; color:#666; float:right; cursor:pointer; margin-top:10px;">Cerrar</button>
+  </div>
+
+  <!-- CANVAS 3D -->
   <div id="globe"></div>
 </div>
 
-<!-- Importmap para versiones modernas (opcional pero recomendado) -->
+<!-- Import Three.js -->
 <script type="importmap">
   {
     "imports": {
@@ -88,129 +255,142 @@
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-  // 1. CONFIGURACIÓN DE DATOS
- const pueblos = {
-    arhuaco: { name:"Arhuaco", lat:10.8, lon:-73.7, url:"/ululato/arhuaco" }, // Sierra Nevada (Centro Norte)
-    wayuu:   { name:"Wayuu",   lat:12.1, lon:-72.2, url:"/ululato/wayuu" },   // Alta Guajira (Más al norte y este)
-    embera:  { name:"Emberá",  lat:5.5,  lon:-76.6, url:"/ululato/embera" }   // Chocó / Pacífico (Más al sur y oeste)
+  // --- CONFIGURACIÓN Y DATOS ---
+  const pueblos = {
+    arhuaco: { 
+      name: "Arhuaco", 
+      lat: 10.8, lon: -73.7, 
+      desc: "Guardianes de la Sierra Nevada de Santa Marta, el corazón del mundo. Su filosofía se basa en el cuidado de la naturaleza.",
+      url: "/ululato/arhuaco" 
+    },
+    wayuu: { 
+      name: "Wayuu",   
+      lat: 12.1, lon: -72.2, 
+      desc: "Habitantes de la península de La Guajira. Conocidos por sus tejidos coloridos y su fuerte conexión con los sueños.",
+      url: "/ululato/wayuu" 
+    },
+    embera: { 
+      name: "Emberá",  
+      lat: 5.5,  lon: -76.6, 
+      desc: "Pueblo de río y montaña en el Pacífico colombiano. Maestros de la artesanía en chaquira y la pintura corporal con jagua.",
+      url: "/ululato/embera" 
+    }
   };
 
   const container = document.getElementById("globe");
-  const loaderDiv = document.getElementById("loader");
+  const tooltip = document.getElementById("tooltip");
 
-  // 2. ESCENA BÁSICA
+  // --- SCENE SETUP ---
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x050b15); // Fondo espacio oscuro
+  scene.background = new THREE.Color(0x020205);
+  // Niebla ligera para fundir el horizonte lejano
+  scene.fog = new THREE.FogExp2(0x020205, 0.02);
 
   const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-  camera.position.set(0, 0, 6.5); // Un poco más lejos para ver bien
+  camera.position.set(0, 0, 12); // Empezamos lejos para la intro
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización retina
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Tone mapping para mejor luz
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(renderer.domElement);
 
-    // --- FONDO ESTRELLADO  ---
+  // --- LUCES ---
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.05); // Muy tenue
+  scene.add(ambientLight);
+
+  const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  sunLight.position.set(10, 5, 10);
+  scene.add(sunLight);
+
+  // Luz azulada de contra (Rim Light) para efecto cinematográfico
+  const rimLight = new THREE.SpotLight(0x4455ff, 5);
+  rimLight.position.set(-10, 5, -5);
+  rimLight.lookAt(0,0,0);
+  scene.add(rimLight);
+
+  // --- ESTRELLAS ---
   function createStars() {
     const starGeo = new THREE.BufferGeometry();
-    const count = 3000; // Cantidad de estrellas
+    const count = 4000;
     const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
 
-    for (let i = 0; i < count * 3; i++) {
-      // Distribución aleatoria entre -400 y 400
-      positions[i] = (Math.random() - 0.5) * 800;
+    for (let i = 0; i < count * 3; i+=3) {
+      const r = 400 * Math.cbrt(Math.random()); // Distribución esférica
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos(2 * Math.random() - 1);
+      
+      positions[i] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i+1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i+2] = r * Math.cos(phi);
+
+      // Color estrellas: blanco o azul tenue
+      const starType = Math.random();
+      colors[i] = colors[i+1] = colors[i+2] = starType > 0.9 ? 1 : 0.8; 
     }
 
     starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    
+    starGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
     const starMat = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.7, // Tamaño de la estrella
-      sizeAttenuation: true, // Se ven más pequeñas si están lejos
+      vertexColors: true,
+      size: 0.8,
+      sizeAttenuation: true,
       transparent: true,
       opacity: 0.8
     });
-
     const stars = new THREE.Points(starGeo, starMat);
     scene.add(stars);
   }
   createStars();
-  // ------------------------
 
-  // 3. ILUMINACIÓN
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-  scene.add(ambientLight);
-
-  const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
-  sunLight.position.set(5, 3, 5);
-  scene.add(sunLight);
-
-  // Luz de rebote (rim light) para que se vea bonito el borde oscuro
-  const backLight = new THREE.DirectionalLight(0x445566, 0.5);
-  backLight.position.set(-5, -3, -10);
-  scene.add(backLight);
-
-  // 4. GESTOR DE CARGA (Loading Manager)
-  const loadingManager = new THREE.LoadingManager();
-  
-  loadingManager.onLoad = () => {
-    // Cuando todo cargue, ocultamos el loader
-    loaderDiv.style.opacity = '0';
-    setTimeout(() => { loaderDiv.style.display = 'none'; }, 500);
-  };
-
-  const textureLoader = new THREE.TextureLoader(loadingManager);
-
-  // 5. LA TIERRA
-  // NOTA: Asegúrate de que las rutas sean correctas en tu servidor
+  // --- LA TIERRA ---
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
-  // Usamos texturas. Si fallan las rutas locales, fallará la carga.
-  // Asegúrate de que la carpeta 'textures' esté junto al html.
-  /*
-  const earthMap    = textureLoader.load("textures/8k_earth_daymap.jpg");
-  const normalMap   = textureLoader.load("textures/Earth-normal-8k.png");
-  const specMap     = textureLoader.load("textures/EarthSpec.png");
-*/
-// --- 2K ----
-  const earthMap    = textureLoader.load("textures/2k/2k_earth_daymap.jpg");
-  const normalMap   = textureLoader.load("textures/2k/EarthNormal.png");
-  const specMap     = textureLoader.load("textures/2k/EarthSpec.png");
-  
+  const loadingManager = new THREE.LoadingManager();
+  const texLoader = new THREE.TextureLoader(loadingManager);
+
+  // URLs de texturas (asegúrate de que existan)
+  const earthMap = texLoader.load("textures/2k/2k_earth_daymap.jpg"); 
+  const normalMap = texLoader.load("textures/2k/EarthNormal.png");
+  const specMap = texLoader.load("textures/2k/EarthSpec.png");
 
   const earthGeo = new THREE.SphereGeometry(2, 64, 64);
-  const earthMat = new THREE.MeshPhongMaterial({
+  const earthMat = new THREE.MeshStandardMaterial({
     map: earthMap,
-    normalMap: normalMap,        // CORREGIDO: antes decía normalpMap
-    normalScale: new THREE.Vector2(0.5, 0.5), // CORREGIDO: Vector2 requerido
-    specularMap: specMap,
-    specular: new THREE.Color(0x333333),
-    shininess: 15
+    normalMap: normalMap,
+    roughnessMap: specMap, // Usamos specular como roughness inverso (truco)
+    roughness: 0.6,
+    metalness: 0.1,
   });
-  
   const earth = new THREE.Mesh(earthGeo, earthMat);
   earthGroup.add(earth);
 
-  // Atmósfera simple (brillo externo)
-  const atmosGeo = new THREE.SphereGeometry(2.03, 64, 64);
+  // --- ATMÓSFERA GLOW ---
+  // Un truco premium es usar un shader o un material aditivo
+  const atmosGeo = new THREE.SphereGeometry(2.1, 64, 64);
   const atmosMat = new THREE.MeshPhongMaterial({
-    color: 0x00aaff,
+    color: 0x0088ff,
     transparent: true,
-    opacity: 0.1,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending
+    opacity: 0.15,
+    side: THREE.BackSide, // Invertido para efecto halo
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
   });
   const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
-  earthGroup.add(atmosphere);
+  atmosphere.scale.set(1.1, 1.1, 1.1);
+  scene.add(atmosphere); // Fuera del grupo para que no rote con la tierra y el brillo sea constante
 
+  // --- MARCADORES ---
+  const markersGroup = new THREE.Group();
+  earthGroup.add(markersGroup);
 
-  // 6. PUNTOS (MARCADORES)
-   const spotGroup = new THREE.Group();
-  earth.add(spotGroup);
-
-   function latLonToVector3(lat, lon, radius) {
-    const phi   = (90 - lat) * (Math.PI / 180);
+  function latLonToVector3(lat, lon, radius) {
+    const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
     const x = -(radius * Math.sin(phi) * Math.cos(theta));
     const z = (radius * Math.sin(phi) * Math.sin(theta));
@@ -218,198 +398,264 @@
     return new THREE.Vector3(x, y, z);
   }
 
-  const spotGeo = new THREE.SphereGeometry(0.035, 16, 16);
-  // NOTA: Quitamos la definición de material global aquí
-
   Object.entries(pueblos).forEach(([key, p]) => {
-    // 1. Creamos un material ÚNICO para cada esfera
-    const mat = new THREE.MeshBasicMaterial({ color: 0xffd966 }); 
-    const mesh = new THREE.Mesh(spotGeo, mat);
+    const pos = latLonToVector3(p.lat, p.lon, 2.01);
     
-    const pos = latLonToVector3(p.lat, p.lon, 2.005); 
-    mesh.position.copy(pos);
-    mesh.userData = { puebloId: key, url: p.url, isMarker: true }; // Marcamos que es un punto
+    // 1. Núcleo del marcador
+    const coreGeo = new THREE.SphereGeometry(0.02, 16, 16);
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+    const core = new THREE.Mesh(coreGeo, coreMat);
+    core.position.copy(pos);
     
-    // Anillo (Opcional: si quieres que el anillo también cambie de color, necesitaría lógica extra, 
-    // pero por ahora dejemos el anillo amarillo pulsando).
-    const ringGeo = new THREE.RingGeometry(0.05, 0.065, 32);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd966, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+    // 2. Halo pulsante (anillo)
+    const ringGeo = new THREE.RingGeometry(0.04, 0.05, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ 
+      color: 0xffd700, 
+      side: THREE.DoubleSide, 
+      transparent: true, 
+      opacity: 0.8 
+    });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.position.copy(pos);
-    ring.lookAt(new THREE.Vector3(0,0,0));
+    ring.lookAt(new THREE.Vector3(0,0,0)); // Mirar al centro de la tierra para alinearse
     
-    spotGroup.add(mesh);
-    spotGroup.add(ring);
+    // Hitbox invisible para facilitar el click/hover
+    const hitGeo = new THREE.SphereGeometry(0.1, 8, 8);
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+    const hitbox = new THREE.Mesh(hitGeo, hitMat);
+    hitbox.position.copy(pos);
+    hitbox.userData = { id: key, name: p.name, data: p };
+
+    // Agrupamos visuales
+    markersGroup.add(core);
+    markersGroup.add(ring);
+    markersGroup.add(hitbox);
+
+    // Guardamos referencia en hitbox para animar el anillo
+    hitbox.userData.ring = ring;
   });
 
-  // 7. INTERACCIÓN Y CONTROLES
+  // --- CONTROLS ---
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enablePan = false;
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.minDistance = 3;
-  controls.maxDistance = 10;
+  controls.minDistance = 2.5;
+  controls.maxDistance = 15;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.5;
 
-  controls.minPolarAngle = 0.5; // No ver el polo norte puro
-  controls.maxPolarAngle = 2.5; // No ver el polo sur puro
-
+  // --- LOGICA DE UI E INTERACCIÓN ---
+  let selectedPueblo = null;
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  // Click evento
-  renderer.domElement.addEventListener("click", (e) => {
-    // Si estamos arrastrando (moviendo cámara), no activar click
-    // Una forma simple de evitar clicks falsos al rotar es medir el tiempo de mousedown/up
-    // pero aquí usaremos lógica directa del raycaster.
-    
-    const rect = renderer.domElement.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  // Custom Dropdown Logic
+  const selectWrapper = document.querySelector('.custom-select');
+  const selectTrigger = document.querySelector('.custom-select__trigger');
+  const selectLabel = document.getElementById('select-label');
+  const options = document.querySelectorAll('.option');
 
-    raycaster.setFromCamera(mouse, camera);
-    // Intersectamos con spotGroup.children
-    const hits = raycaster.intersectObjects(spotGroup.children);
-
-    if (hits.length > 0) {
-      // Buscamos el objeto que tenga userData (porque el anillo no tiene ID)
-      const hit = hits.find(h => h.object.userData.puebloId);
-      if (hit) {
-        const url = hit.object.userData.url;
-        console.log("Navegando a:", url);
-        // Descomenta la siguiente línea para navegar de verdad:
-        // window.location.href = url;
-        alert(`Navegar a: ${url}`);
-      }
-    }
+  selectTrigger.addEventListener('click', () => {
+    selectWrapper.classList.toggle('open');
   });
 
-  // 8. ANIMACIÓN Y GIRO AUTOMÁTICO
-  let isAutoRotating = true;
-  let targetRotationY = 0;
-  let targetRotationX = 0;
-  let isFocusing = false; // Si estamos en medio de una animación de enfoque
-
-  function highlightMarker(selectedId) {
-    // Recorremos todos los hijos del grupo de puntos
-    spotGroup.children.forEach(child => {
-      // Solo nos interesan las esferas centrales (que tienen puebloId)
-      if (child.userData && child.userData.puebloId) {
-        
-        if (child.userData.puebloId === selectedId) {
-          // SI ES EL SELECCIONADO: ROJO Y GRANDE
-          child.material.color.setHex(0xff3300); // Rojo intenso
-          child.scale.set(1.5, 1.5, 1.5);        // 50% más grande
-        } else {
-          // SI NO ES: AMARILLO Y TAMAÑO NORMAL
-          child.material.color.setHex(0xffd966); // Amarillo original
-          child.scale.set(1, 1, 1);
-        }
-        
-      }
+  options.forEach(option => {
+    option.addEventListener('click', function() {
+      selectWrapper.classList.remove('open');
+      options.forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      
+      const value = this.getAttribute('data-value');
+      const text = this.textContent;
+      selectLabel.textContent = text;
+      
+      handleSelection(value);
     });
-  }
-  
-  function animate() {
-    requestAnimationFrame(animate);
+  });
+
+  // Info Card Elements
+  const infoCard = document.getElementById('info-card');
+  const cardTitle = document.getElementById('card-title');
+  const cardDesc = document.getElementById('card-desc');
+  const cardLink = document.getElementById('card-link');
+  const closeCardBtn = document.getElementById('close-card');
+
+  closeCardBtn.addEventListener('click', () => {
+    infoCard.classList.remove('active');
+    handleSelection(""); // Reset rotation
+    // Reset dropdown UI text
+    selectLabel.textContent = "Rotación Libre";
+    options.forEach(o => o.classList.remove('selected'));
+    document.querySelector('.option[data-value=""]').classList.add('selected');
+  });
+
+  function handleSelection(id) {
+    selectedPueblo = id;
     
-    const time = performance.now() * 0.001;
-
-    // Efecto pulsante en los marcadores
-    spotGroup.children.forEach((obj, i) => {
-      // Solo escalar los anillos, no las esferas centrales (opcional)
-      if (obj.geometry.type === 'RingGeometry') {
-        const s = 1 + 0.3 * Math.sin(time * 3 + i);
-        obj.scale.set(s, s, s);
-      }
-    });
-
-    // Rotación automática suave si no hay selección activa
-    if (isAutoRotating && !isFocusing) {
-      earthGroup.rotation.y += 0.0005; 
-    }
-
-    controls.update();
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  // 9. LÓGICA DE SELECCIÓN (FOCUS PUEBLO)
-  const select = document.getElementById("puebloSelect");
-
-  select.addEventListener("change", (e) => {
-    const id = e.target.value;
-
-    highlightMarker(id); 
-    
-    if (!id) {
-      isAutoRotating = true; // Volver a rotar libre
+    if(!id) {
+      controls.autoRotate = true;
+      infoCard.classList.remove('active');
+      // Alejar cámara suavemente
+      gsap.to(camera.position, {
+        duration: 1.5,
+        x: 0, y: 0, z: 6.5,
+        ease: "power2.inOut"
+      });
       return;
     }
-    
+
     const p = pueblos[id];
-    if (p) focusPueblo(p);
-  });
+    // Rellenar tarjeta
+    cardTitle.textContent = p.name;
+    cardDesc.textContent = p.desc;
+    cardLink.href = p.url;
+    infoCard.classList.add('active');
 
-  function focusPueblo(p) {
-    isAutoRotating = false;
-    isFocusing = true;
-
-    // Calcular ángulos target
-    // Longitud: offset de textura. Usually textura empieza en meridiano de Greenwich o similar.
-    // ThreeJS esfera: UV mapping hace que 0 este en +Z o -Z dependiendo setup.
-    // Ajuste empírico: -lon * deg2rad - PI/2
-    
-    const latRad = p.lat * (Math.PI / 180);
-    const lonRad = p.lon * (Math.PI / 180);
-
-    // Queremos rotar el GRUPO TIERRA (earthGroup) para que el punto (lat,lon) quede mirando a Z+ (donde está la cámara)
-    // Rotación Y (Longitud): 
-    const targetY = -lonRad - (Math.PI / 2);  // Ajuste de fase para centrar
-    
-    // Rotación X (Latitud):
-    const targetX = latRad;
-
-    // Animación suave con GSAP sería ideal, pero haremos interpolación manual simple
-    const startY = earthGroup.rotation.y; // Cuidado con vueltas completas
-    const startX = earthGroup.rotation.x;
-    
-    // Resolver el problema de giros de 360 grados (shortest path)
-    // Simplificación: reseteamos el modulo de Y para que no de vueltas locas
-    const currentY = earthGroup.rotation.y % (Math.PI * 2);
-    earthGroup.rotation.y = currentY;
-
-    let diffY = targetY - currentY;
-    // Buscar camino más corto
-    if (diffY > Math.PI) diffY -= Math.PI * 2;
-    if (diffY < -Math.PI) diffY += Math.PI * 2;
-
-    const finalY = currentY + diffY;
-
-    const duration = 1500; // ms
-    const startTime = performance.now();
-
-    function tween() {
-      const now = performance.now();
-      const progress = Math.min(1, (now - startTime) / duration);
-      // Easing function (easeInOutCubic)
-      const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-      earthGroup.rotation.y = currentY + (finalY - currentY) * ease;
-      earthGroup.rotation.x = startX + (targetX - startX) * ease;
-
-      if (progress < 1) {
-        requestAnimationFrame(tween);
-      } else {
-        isFocusing = false;
-      }
-    }
-    tween();
+    focusOnLocation(p.lat, p.lon);
   }
 
-  // Responsive
+  function focusOnLocation(lat, lon) {
+    controls.autoRotate = false;
+
+    // Calculamos la posición deseada de la cámara
+    // Queremos que la cámara esté frente al punto
+    const targetDist = 3.5; // Zoom in
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    
+    // En ThreeJS coordenadas esféricas:
+    // x = r sin(phi) cos(theta) ... (similar a antes pero convertimos lat/lon a coord camera)
+    // Sin embargo, es más fácil rotar la Tierra hacia la cámara fija, o mover la cámara.
+    // Para efecto "fly to", mover la cámara es más intuitivo con OrbitControls.
+    
+    // Convertimos lat/lon a posición cartesiana (donde debería estar la cámara)
+    // Nota: El mapa de textura suele tener un offset, ajustamos lon
+    // Ajuste empírico: Threejs texture offset suele requerir lon + 270 o similar.
+    // Usaremos un método más robusto: Vector unitario del punto
+    
+    const pVec = latLonToVector3(lat, lon, 1).normalize();
+    
+    // Posición final de la cámara: pVec * distancia
+    const endPos = pVec.clone().multiplyScalar(targetDist);
+
+    // Animamos la cámara usando GSAP
+    gsap.to(camera.position, {
+      duration: 1.5,
+      x: endPos.x,
+      y: endPos.y,
+      z: endPos.z,
+      onUpdate: () => controls.update(), // Importante para que OrbitControls no se rompa
+      ease: "power3.inOut"
+    });
+  }
+
+  // --- EVENTOS MOUSE (HOVER & CLICK 3D) ---
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('click', onMouseClick);
+
+  function onMouseMove(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(markersGroup.children);
+
+    let found = false;
+    for(let i=0; i<intersects.length; i++) {
+      const obj = intersects[i].object;
+      if(obj.userData && obj.userData.name) {
+        // Show Tooltip
+        tooltip.style.left = event.clientX + 'px';
+        tooltip.style.top = event.clientY + 'px';
+        tooltip.textContent = obj.userData.name;
+        tooltip.style.opacity = 1;
+        document.body.style.cursor = 'pointer';
+        
+        // Highlight effect (scale up ring)
+        if(obj.userData.ring) {
+           gsap.to(obj.userData.ring.scale, {x:1.5, y:1.5, duration: 0.3});
+        }
+        
+        found = true;
+        break;
+      }
+    }
+
+    if(!found) {
+      tooltip.style.opacity = 0;
+      document.body.style.cursor = 'default';
+      // Reset scales
+      markersGroup.children.forEach(child => {
+        if(child.geometry.type === 'RingGeometry') {
+           // Si no está seleccionado, volver a escala normal (animación loop se encarga del resto)
+        }
+      });
+    }
+  }
+
+  function onMouseClick(event) {
+    if(event.target.closest('#ui-controls') || event.target.closest('#info-card')) return;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(markersGroup.children);
+    
+    if(intersects.length > 0) {
+      const obj = intersects[0].object;
+      if(obj.userData && obj.userData.id) {
+        // Update UI Dropdown logic sync
+        const id = obj.userData.id;
+        const option = document.querySelector(`.option[data-value="${id}"]`);
+        if(option) option.click(); // Simulate UI click to keep everything in sync
+      }
+    }
+  }
+
+  // --- ANIMACIÓN LOOP ---
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
+
+    controls.update();
+    
+    // Animación de los anillos (Pulsar)
+    markersGroup.children.forEach(child => {
+      if(child.geometry.type === 'RingGeometry') {
+        // Onda suave
+        const scale = 1 + 0.2 * Math.sin(time * 3);
+        // Si no estamos haciendo hover (GSAP controlando), aplicamos pulso
+        if(!gsap.isTweening(child.scale)) {
+           child.scale.set(scale, scale, scale);
+        }
+      }
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  // --- CARGA Y RESIZE ---
+  loadingManager.onLoad = () => {
+    const loader = document.getElementById('loader');
+    loader.style.opacity = 0;
+    setTimeout(() => {
+        loader.style.display = 'none';
+        
+        // INTRO ANIMATION (De lejos a cerca)
+        gsap.to(camera.position, {
+            duration: 2.5,
+            z: 6.5,
+            ease: "power2.out"
+        });
+
+        animate();
+    }, 800);
+  };
+
   window.addEventListener("resize", () => {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
