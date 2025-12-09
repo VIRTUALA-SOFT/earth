@@ -309,7 +309,7 @@
 
     // Queremos rotar el GRUPO TIERRA (earthGroup) para que el punto (lat,lon) quede mirando a Z+ (donde está la cámara)
     // Rotación Y (Longitud): 
-    const targetY = -lonRad + (Math.PI / 2); // Ajuste de fase para centrar
+    const targetY = -lonRad - (Math.PI / 2);  // Ajuste de fase para centrar
     
     // Rotación X (Latitud):
     const targetX = latRad;
