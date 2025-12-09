@@ -172,39 +172,28 @@
 
 
   // 6. PUNTOS (MARCADORES)
-  const spotGroup = new THREE.Group();
-  earth.add(spotGroup); // Añadimos al mesh de la tierra para que roten con ella
-
-  // Función para convertir Lat/Lon a Vector3 en la superficie de la esfera
-  function latLonToVector3(lat, lon, radius) {
-    const phi   = (90 - lat) * (Math.PI / 180);
-    const theta = (lon + 180) * (Math.PI / 180);
-
-    // Three.js coord system: Y is up.
-    // Mapeo estándar esférico:
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const z = (radius * Math.sin(phi) * Math.sin(theta));
-    const y = (radius * Math.cos(phi));
-
-    return new THREE.Vector3(x, y, z);
-  }
+   const spotGroup = new THREE.Group();
+  earth.add(spotGroup);
 
   const spotGeo = new THREE.SphereGeometry(0.035, 16, 16);
-  const spotMat = new THREE.MeshBasicMaterial({ color: 0xffd966 });
+  // NOTA: Quitamos la definición de material global aquí
 
   Object.entries(pueblos).forEach(([key, p]) => {
-    const mesh = new THREE.Mesh(spotGeo, spotMat);
-    // Un poquito más de 2.0 para que no atraviese la textura
+    // 1. Creamos un material ÚNICO para cada esfera
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffd966 }); 
+    const mesh = new THREE.Mesh(spotGeo, mat);
+    
     const pos = latLonToVector3(p.lat, p.lon, 2.005); 
     mesh.position.copy(pos);
-    mesh.userData = { puebloId: key, url: p.url };
+    mesh.userData = { puebloId: key, url: p.url, isMarker: true }; // Marcamos que es un punto
     
-    // Anillo exterior para resaltar
-    const ringGeo = new THREE.RingGeometry(0.05, 0.06, 32);
+    // Anillo (Opcional: si quieres que el anillo también cambie de color, necesitaría lógica extra, 
+    // pero por ahora dejemos el anillo amarillo pulsando).
+    const ringGeo = new THREE.RingGeometry(0.05, 0.065, 32);
     const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd966, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.position.copy(pos);
-    ring.lookAt(new THREE.Vector3(0,0,0)); // Orientar hacia el centro
+    ring.lookAt(new THREE.Vector3(0,0,0));
     
     spotGroup.add(mesh);
     spotGroup.add(ring);
@@ -257,6 +246,26 @@
   let targetRotationX = 0;
   let isFocusing = false; // Si estamos en medio de una animación de enfoque
 
+  function highlightMarker(selectedId) {
+    // Recorremos todos los hijos del grupo de puntos
+    spotGroup.children.forEach(child => {
+      // Solo nos interesan las esferas centrales (que tienen puebloId)
+      if (child.userData && child.userData.puebloId) {
+        
+        if (child.userData.puebloId === selectedId) {
+          // SI ES EL SELECCIONADO: ROJO Y GRANDE
+          child.material.color.setHex(0xff3300); // Rojo intenso
+          child.scale.set(1.5, 1.5, 1.5);        // 50% más grande
+        } else {
+          // SI NO ES: AMARILLO Y TAMAÑO NORMAL
+          child.material.color.setHex(0xffd966); // Amarillo original
+          child.scale.set(1, 1, 1);
+        }
+        
+      }
+    });
+  }
+  
   function animate() {
     requestAnimationFrame(animate);
     
@@ -286,6 +295,9 @@
 
   select.addEventListener("change", (e) => {
     const id = e.target.value;
+
+    highlightMarker(id); 
+    
     if (!id) {
       isAutoRotating = true; // Volver a rotar libre
       return;
