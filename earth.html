@@ -320,7 +320,20 @@
     bumpScale: 0.05,
     specularMap: texLoader.load("https://unpkg.com/three-globe/example/img/earth-water.png"),
     specular: new THREE.Color(0x222222), shininess: 15, color: 0xcccccc
+
+   /*
+    const earthMap    = textureLoader.load("textures/8k_earth_daymap.jpg");
+    const normalMap   = textureLoader.load("textures/Earth-normal-8k.png");
+    const specMap     = textureLoader.load("textures/EarthSpec.png");
+  */
+  // --- 2K ----
+   /*
+    const earthMap    = textureLoader.load("textures/2k/2k_earth_daymap.jpg");
+    const normalMap   = textureLoader.load("textures/2k/EarthNormal.png");
+    const specMap     = textureLoader.load("textures/2k/EarthSpec.png");
+  */
   });
+  
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), earthMat);
   earthGroup.add(earth);
   
