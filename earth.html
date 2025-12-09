@@ -9,20 +9,20 @@
 
   <style>
     :root {
-      --primary: #ffd700;       /* Dorado */
-      --accent: #00f3ff;        /* Cian Eléctrico */
-      --glass-bg: rgba(20, 25, 40, 0.75);
+      --primary: #ffd700;       
+      --accent: #00f3ff;        
+      --glass-bg: rgba(15, 20, 35, 0.85); /* Un poco más oscuro para leer mejor */
       --glass-border: 1px solid rgba(255, 255, 255, 0.15);
-      --glass-blur: blur(16px);
+      --glass-blur: blur(20px);
       --text-main: #ffffff;
       --text-secondary: #aaaaaa;
     }
 
-    body { margin: 0; overflow: hidden; background: #020205; font-family: 'Montserrat', sans-serif; }
+    body { margin: 0; overflow: hidden; background: #000000; font-family: 'Montserrat', sans-serif; }
     #app { position: relative; width: 100vw; height: 100vh; }
     #globe { width: 100%; height: 100%; display: block; }
 
-    /* --- PANELES ESTILO CRISTAL --- */
+    /* UI GLOBAL */
     .glass-panel {
       background: var(--glass-bg);
       backdrop-filter: var(--glass-blur);
@@ -30,149 +30,108 @@
       border: var(--glass-border);
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
       color: var(--text-main);
       transition: all 0.3s ease;
     }
 
-    /* --- UI IZQUIERDA (BUSCADOR) --- */
+    /* IZQUIERDA: BUSCADOR */
     #ui-controls {
       position: absolute; top: 40px; left: 40px; width: 320px; z-index: 10;
       display: flex; flex-direction: column; gap: 15px;
     }
-
     h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0; color: var(--primary); }
     p.subtitle { font-size: 0.85rem; color: var(--text-secondary); margin: 0; font-weight: 300; }
 
-    .search-container { position: relative; width: 100%; }
-    
     .search-input {
-      width: 100%;
-      padding: 14px 45px 14px 16px;
+      width: 100%; padding: 14px 45px 14px 16px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      color: white;
-      font-family: inherit;
-      font-size: 0.95rem;
-      outline: none;
-      box-sizing: border-box;
-      transition: 0.3s;
+      border-radius: 12px; color: white; outline: none; transition: 0.3s;
     }
-    .search-input:focus {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-    }
-    .search-icon {
-      position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-      color: var(--text-secondary); pointer-events: none;
-    }
-
-    /* RESULTADOS */
+    .search-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+    .search-icon { position: absolute; right: 15px; top: 65%; color: #666; }
+    
     .results-list {
-      max-height: 0; overflow-y: auto;
-      background: rgba(10, 15, 25, 0.95);
-      border-radius: 12px; margin-top: 5px; opacity: 0;
-      transition: all 0.3s ease;
+      max-height: 0; overflow-y: auto; background: rgba(10, 15, 25, 0.98);
+      border-radius: 12px; opacity: 0; transition: 0.3s;
     }
-    .results-list.active {
-      max-height: 300px; opacity: 1; border: var(--glass-border); padding: 5px 0;
-    }
-    .results-list::-webkit-scrollbar { width: 6px; }
-    .results-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    .results-list.active { max-height: 300px; opacity: 1; border: var(--glass-border); padding: 5px 0; margin-top: 10px;}
+    .result-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; }
+    .result-item:hover { background: rgba(255,255,255,0.1); }
 
-    .result-item {
-      padding: 12px 16px; cursor: pointer; font-size: 0.9rem;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .result-item:hover { background: rgba(255, 255, 255, 0.1); }
-    .result-item span.region { font-size: 0.75rem; color: #666; text-transform: uppercase; }
-
-    /* --- INFO CARD --- */
+    /* DERECHA: INFO CARD (MEJORADA PARA TEXTO LARGO) */
     #info-card {
-      position: absolute; bottom: 40px; right: 40px; width: 340px;
+      position: absolute; bottom: 40px; right: 40px; width: 360px;
       transform: translateX(50px); opacity: 0; pointer-events: none; z-index: 10;
+      display: flex; flex-direction: column;
+      max-height: 60vh; /* Límite de altura para pantallas pequeñas */
     }
     #info-card.active { transform: translateX(0); opacity: 1; pointer-events: all; }
     
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .card-title { font-size: 1.4rem; margin: 0; color: var(--accent); }
-    .card-close { background: none; border: none; color: #666; cursor: pointer; font-size: 1.2rem; }
-    .card-close:hover { color: white; }
-    .card-desc { font-size: 0.9rem; line-height: 1.6; color: #ddd; margin-bottom: 20px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .card-title { font-size: 1.5rem; margin: 0; color: var(--accent); }
+    
+    /* Scroll para la descripción si es muy larga */
+    .card-content-scroll {
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding-right: 10px;
+    }
+    .card-content-scroll::-webkit-scrollbar { width: 4px; }
+    .card-content-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+
+    .card-desc { 
+      font-size: 0.95rem; line-height: 1.7; color: #e0e0e0; margin: 0; 
+      font-weight: 300; text-align: justify;
+    }
     
     .btn-action {
-      display: block; width: 100%; text-align: center; padding: 12px 0;
-      background: transparent; border: 1px solid var(--accent); color: var(--accent);
-      border-radius: 8px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
-      text-decoration: none; transition: 0.3s;
+      display: block; width: 100%; text-align: center; padding: 14px 0;
+      background: rgba(0, 243, 255, 0.1); border: 1px solid var(--accent); color: var(--accent);
+      border-radius: 8px; font-weight: 600; letter-spacing: 1px; text-decoration: none; transition: 0.3s;
     }
-    .btn-action:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4); }
+    .btn-action:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 243, 255, 0.5); }
 
-    /* --- TOOLTIP --- */
-    #tooltip {
-      position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 6px 12px;
-      border-radius: 4px; font-size: 0.8rem; pointer-events: none; opacity: 0;
-      border: 1px solid #444; z-index: 100; transform: translate(-50%, -150%);
-    }
-
-    /* --- LOADER --- */
-    #loader {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020205; z-index: 999;
-      display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease;
-    }
-    .loader-bar { width: 200px; height: 2px; background: #333; margin-top: 20px; position: relative; overflow: hidden; }
-    .loader-bar::after {
-      content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: var(--primary);
-      animation: load 1.5s ease-in-out infinite;
-    }
-    @keyframes load { 0% { left: -50%; } 100% { left: 100%; } }
-
-    @media (max-width: 768px) {
-      #ui-controls { top: 20px; left: 20px; width: calc(100% - 40px); }
-      #info-card { bottom: 20px; right: 20px; left: 20px; width: auto; }
-    }
+    #tooltip { position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 6px 12px; border-radius: 4px; pointer-events: none; opacity: 0; border: 1px solid #444; z-index: 100; font-size: 0.8rem; }
+    #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 999; display: flex; justify-content: center; align-items: center; color: var(--primary); font-size: 1.5rem; transition: opacity 0.8s; }
   </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div style="font-size: 1.5rem; color: var(--primary); letter-spacing: 5px;">ULULATO</div>
-  <div class="loader-bar"></div>
-</div>
-
+<div id="loader">Cargando Universo...</div>
 <div id="tooltip"></div>
 
 <div id="app">
-  <!-- UI IZQUIERDA -->
+  <!-- BUSCADOR -->
   <div id="ui-controls" class="glass-panel">
     <div>
       <h1>Orígenes</h1>
       <p class="subtitle">Explora la sabiduría ancestral</p>
     </div>
     <div class="search-container">
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar pueblo, región...">
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar pueblo o región...">
       <div class="search-icon">🔍</div>
       <div id="resultsList" class="results-list"></div>
     </div>
   </div>
 
-  <!-- UI DERECHA -->
+  <!-- TARJETA INFO -->
   <div id="info-card" class="glass-panel">
     <div class="card-header">
       <h2 class="card-title" id="card-title">Título</h2>
-      <button class="card-close" id="close-card">×</button>
+      <button id="close-card" style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.5rem;">&times;</button>
     </div>
-    <p class="card-desc" id="card-desc">Descripción...</p>
+    <div class="card-content-scroll">
+      <p class="card-desc" id="card-desc">Descripción...</p>
+    </div>
     <a href="#" id="card-link" class="btn-action">Visitar Pueblo</a>
   </div>
 
   <div id="globe"></div>
 </div>
 
+<!-- Import map para Three.js -->
 <script type="importmap">
   {
     "imports": {
@@ -185,10 +144,115 @@
 <script type="module">
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  
+  // --- 1. IMPORTAMOS LA DATA (PUNTO 1) ---
+  // Asegúrate de que el archivo data_pueblos.js esté en la misma carpeta
+  import { pueblosData } from './data_pueblos.js';
 
-  // ==========================================
-  // 1. UTILIDADES MATEMÁTICAS (FUNDAMENTAL)
-  // ==========================================
+  // --- CONFIGURACIÓN THREE.JS ---
+  const container = document.getElementById("globe");
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000); // Negro puro para resaltar estrellas
+  scene.fog = new THREE.FogExp2(0x000000, 0.02); // Niebla negra para fundido suave
+
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000); // Far plane más lejos para estrellas
+  camera.position.set(0, 0, 16);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  container.appendChild(renderer.domElement);
+
+  // --- ILUMINACIÓN ---
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x000000, 0.8));
+  
+  const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+  sunLight.position.set(10, 5, 20);
+  scene.add(sunLight);
+  
+  // Luz trasera para el efecto "Cine"
+  const rimLight = new THREE.SpotLight(0x0088ff, 3);
+  rimLight.position.set(-15, 10, -5);
+  rimLight.lookAt(0,0,0);
+  scene.add(rimLight);
+
+  // --- ESTRELLAS REALISTAS (PUNTO 3) ---
+  function createRealisticStars() {
+    // Capa 1: Estrellas lejanas y pequeñas (Fondo)
+    const starGeo1 = new THREE.BufferGeometry();
+    const count1 = 5000;
+    const pos1 = new Float32Array(count1 * 3);
+    for(let i=0; i<count1*3; i++) pos1[i] = (Math.random()-0.5) * 1500; // Muy dispersas
+    starGeo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
+    const stars1 = new THREE.Points(starGeo1, new THREE.PointsMaterial({
+      color: 0xffffff, size: 0.4, transparent: true, opacity: 0.6, sizeAttenuation: true
+    }));
+    scene.add(stars1);
+
+    // Capa 2: Estrellas más cercanas y brillantes (Profundidad)
+    const starGeo2 = new THREE.BufferGeometry();
+    const count2 = 1500;
+    const pos2 = new Float32Array(count2 * 3);
+    const colors2 = new Float32Array(count2 * 3);
+    for(let i=0; i<count2; i++) {
+        pos2[i*3] = (Math.random()-0.5) * 1200;
+        pos2[i*3+1] = (Math.random()-0.5) * 1200;
+        pos2[i*3+2] = (Math.random()-0.5) * 1200;
+        
+        // Color ligeramente azulado o blanco
+        const shade = Math.random();
+        colors2[i*3] = shade > 0.8 ? 0.8 : 1.0;     // R
+        colors2[i*3+1] = shade > 0.8 ? 0.8 : 1.0;   // G
+        colors2[i*3+2] = 1.0;                       // B (siempre azulado)
+    }
+    starGeo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+    starGeo2.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+    const stars2 = new THREE.Points(starGeo2, new THREE.PointsMaterial({
+      vertexColors: true, size: 0.9, transparent: true, opacity: 0.9, sizeAttenuation: true
+    }));
+    scene.add(stars2);
+  }
+  createRealisticStars();
+
+  // --- PLANETA ---
+  const earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+  const loader = new THREE.TextureLoader();
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: loader.load("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"),
+    bumpMap: loader.load("https://unpkg.com/three-globe/example/img/earth-topology.png"),
+    bumpScale: 0.05,
+    specularMap: loader.load("https://unpkg.com/three-globe/example/img/earth-water.png"),
+    specular: new THREE.Color(0x222222), shininess: 15, color: 0xcccccc
+  });
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), earthMat);
+  earthGroup.add(earth);
+
+  // Atmósfera
+  const atmos = new THREE.Mesh(
+    new THREE.SphereGeometry(2.1, 64, 64),
+    new THREE.MeshPhongMaterial({
+      color: 0x4488ff, transparent: true, opacity: 0.15,
+      side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false
+    })
+  );
+  scene.add(atmos);
+
+  // --- MARCADORES ---
+  const markersGroup = new THREE.Group();
+  earthGroup.add(markersGroup);
+
+  const matMain = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+  const matVillage = new THREE.MeshBasicMaterial({ color: 0xffeba0, transparent: true, opacity: 0.4 });
+  const matRing = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+  const geoMain = new THREE.SphereGeometry(0.015, 8, 8);
+  const geoVillage = new THREE.SphereGeometry(0.006, 4, 4);
+  const geoRing = new THREE.RingGeometry(0.025, 0.035, 16);
+  const geoBeam = new THREE.CylinderGeometry(0.005, 0.005, 1, 4);
+  geoBeam.translate(0, 0.5, 0);
+
   function latLonToVector3(lat, lon, radius) {
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
@@ -198,164 +262,10 @@
     return new THREE.Vector3(x, y, z);
   }
 
-  // ==========================================
-  // 2. BASE DE DATOS MAESTRA
-  // ==========================================
-  const etniasBase = [
-    // AMÉRICA DEL SUR
-    { id: "arhuaco", name: "Arhuaco", region: "Colombia (Sierra)", lat: 10.70, lon: -73.65, desc: "Guardianes de la Sierra Nevada." },
-    { id: "wayuu", name: "Wayuu", region: "Colombia/Venezuela", lat: 11.95, lon: -71.80, desc: "Gente de arena, sol y viento." },
-    { id: "embera", name: "Emberá", region: "Colombia (Chocó)", lat: 5.80, lon: -76.80, desc: "Pueblo de río y selva húmeda." },
-    { id: "tikuna", name: "Tikuna", region: "Amazonas", lat: -3.80, lon: -70.10, desc: "Pueblo del agua, habitan el trapecio amazónico." },
-    { id: "kayapo", name: "Kayapó", region: "Brasil (Xingu)", lat: -7.50, lon: -52.00, desc: "Guerreros defensores del río Xingu." },
-    { id: "mapuche", name: "Mapuche", region: "Chile/Argentina", lat: -38.50, lon: -72.00, desc: "Gente de la tierra, nunca conquistados." },
-    { id: "quechua", name: "Quechua", region: "Perú/Ecuador", lat: -13.50, lon: -71.90, desc: "Descendientes del Imperio Inca." },
-    
-    // AMÉRICA DEL NORTE
-    { id: "maya", name: "Maya", region: "México/Guatemala", lat: 19.00, lon: -89.00, desc: "Constructores de pirámides y observadores del tiempo." },
-    { id: "navajo", name: "Navajo (Diné)", region: "USA (Arizona)", lat: 36.00, lon: -110.00, desc: "El pueblo sagrado de los cañones." },
-    { id: "inuit", name: "Inuit", region: "Canadá/Alaska", lat: 68.00, lon: -100.00, desc: "Maestros del hielo y el ártico." },
-    
-    // ÁFRICA
-    { id: "tuareg", name: "Tuareg", region: "Sahara", lat: 20.00, lon: 5.00, desc: "Hombres azules del desierto." },
-    { id: "maasai", name: "Maasai", region: "Kenia", lat: -1.50, lon: 36.00, desc: "Guerreros pastores de la sabana." },
-    { id: "himba", name: "Himba", region: "Namibia", lat: -18.00, lon: 13.00, desc: "Famosos por su piel cubierta de ocre rojo." },
-    
-    // ASIA & OCEANÍA
-    { id: "mongol", name: "Mongol", region: "Mongolia", lat: 47.00, lon: 103.00, desc: "Nómadas de la estepa eterna." },
-    { id: "tibetan", name: "Tibetano", region: "Tíbet", lat: 31.00, lon: 89.00, desc: "Habitantes del techo del mundo." },
-    { id: "aboriginal", name: "Aborigen", region: "Australia", lat: -25.00, lon: 133.00, desc: "La cultura viva más antigua de la Tierra." },
-    { id: "maori", name: "Maorí", region: "Nueva Zelanda", lat: -39.00, lon: 175.50, desc: "Guerreros y navegantes de Aotearoa." },
-    { id: "sami", name: "Sami", region: "Laponia", lat: 67.00, lon: 20.00, desc: "Pueblo del sol de medianoche." }
-  ];
-
-  // FUNCIÓN GENERADORA: Expande los datos para llenar el mapa
-  function generarPueblosMasivos() {
-    const listaCompleta = [];
-    etniasBase.forEach(etnia => {
-      // 1. Etnias principales
-      listaCompleta.push({
-        ...etnia,
-        uniqueId: etnia.id + "_main",
-        type: 'main'
-      });
-
-      // 2. Generar comunidades cercanas (para poblar el mapa)
-      const numComunidades = Math.floor(Math.random() * 8) + 5; 
-      for (let i = 0; i < numComunidades; i++) {
-        const dispersion = 1.8; // Grados de separación
-        listaCompleta.push({
-          id: etnia.id, 
-          uniqueId: `${etnia.id}_${i}`,
-          name: `Comunidad ${etnia.name}`,
-          region: etnia.region,
-          lat: etnia.lat + (Math.random() - 0.5) * dispersion,
-          lon: etnia.lon + (Math.random() - 0.5) * dispersion,
-          desc: etnia.desc,
-          url: etnia.url || "#",
-          type: 'village'
-        });
-      }
-    });
-    return listaCompleta;
-  }
-  
-  const pueblos = generarPueblosMasivos(); 
-
-  // ==========================================
-  // 3. ESCENA THREE.JS
-  // ==========================================
-  const container = document.getElementById("globe");
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x020205);
-  scene.fog = new THREE.FogExp2(0x020205, 0.02);
-
-  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-  camera.position.set(0, 0, 14);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  container.appendChild(renderer.domElement);
-
-  // --- ILUMINACIÓN (Corregida para evitar oscuridad) ---
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
-  scene.add(ambientLight);
-
-  const hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 1.0);
-  scene.add(hemiLight);
-
-  const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
-  sunLight.position.set(5, 5, 20); // Frente a la cámara
-  scene.add(sunLight);
-
-  const rimLight = new THREE.SpotLight(0x00f3ff, 4); 
-  rimLight.position.set(-10, 10, -5);
-  rimLight.lookAt(0, 0, 0);
-  scene.add(rimLight);
-
-  // --- ESTRELLAS ---
-  const starGeo = new THREE.BufferGeometry();
-  const starCount = 3000;
-  const starPos = new Float32Array(starCount * 3);
-  for(let i=0; i<starCount*3; i++) starPos[i] = (Math.random()-0.5) * 600;
-  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 0.5, transparent: true, opacity: 0.7}));
-  scene.add(stars);
-
-  // --- EL MUNDO ---
-  const earthGroup = new THREE.Group();
-  scene.add(earthGroup);
-
-  const loader = new THREE.TextureLoader();
-  const earthMat = new THREE.MeshPhongMaterial({
-    map: loader.load("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"),
-    bumpMap: loader.load("https://unpkg.com/three-globe/example/img/earth-topology.png"),
-    bumpScale: 0.05,
-    specularMap: loader.load("https://unpkg.com/three-globe/example/img/earth-water.png"),
-    specular: new THREE.Color(0x222222),
-    shininess: 15,
-    color: 0xaaaaaa 
-  });
-
-  const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), earthMat);
-  earthGroup.add(earth);
-
-  // Atmósfera
-  const atmos = new THREE.Mesh(
-    new THREE.SphereGeometry(2.1, 64, 64),
-    new THREE.MeshPhongMaterial({
-      color: 0x4488ff,
-      transparent: true, opacity: 0.2,
-      side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false
-    })
-  );
-  scene.add(atmos);
-
-  // ==========================================
-  // 4. MARCADORES (PUNTOS)
-  // ==========================================
-  const markersGroup = new THREE.Group();
-  earthGroup.add(markersGroup);
-
-  // Materiales compartidos
-  const matMain = new THREE.MeshBasicMaterial({ color: 0xffd700 }); 
-  const matVillage = new THREE.MeshBasicMaterial({ color: 0xffeba0, transparent: true, opacity: 0.6 });
-  const matRing = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
-  
-  // Geometrías compartidas
-  const geoMain = new THREE.SphereGeometry(0.015, 8, 8);
-  const geoVillage = new THREE.SphereGeometry(0.008, 4, 4);
-  const geoRing = new THREE.RingGeometry(0.025, 0.035, 16);
-  const geoBeam = new THREE.CylinderGeometry(0.005, 0.005, 1, 4);
-  geoBeam.translate(0, 0.5, 0);
-
-  // Crear Puntos
-  pueblos.forEach((p, index) => {
+  // Renderizar puntos desde la data importada
+  pueblosData.forEach((p, index) => {
     const pos = latLonToVector3(p.lat, p.lon, 2.005);
     const isMain = p.type === 'main';
-
     const mesh = new THREE.Mesh(isMain ? geoMain : geoVillage, isMain ? matMain.clone() : matVillage.clone());
     mesh.position.copy(pos);
     
@@ -366,84 +276,82 @@
         ring.lookAt(new THREE.Vector3(0,0,0));
         markersGroup.add(ring);
 
-        beam = new THREE.Mesh(geoBeam, new THREE.MeshBasicMaterial({ 
-            color: 0x00f3ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending 
-        }));
+        beam = new THREE.Mesh(geoBeam, new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending }));
         beam.position.copy(pos);
         beam.lookAt(new THREE.Vector3(0,0,0));
         beam.rotateX(-Math.PI/2);
         beam.scale.set(1, 0, 1);
         markersGroup.add(beam);
     }
-
-    const hitGeo = new THREE.SphereGeometry(isMain ? 0.06 : 0.03, 4, 4);
-    const hit = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(isMain?0.06:0.03, 4,4), new THREE.MeshBasicMaterial({visible:false}));
     hit.position.copy(pos);
-    
-    hit.userData = { 
-        id: p.id, 
-        uniqueId: index, 
-        data: p, 
-        mesh: mesh, 
-        ring: ring, 
-        beam: beam,
-        isMain: isMain
-    };
-
+    hit.userData = { id: p.id, uniqueId: index, data: p, mesh, ring, beam, isMain };
     markersGroup.add(mesh);
     markersGroup.add(hit);
   });
 
-  // ==========================================
-  // 5. INTERACCIÓN Y SELECCIÓN
-  // ==========================================
+  // --- INTERACCIÓN Y ANIMACIÓN ---
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.autoRotate = true;
+  controls.enableDamping = true; 
+  controls.dampingFactor = 0.05;
+  controls.autoRotate = true; 
   controls.autoRotateSpeed = 0.5;
-  controls.minDistance = 2.5;
-  controls.maxDistance = 20;
+  controls.minDistance = 2.5; controls.maxDistance = 20;
 
-  let currentSelectionId = null;
+  // ANIMACIÓN DE SELECCIÓN (PUNTO 2 y 5)
+  let currentSelectionTween = null;
 
   function selectPueblo(id) {
-    currentSelectionId = id;
-    
-    // Resetear visuales
-    markersGroup.children.forEach(child => {
-      if (child.userData && child.userData.data) {
-        const u = child.userData;
-        const isSelected = (u.id === id);
+    // Limpiar tweens anteriores
+    if(currentSelectionTween) { currentSelectionTween.kill(); currentSelectionTween = null; }
 
-        if (isSelected && u.isMain) {
-          // Seleccionado
+    markersGroup.children.forEach(child => {
+      if (!child.userData.data) return;
+      const u = child.userData;
+      const isSelected = (u.id === id);
+
+      if (isSelected && u.isMain) {
+          // ACTIVAR
           u.mesh.material.color.setHex(0x00f3ff);
-          if(u.ring) u.ring.material.color.setHex(0x00f3ff);
-          if(u.ring) u.ring.material.opacity = 1;
+          if(u.ring) {
+            u.ring.material.color.setHex(0x00f3ff);
+            u.ring.material.opacity = 1;
+            
+            // --- AQUÍ ESTÁ EL TITILITEO (BLINKING) ---
+            // Yoyo infinite animation para pulso
+            currentSelectionTween = gsap.to(u.ring.scale, {
+               x: 2.5, y: 2.5, 
+               duration: 1.2, 
+               yoyo: true, 
+               repeat: -1, 
+               ease: "sine.inOut" 
+            });
+            // También pulso de opacidad
+            gsap.to(u.ring.material, { opacity: 0.2, duration: 1.2, yoyo: true, repeat: -1 });
+          }
           
-          gsap.to(u.mesh.scale, { x:2, y:2, z:2, duration: 0.5 });
-          if(u.ring) gsap.to(u.ring.scale, { x:2, y:2, duration: 0.5 });
           if(u.beam) {
-             gsap.to(u.beam.scale, { y: 1.5, duration: 0.8, ease: "power2.out" });
-             gsap.to(u.beam.material, { opacity: 0.6, duration: 0.3 });
+             gsap.to(u.beam.scale, { y: 2.0, duration: 1 });
+             gsap.to(u.beam.material, { opacity: 0.8, duration: 0.5 });
           }
           showInfoCard(u.data);
-
-        } else {
-          // No seleccionado
-          const baseColor = u.isMain ? 0xffd700 : 0xffeba0;
-          u.mesh.material.color.setHex(baseColor);
-          if(u.ring) u.ring.material.color.setHex(0xffd700);
+      } else {
+          // DESACTIVAR
+          const color = u.isMain ? 0xffd700 : 0xffeba0;
+          u.mesh.material.color.setHex(color);
           
-          const dimOpacity = id ? 0.1 : (u.isMain ? 0.4 : 0.6);
-          if(u.ring) u.ring.material.opacity = dimOpacity;
-          
-          gsap.to(u.mesh.scale, { x:1, y:1, z:1, duration: 0.5 });
+          if(u.ring) {
+            gsap.killTweensOf(u.ring.scale); // Parar titileo anterior
+            gsap.killTweensOf(u.ring.material);
+            
+            u.ring.material.color.setHex(0xffd700);
+            u.ring.material.opacity = id ? 0.1 : 0.4; // Dimming
+            gsap.to(u.ring.scale, { x: 1, y: 1, duration: 0.5 });
+          }
           if(u.beam) {
              gsap.to(u.beam.scale, { y: 0, duration: 0.3 });
              gsap.to(u.beam.material, { opacity: 0, duration: 0.3 });
           }
-        }
       }
     });
 
@@ -452,120 +360,81 @@
       document.getElementById('info-card').classList.remove('active');
     } else {
       controls.autoRotate = false;
-      // Buscar coordenadas de la etnia principal para enfocar
-      const target = etniasBase.find(e => e.id === id);
+      const target = pueblosData.find(e => e.id === id && e.type === 'main');
       if(target) focusCamera(target.lat, target.lon);
     }
   }
 
-  function showInfoCard(data) {
-    document.getElementById('card-title').textContent = data.name;
-    document.getElementById('card-desc').textContent = data.desc;
-    document.getElementById('card-link').href = data.url;
-    document.getElementById('info-card').classList.add('active');
-  }
-
+  // ZOOM LENTO Y SUAVE (PUNTO 5)
   function focusCamera(lat, lon) {
     const pVec = latLonToVector3(lat, lon, 1).normalize();
-    const targetDist = 4.5;
+    const targetDist = 4.5; // Distancia final
     const endPos = pVec.clone().multiplyScalar(targetDist);
     
+    // Aumenté duración a 3.5s y cambié easing a power3.inOut
     gsap.to(camera.position, {
-      duration: 1.5,
+      duration: 3.5, 
       x: endPos.x, y: endPos.y, z: endPos.z,
       onUpdate: () => controls.update(),
       ease: "power3.inOut"
     });
   }
 
-  // --- BUSCADOR ---
+  function showInfoCard(data) {
+    document.getElementById('card-title').textContent = data.name;
+    document.getElementById('card-desc').textContent = data.desc; // Texto largo
+    document.getElementById('info-card').classList.add('active');
+  }
+
+  // UI Event Listeners
   const searchInput = document.getElementById('searchInput');
   const resultsList = document.getElementById('resultsList');
 
   searchInput.addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
-    resultsList.innerHTML = ''; 
-
-    if (term.length < 1) {
-      resultsList.classList.remove('active');
-      return; 
-    }
-
-    // Filtrar solo las principales para no saturar resultados
-    const filtered = etniasBase.filter(p => 
-      p.name.toLowerCase().includes(term) || 
-      p.region.toLowerCase().includes(term)
-    );
-
+    resultsList.innerHTML = '';
+    if (term.length < 1) { resultsList.classList.remove('active'); return; }
+    
+    // Filtrar solo principales
+    const filtered = pueblosData.filter(p => p.type==='main' && (p.name.toLowerCase().includes(term) || p.region.toLowerCase().includes(term)));
+    
     if (filtered.length > 0) {
       filtered.forEach(p => {
         const div = document.createElement('div');
         div.className = 'result-item';
-        div.innerHTML = `<span>${p.name}</span> <span class="region">${p.region}</span>`;
-        div.onclick = () => {
-          searchInput.value = p.name;
-          resultsList.classList.remove('active');
-          selectPueblo(p.id);
-        };
+        div.innerHTML = `<span>${p.name}</span><span style="font-size:0.7em; color:#888;">${p.region}</span>`;
+        div.onclick = () => { searchInput.value = p.name; resultsList.classList.remove('active'); selectPueblo(p.id); };
         resultsList.appendChild(div);
       });
       resultsList.classList.add('active');
-    } else {
-      resultsList.classList.remove('active');
-    }
+    } else { resultsList.classList.remove('active'); }
   });
 
-  document.getElementById('close-card').addEventListener('click', () => {
-    selectPueblo(null);
-    searchInput.value = '';
-  });
+  document.getElementById('close-card').onclick = () => { selectPueblo(null); searchInput.value=''; };
 
-  // --- CLICK EVENTS ---
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  
-  window.addEventListener('click', (event) => {
-    if(event.target.closest('.glass-panel')) return;
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  window.addEventListener('click', (e) => {
+    if(e.target.closest('.glass-panel')) return;
+    mouse.x = (e.clientX/window.innerWidth)*2-1; mouse.y = -(e.clientY/window.innerHeight)*2+1;
     raycaster.setFromCamera(mouse, camera);
-    
     const hits = raycaster.intersectObjects(markersGroup.children);
-    if(hits.length > 0) {
-      const obj = hits[0].object;
-      if(obj.userData && obj.userData.id) {
-        selectPueblo(obj.userData.id);
-        searchInput.value = obj.userData.data.name.split(" Comunidad")[0]; 
-      }
-    } else {
-        selectPueblo(null);
-        searchInput.value = '';
-    }
+    if(hits.length>0 && hits[0].object.userData.id) {
+       selectPueblo(hits[0].object.userData.id);
+       if(hits[0].object.userData.isMain) searchInput.value = hits[0].object.userData.data.name;
+    } else { selectPueblo(null); searchInput.value=''; }
   });
 
-  // --- ANIMACIÓN ---
-  const clock = new THREE.Clock();
+  // Loop
   function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
   }
-  
-  // INIT
-  window.addEventListener('load', () => {
-     setTimeout(() => {
-       document.getElementById('loader').style.opacity = 0;
-       setTimeout(() => { document.getElementById('loader').style.display='none'; animate(); }, 800);
-     }, 1000);
-  });
-  
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
+  window.onload = () => {
+    setTimeout(()=>{ document.getElementById('loader').style.opacity=0; setTimeout(()=>{document.getElementById('loader').style.display='none'; animate();},800); },1000);
+  };
+  window.onresize = () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
 </script>
 </body>
 </html>
