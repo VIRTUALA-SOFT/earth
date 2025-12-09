@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experiencia Inmersiva - Wayuu</title>
+  
+  <!-- Fuentes Premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- GSAP para animaciones de cine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --gold: #d4af37;
+      --sand: #f4e4bc;
+      --dark: #0a0a0a;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    body, html {
+      margin: 0; padding: 0;
+      background-color: var(--dark);
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* CANVAS DE FONDO (PARTÍCULAS) */
+    #ambient-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1; pointer-events: none;
+    }
+
+    /* NAVEGACIÓN FLOTANTE */
+    nav {
+      position: fixed; top: 0; left: 0; width: 100%;
+      padding: 20px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    }
+    .back-btn {
+      color: white; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+      display: flex; align-items: center; gap: 10px; transition: 0.3s;
+    }
+    .back-btn:hover { color: var(--gold); }
+
+    /* SECCIONES GENERALES */
+    section {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 0 10%;
+      box-sizing: border-box;
+    }
+
+    h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
+    
+    /* --- HERO SECTION --- */
+    .hero {
+      align-items: center; text-align: center;
+      background: url('https://images.unsplash.com/photo-1535068484670-608f63852108?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
+      background-attachment: fixed; /* Parallax simple */
+    }
+    .hero::after {
+      content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.4); /* Oscurecer imagen */
+    }
+    .hero-content { position: relative; z-index: 2; opacity: 0; transform: translateY(30px); }
+    
+    .hero h1 { font-size: 5rem; margin: 0; color: var(--gold); line-height: 1; text-transform: uppercase; letter-spacing: 5px; }
+    .hero p { font-size: 1.5rem; letter-spacing: 3px; margin-top: 10px; font-weight: 300; }
+    .scroll-indicator {
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      animation: bounce 2s infinite; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7;
+    }
+
+    /* --- DATA SECTION (POBLACIÓN & SOCIOECONOMÍA) --- */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto;
+    }
+    .stat-card {
+      background: var(--glass); border: var(--glass-border);
+      backdrop-filter: blur(10px); padding: 30px; border-radius: 4px;
+      transition: transform 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-10px); border-color: var(--gold); }
+    .stat-number { font-size: 2.5rem; color: var(--gold); font-family: 'Cormorant Garamond', serif; display: block; margin-bottom: 5px; }
+    .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #aaa; }
+
+    /* --- CULTURA (SLIDER HORIZONTAL) --- */
+    .culture-section { overflow: hidden; }
+    .culture-container { display: flex; align-items: center; gap: 50px; }
+    .culture-text { flex: 1; max-width: 500px; z-index: 2; }
+    .culture-text h2 { font-size: 3.5rem; color: var(--gold); margin-bottom: 20px; }
+    .culture-text p { line-height: 1.8; font-size: 1.1rem; color: #ddd; }
+    
+    .culture-gallery { flex: 1.5; display: flex; gap: 20px; perspective: 1000px; }
+    .gallery-img {
+      width: 300px; height: 400px; object-fit: cover; border-radius: 8px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+      transition: 0.5s; opacity: 0.8;
+    }
+    .gallery-img:hover { transform: scale(1.05) rotateY(-5deg); opacity: 1; z-index: 10; border: 1px solid var(--gold); }
+
+    /* --- ENTORNO (FULL WIDTH) --- */
+    .env-section {
+      background: linear-gradient(90deg, #0a0a0a 0%, transparent 50%, #0a0a0a 100%),
+                  url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
+      align-items: flex-start;
+    }
+    .env-card {
+      background: rgba(0,0,0,0.7); padding: 40px; max-width: 500px;
+      border-left: 4px solid var(--gold);
+      backdrop-filter: blur(5px);
+    }
+
+    /* FOOTER */
+    footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; }
+
+    @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
+
+    /* RESPONSIVE */
+    @media(max-width: 768px) {
+      .hero h1 { font-size: 3rem; }
+      .culture-container { flex-direction: column; }
+      section { padding: 50px 20px; }
+      .gallery-img { width: 100%; height: 250px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FONDO INTERACTIVO -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- NAVEGACIÓN -->
+  <nav>
+    <a href="javascript:history.back()" class="back-btn">← Volver al Globo</a>
+    <div style="font-size:0.8rem; letter-spacing:1px;">ULULATO EXPERIENCE</div>
+  </nav>
+
+  <!-- 1. HERO: IMPACTO VISUAL -->
+  <section class="hero">
+    <div class="hero-content" id="hero-content">
+      <p>PUEBLO DE ORIGEN</p>
+      <h1 id="pueblo-title">WAYUU</h1>
+      <p id="pueblo-subtitle">Hijos de la lluvia y la sequía</p>
+    </div>
+    <div class="scroll-indicator">Descubre su historia</div>
+  </section>
+
+  <!-- 2. POBLACIÓN Y SOCIOECONOMÍA (STATS) -->
+  <section id="stats">
+    <div style="margin-bottom: 40px; text-align:center;">
+      <h2 style="font-size: 2.5rem; color: #fff;">Radiografía Social</h2>
+      <p style="color: #aaa; max-width: 600px; margin: 0 auto;">Una mirada a la estructura demográfica y económica actual.</p>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number">380k+</span>
+        <span class="stat-label">Población Estimada</span>
+        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">La etnia indígena más numerosa de Colombia y Venezuela.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">Clanes</span>
+        <span class="stat-label">Organización Social</span>
+        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Estructura matrilineal. El apellido y la herencia pasan por la madre.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">Pesca</span>
+        <span class="stat-label">& Pastoreo</span>
+        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Economía de subsistencia basada en chivos y recursos marinos.</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">Tejido</span>
+        <span class="stat-label">Arte & Comercio</span>
+        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Las mochilas Wayuu son su principal producto de exportación cultural.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CULTURA (INMERSIVA) -->
+  <section class="culture-section" id="culture">
+    <div class="culture-container">
+      <div class="culture-text">
+        <h2>La Palabra Sagrada</h2>
+        <p>
+          Para los Wayuu, la palabra (Pütchikalü) tiene un valor incalculable. Los conflictos no se resuelven con violencia, sino a través del <strong>Pütchipü'ü</strong> (Palabrero), un mediador que utiliza la retórica y la compensación para restaurar la armonía.
+        </p>
+        <p>
+          Sus sueños son mensajes de los ancestros. La realidad y el mundo onírico se entrelazan en su vida diaria, guiando decisiones sobre salud, viajes y vida comunitaria.
+        </p>
+      </div>
+      <div class="culture-gallery">
+        <img src="https://i.pinimg.com/736x/8e/9b/72/8e9b7274092497876a604246944e0049.jpg" class="gallery-img" alt="Tejido">
+        <img src="https://off2colombia.com.co/images/destinations/guajira/wayuu-culture/wayuu-culture-4.jpg" class="gallery-img" alt="Rostros">
+        <img src="https://storage.googleapis.com/chile-travel-cdn/2021/07/wayuu-festival-la-guajira-colombia.jpg" class="gallery-img" alt="Danza Yonna">
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. ENTORNO AMBIENTAL -->
+  <section class="env-section" id="env">
+    <div class="env-card">
+      <h2 style="font-size: 2.5rem; color: var(--gold); margin-top:0;">El Desierto Vivo</h2>
+      <p>
+        La Guajira es un territorio de contrastes extremos. Un desierto que se encuentra abruptamente con el Mar Caribe.
+      </p>
+      <ul style="list-style: none; padding: 0; line-height: 2;">
+        <li>✦ <strong>Clima:</strong> Árido y seco, con vientos alisios constantes.</li>
+        <li>✦ <strong>Flora:</strong> Cactus, trupillos y manglares costeros.</li>
+        <li>✦ <strong>Desafío:</strong> La escasez de agua dulce es la lucha constante de este pueblo resiliente.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    © 2024 Proyecto Ululato - Preservando la Memoria Ancestral
+  </footer>
+
+  <script>
+    // 1. ANIMACIONES CON GSAP (SCROLLTELLING)
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Intro Hero
+    gsap.to("#hero-content", { duration: 1.5, opacity: 1, y: 0, ease: "power3.out", delay: 0.5 });
+
+    // Stats (Aparecen una por una)
+    gsap.from(".stat-card", {
+      scrollTrigger: { trigger: "#stats", start: "top 80%" },
+      y: 50, opacity: 0, duration: 0.8, stagger: 0.2
+    });
+
+    // Cultura (Texto desliza izquierda, fotos derecha)
+    gsap.from(".culture-text", {
+      scrollTrigger: { trigger: "#culture", start: "top 70%" },
+      x: -50, opacity: 0, duration: 1
+    });
+    gsap.from(".gallery-img", {
+      scrollTrigger: { trigger: "#culture", start: "top 70%" },
+      x: 50, opacity: 0, duration: 1, stagger: 0.2
+    });
+
+    // Entorno (Fade in suave)
+    gsap.from(".env-card", {
+      scrollTrigger: { trigger: "#env", start: "top 75%" },
+      scale: 0.9, opacity: 0, duration: 1
+    });
+
+    // 2. EFECTO DE PARTÍCULAS EN EL CANVAS (AMBIENTE MÁGICO)
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.5; // Movimiento lento
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 2;
+        this.alpha = Math.random() * 0.5;
+        this.life = Math.random() * 100;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life--;
+        
+        if(this.life < 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`; // Color dorado suave
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Crear 100 partículas
+    for(let i=0; i<100; i++) particles.push(new Particle());
+
+    function animateCanvas() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+
+    // 3. LÓGICA DINÁMICA (SIMULACIÓN)
+    // En una app real, leerías la URL ?id=wayuu y llenarías los datos desde data_pueblos.js
+    // Aquí está pre-llenado para Wayuu como ejemplo visual.
+  </script>
+</body>
+</html>
