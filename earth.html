@@ -43,11 +43,17 @@
     h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0; color: var(--primary); }
     p.subtitle { font-size: 0.85rem; color: var(--text-secondary); margin: 0; font-weight: 300; }
 
+   /* Corrección del buscador */
     .search-input {
-      width: 100%; padding: 14px 45px 14px 16px;
+      width: 100%;
+      padding: 14px 45px 14px 16px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px; color: white; outline: none; transition: 0.3s;
+      border-radius: 12px;
+      color: white;
+      outline: none;
+      transition: 0.3s;
+      box-sizing: border-box; 
     }
     .search-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
     .search-icon { position: absolute; right: 15px; top: 65%; color: #666; }
@@ -179,41 +185,47 @@
   scene.add(rimLight);
 
   // --- ESTRELLAS REALISTAS (PUNTO 3) ---
-  function createRealisticStars() {
-    // Capa 1: Estrellas lejanas y pequeñas (Fondo)
-    const starGeo1 = new THREE.BufferGeometry();
-    const count1 = 5000;
-    const pos1 = new Float32Array(count1 * 3);
-    for(let i=0; i<count1*3; i++) pos1[i] = (Math.random()-0.5) * 1500; // Muy dispersas
-    starGeo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
-    const stars1 = new THREE.Points(starGeo1, new THREE.PointsMaterial({
-      color: 0xffffff, size: 0.4, transparent: true, opacity: 0.6, sizeAttenuation: true
-    }));
-    scene.add(stars1);
+ // --- ESTRELLAS ULTRA DENSAS ---
+function createRealisticStars() {
+  // Capa 1: Fondo profundo (15,000 estrellas)
+  const starGeo1 = new THREE.BufferGeometry();
+  const count1 = 15000; // Antes eran 5000
+  const pos1 = new Float32Array(count1 * 3);
+  for(let i=0; i<count1*3; i++) pos1[i] = (Math.random()-0.5) * 2000; // Más dispersión
+  starGeo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
+  const stars1 = new THREE.Points(starGeo1, new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.3, transparent: true, opacity: 0.5, sizeAttenuation: true
+  }));
+  scene.add(stars1);
 
-    // Capa 2: Estrellas más cercanas y brillantes (Profundidad)
-    const starGeo2 = new THREE.BufferGeometry();
-    const count2 = 1500;
-    const pos2 = new Float32Array(count2 * 3);
-    const colors2 = new Float32Array(count2 * 3);
-    for(let i=0; i<count2; i++) {
-        pos2[i*3] = (Math.random()-0.5) * 1200;
-        pos2[i*3+1] = (Math.random()-0.5) * 1200;
-        pos2[i*3+2] = (Math.random()-0.5) * 1200;
-        
-        // Color ligeramente azulado o blanco
-        const shade = Math.random();
-        colors2[i*3] = shade > 0.8 ? 0.8 : 1.0;     // R
-        colors2[i*3+1] = shade > 0.8 ? 0.8 : 1.0;   // G
-        colors2[i*3+2] = 1.0;                       // B (siempre azulado)
-    }
-    starGeo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
-    starGeo2.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
-    const stars2 = new THREE.Points(starGeo2, new THREE.PointsMaterial({
-      vertexColors: true, size: 0.9, transparent: true, opacity: 0.9, sizeAttenuation: true
-    }));
-    scene.add(stars2);
+  // Capa 2: Estrellas brillantes y cercanas (4,000 estrellas)
+  const starGeo2 = new THREE.BufferGeometry();
+  const count2 = 4000; // Antes eran 1500
+  const pos2 = new Float32Array(count2 * 3);
+  const colors2 = new Float32Array(count2 * 3);
+  for(let i=0; i<count2; i++) {
+      // Coordenadas esféricas para evitar "caja" de estrellas
+      const r = 800 + Math.random() * 800; 
+      const theta = 2 * Math.PI * Math.random();
+      const phi = Math.acos(2 * Math.random() - 1);
+      
+      pos2[i*3] = r * Math.sin(phi) * Math.cos(theta);
+      pos2[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+      pos2[i*3+2] = r * Math.cos(phi);
+      
+      const shade = Math.random();
+      colors2[i*3] = shade > 0.8 ? 0.9 : 1.0;     
+      colors2[i*3+1] = shade > 0.8 ? 0.9 : 1.0;   
+      colors2[i*3+2] = 1.0; // Azulado
   }
+  starGeo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+  starGeo2.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+  const stars2 = new THREE.Points(starGeo2, new THREE.PointsMaterial({
+    vertexColors: true, size: 0.8, transparent: true, opacity: 0.9, sizeAttenuation: true
+  }));
+  scene.add(stars2);
+}
+  
   createRealisticStars();
 
   // --- PLANETA ---
@@ -390,25 +402,50 @@
   const searchInput = document.getElementById('searchInput');
   const resultsList = document.getElementById('resultsList');
 
-  searchInput.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    resultsList.innerHTML = '';
-    if (term.length < 1) { resultsList.classList.remove('active'); return; }
+// Función para quitar tildes y normalizar (Amazonía -> amazonia)
+const normalizeText = (text) => {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+};
+
+searchInput.addEventListener('input', (e) => {
+  const rawTerm = e.target.value;
+  const term = normalizeText(rawTerm);
+  
+  resultsList.innerHTML = '';
+  if (rawTerm.length < 1) { resultsList.classList.remove('active'); return; }
+  
+  // Filtramos buscando en NOMBRE o en REGIÓN
+  const filtered = pueblosData.filter(p => {
+    if (p.type !== 'main') return false; // Solo principales
     
-    // Filtrar solo principales
-    const filtered = pueblosData.filter(p => p.type==='main' && (p.name.toLowerCase().includes(term) || p.region.toLowerCase().includes(term)));
+    const nameMatch = normalizeText(p.name).includes(term);
+    const regionMatch = normalizeText(p.region).includes(term);
     
-    if (filtered.length > 0) {
-      filtered.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'result-item';
-        div.innerHTML = `<span>${p.name}</span><span style="font-size:0.7em; color:#888;">${p.region}</span>`;
-        div.onclick = () => { searchInput.value = p.name; resultsList.classList.remove('active'); selectPueblo(p.id); };
-        resultsList.appendChild(div);
-      });
-      resultsList.classList.add('active');
-    } else { resultsList.classList.remove('active'); }
+    return nameMatch || regionMatch;
   });
+  
+  if (filtered.length > 0) {
+    filtered.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      // Mostramos nombre y región
+      div.innerHTML = `
+        <div style="display:flex; flex-direction:column;">
+          <span style="font-weight:600; color:#fff;">${p.name}</span>
+          <span style="font-size:0.75em; color:#00f3ff; margin-top:2px;">${p.region}</span>
+        </div>`;
+      div.onclick = () => { 
+        searchInput.value = p.name; 
+        resultsList.classList.remove('active'); 
+        selectPueblo(p.id); 
+      };
+      resultsList.appendChild(div);
+    });
+    resultsList.classList.add('active');
+  } else { 
+    resultsList.classList.remove('active'); 
+  }
+});
 
   document.getElementById('close-card').onclick = () => { selectPueblo(null); searchInput.value=''; };
 
