@@ -59,6 +59,16 @@
       box-sizing: border-box; /* Evita que se salga */
       font-family: inherit;
     }
+     .card-header-media {
+      width: 100%;
+      height: 180px; /* Un poco más alto para mejor vista */
+      object-fit: cover; /* Fundamental para que el video llene el cuadro sin deformarse */
+      border-radius: 12px;
+      margin-bottom: 15px;
+      background-color: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: block;
+    }    
     .search-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
     .search-icon { position: absolute; right: 15px; top: 60%; color: #666; pointer-events: none;}
 
@@ -176,7 +186,18 @@
   <!-- TARJETA INFO -->
    <div id="info-card" class="glass-panel">
     <!-- Imagen de cabecera -->
-    <img id="card-img" src="" alt="Imagen del pueblo" class="card-header-img">
+    <!--<img id="card-img" src="" alt="Imagen del pueblo" class="card-header-img">-->
+
+     <div class="card-media-wrapper">
+      <!-- Etiqueta IMG para las fotos de la carpeta img/ -->
+      <img id="card-img" src="" alt="Imagen" class="card-header-media" style="display: none;">
+      
+      <!-- Etiqueta VIDEO para los archivos de la carpeta videos/ -->
+      <video id="card-video" class="card-header-media" style="display: none;" autoplay muted loop playsinline>
+        <source src="" type="video/mp4">
+      </video>
+    </div>
+     
     
     <div class="card-header">
       <h2 class="card-title" id="card-title">Título</h2>
@@ -440,26 +461,54 @@
     gsap.to(camera.position, { duration: 3.5, x: endPos.x, y: endPos.y, z: endPos.z, onUpdate: () => controls.update(), ease: "power3.inOut" });
   }
 
-  function showInfoCard(data) {
+ function showInfoCard(data) {
+    // 1. Llenar textos
     document.getElementById('card-title').textContent = data.name;
     document.getElementById('card-desc').textContent = data.desc;
-
-    // LÓGICA DE IMAGEN
+    
+    // 2. Obtener elementos del DOM
     const imgEl = document.getElementById('card-img');
+    const videoEl = document.getElementById('card-video');
     
-    // 1. Define tu imagen por defecto aquí (puede ser una ruta local como 'img/default.jpg')
-    const defaultImage = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop"; 
+    // Imagen por defecto (si falla la carga o no hay datos)
+    // Puedes tener una imagen genérica en tu carpeta img también
+    const defaultImage = "img/default.jpeg"; 
 
-    // 2. Verifica si el dato tiene imagen, si no, usa la default
-    const imageUrl = data.img ? data.img : defaultImage;
-    
-    imgEl.src = imageUrl;
+    // 3. LÓGICA INTELIGENTE: ¿Es video o imagen?
+    if (data.video) {
+        // --- CASO A: TIENE VIDEO ---
+        console.log("Cargando video desde:", data.video);
+        
+        imgEl.style.display = 'none';       // Ocultar la foto
+        videoEl.style.display = 'block';    // Mostrar el reproductor
+        
+        videoEl.src = data.video;           // Asignar la ruta (ej: videos/wayuu.mp4)
+        videoEl.load();                     // Cargar
+        videoEl.play().catch(e => console.log("Auto-play prevenido por navegador")); // Intentar reproducir
 
-    // 3. (Opcional) Si la imagen específica falla al cargar, poner la default
-    imgEl.onerror = function() {
-        this.src = defaultImage;
-    };
-    
+    } else {
+        // --- CASO B: TIENE IMAGEN (O NADA) ---
+        
+        // Primero, detenemos el video anterior si estaba sonando
+        videoEl.pause();
+        videoEl.currentTime = 0;
+        videoEl.style.display = 'none';     // Ocultar reproductor
+        
+        imgEl.style.display = 'block';      // Mostrar foto
+        
+        // Si tiene la propiedad 'img', úsala. Si no, usa la default.
+        const imageUrl = data.img ? data.img : defaultImage;
+        
+        console.log("Cargando imagen desde:", imageUrl);
+        imgEl.src = imageUrl;
+        
+        // Si la imagen no existe en la carpeta, cargar la default para que no se vea roto
+        imgEl.onerror = function() { 
+            this.src = "https://images.unsplash.com/photo-1451187580459-43490279c0f?q=80&w=600"; // Fallback online seguro
+        };
+    }
+
+    // 4. Mostrar la tarjeta con animación
     document.getElementById('info-card').classList.add('active');
   }
 
