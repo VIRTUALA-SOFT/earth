@@ -251,16 +251,28 @@
   container.appendChild(renderer.domElement);
 
   // Luces
-  const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
-  sunLight.position.set(5, 3, 10);
-  scene.add(sunLight);
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+   // Luz Ambiental (Relleno base): Subimos la intensidad para ver texturas
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
   scene.add(ambientLight);
-  const rimLight = new THREE.SpotLight(0x00f3ff, 5); // Luz azul trasera
-  rimLight.position.set(-10, 5, -5);
-  rimLight.lookAt(0,0,0);
+
+  // Hemisphere Light (Clave para que no se vea negro):
+  // Simula luz del cielo (azulado) y del suelo (oscuro), dando volumen 3D inmediato.
+  const hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 1.0);
+  scene.add(hemiLight);
+
+  // Luz del Sol (Principal):
+  const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  // La movemos a Z=20 para que ilumine la cara frontal de la Tierra
+  sunLight.position.set(5, 5, 20); 
+  scene.add(sunLight);
+
+  // Luz de Contorno (Rim Light) - Mantenemos el efecto neón trasero
+  const rimLight = new THREE.SpotLight(0x00f3ff, 4); 
+  rimLight.position.set(-10, 10, -5);
+  rimLight.lookAt(0, 0, 0);
   scene.add(rimLight);
 
+  
   // Estrellas
   const starGeo = new THREE.BufferGeometry();
   const starCount = 3000;
@@ -275,22 +287,35 @@
   scene.add(earthGroup);
 
   const loader = new THREE.TextureLoader();
-  const earthMat = new THREE.MeshStandardMaterial({
-    map: loader.load("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"), // Textura ejemplo high-res
-    normalMap: loader.load("https://unpkg.com/three-globe/example/img/earth-topology.png"),
-    roughness: 0.5, metalness: 0.1
+  
+  // Usamos MeshPhongMaterial en lugar de Standard porque es más fácil de iluminar
+  // y da un resultado más "brillante" y nítido para globos terráqueos.
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: loader.load("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"),
+    bumpMap: loader.load("https://unpkg.com/three-globe/example/img/earth-topology.png"),
+    bumpScale: 0.05,
+    specularMap: loader.load("https://unpkg.com/three-globe/example/img/earth-water.png"),
+    specular: new THREE.Color(0x222222), // Brillo sutil en los océanos
+    shininess: 15,
+    color: 0xaaaaaa // Color base gris claro para aclarar la textura si es muy oscura
   });
+
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), earthMat);
   earthGroup.add(earth);
 
-  // Atmósfera (Glow)
+  // Atmósfera (Glow) - La hacemos un poco más visible
   const atmos = new THREE.Mesh(
-    new THREE.SphereGeometry(2.15, 64, 64),
+    new THREE.SphereGeometry(2.1, 64, 64),
     new THREE.MeshPhongMaterial({
-      color: 0x0044aa, transparent: true, opacity: 0.15, side: THREE.BackSide, blending: THREE.AdditiveBlending
+      color: 0x4488ff, // Azul más claro
+      transparent: true, 
+      opacity: 0.2,    // Un poco más opaca
+      side: THREE.BackSide, 
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
     })
   );
-  scene.add(atmos); // Fuera del grupo para no rotar
+  scene.add(atmos);
 
   // --- 4. MARCADORES INTELIGENTES ---
   const markersGroup = new THREE.Group();
