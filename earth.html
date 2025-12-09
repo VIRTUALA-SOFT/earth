@@ -9,9 +9,9 @@
 
   <style>
     :root {
-      --primary: #ffd700;       /* Dorado (Puntos normales) */
-      --accent: #00f3ff;        /* Cian Eléctrico (Seleccionado) */
-      --glass-bg: rgba(20, 25, 40, 0.7);
+      --primary: #ffd700;       /* Dorado */
+      --accent: #00f3ff;        /* Cian Eléctrico */
+      --glass-bg: rgba(20, 25, 40, 0.75);
       --glass-border: 1px solid rgba(255, 255, 255, 0.15);
       --glass-blur: blur(16px);
       --text-main: #ffffff;
@@ -44,12 +44,11 @@
     h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0; color: var(--primary); }
     p.subtitle { font-size: 0.85rem; color: var(--text-secondary); margin: 0; font-weight: 300; }
 
-    /* INPUT DE BÚSQUEDA PREMIUM */
     .search-container { position: relative; width: 100%; }
     
     .search-input {
       width: 100%;
-      padding: 14px 45px 14px 16px; /* Espacio para icono */
+      padding: 14px 45px 14px 16px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
@@ -70,41 +69,28 @@
       color: var(--text-secondary); pointer-events: none;
     }
 
-    /* LISTA DE RESULTADOS (SCROLLABLE) */
+    /* RESULTADOS */
     .results-list {
-      max-height: 0; /* Oculto por defecto */
-      overflow-y: auto;
+      max-height: 0; overflow-y: auto;
       background: rgba(10, 15, 25, 0.95);
-      border-radius: 12px;
-      margin-top: 5px;
-      opacity: 0;
+      border-radius: 12px; margin-top: 5px; opacity: 0;
       transition: all 0.3s ease;
     }
     .results-list.active {
-      max-height: 300px; /* Altura máxima visible */
-      opacity: 1;
-      border: var(--glass-border);
-      padding: 5px 0;
+      max-height: 300px; opacity: 1; border: var(--glass-border); padding: 5px 0;
     }
-    
-    /* Scrollbar personalizado */
     .results-list::-webkit-scrollbar { width: 6px; }
-    .results-list::-webkit-scrollbar-track { background: transparent; }
     .results-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
     .result-item {
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 0.9rem;
+      padding: 12px 16px; cursor: pointer; font-size: 0.9rem;
       border-bottom: 1px solid rgba(255,255,255,0.03);
       display: flex; justify-content: space-between; align-items: center;
-      transition: 0.2s;
     }
     .result-item:hover { background: rgba(255, 255, 255, 0.1); }
-    .result-item.selected { background: rgba(0, 243, 255, 0.15); color: var(--accent); font-weight: 600; }
     .result-item span.region { font-size: 0.75rem; color: #666; text-transform: uppercase; }
 
-    /* --- UI DERECHA (TARJETA INFO) --- */
+    /* --- INFO CARD --- */
     #info-card {
       position: absolute; bottom: 40px; right: 40px; width: 340px;
       transform: translateX(50px); opacity: 0; pointer-events: none; z-index: 10;
@@ -115,12 +101,10 @@
     .card-title { font-size: 1.4rem; margin: 0; color: var(--accent); }
     .card-close { background: none; border: none; color: #666; cursor: pointer; font-size: 1.2rem; }
     .card-close:hover { color: white; }
-    
     .card-desc { font-size: 0.9rem; line-height: 1.6; color: #ddd; margin-bottom: 20px; }
     
     .btn-action {
-      display: block; width: 100%; text-align: center;
-      padding: 12px 0;
+      display: block; width: 100%; text-align: center; padding: 12px 0;
       background: transparent; border: 1px solid var(--accent); color: var(--accent);
       border-radius: 8px; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
       text-decoration: none; transition: 0.3s;
@@ -163,23 +147,20 @@
 <div id="tooltip"></div>
 
 <div id="app">
-  
-  <!-- UI IZQUIERDA: BUSCADOR -->
+  <!-- UI IZQUIERDA -->
   <div id="ui-controls" class="glass-panel">
     <div>
       <h1>Orígenes</h1>
       <p class="subtitle">Explora la sabiduría ancestral</p>
     </div>
-    
     <div class="search-container">
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar pueblo, región...">
       <div class="search-icon">🔍</div>
-      <!-- Aquí se inyectan los resultados -->
       <div id="resultsList" class="results-list"></div>
     </div>
   </div>
 
-  <!-- UI DERECHA: INFO -->
+  <!-- UI DERECHA -->
   <div id="info-card" class="glass-panel">
     <div class="card-header">
       <h2 class="card-title" id="card-title">Título</h2>
@@ -205,50 +186,89 @@
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-  // --- 1. BASE DE DATOS (Escalable) ---
+  // ==========================================
+  // 1. UTILIDADES MATEMÁTICAS (FUNDAMENTAL)
+  // ==========================================
+  function latLonToVector3(lat, lon, radius) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    const x = -(radius * Math.sin(phi) * Math.cos(theta));
+    const z = (radius * Math.sin(phi) * Math.sin(theta));
+    const y = (radius * Math.cos(phi));
+    return new THREE.Vector3(x, y, z);
+  }
+
+  // ==========================================
+  // 2. BASE DE DATOS MAESTRA
+  // ==========================================
   const etniasBase = [
-     // ... (PEGA AQUÍ EL ARRAY 'etniasBase' QUE TE DI ARRIBA) ...
-     // Por brevedad del ejemplo, asegúrate de incluir al menos los datos de América y un par más.
-     { id: "arhuaco", name: "Arhuaco", region: "Colombia", lat: 10.70, lon: -73.65, desc: "Guardianes de la Sierra." },
-     { id: "wayuu", name: "Wayuu", region: "La Guajira", lat: 12.1, lon: -72.2, desc: "Pueblo del desierto." },
-     // ... el resto de la lista ...
+    // AMÉRICA DEL SUR
+    { id: "arhuaco", name: "Arhuaco", region: "Colombia (Sierra)", lat: 10.70, lon: -73.65, desc: "Guardianes de la Sierra Nevada." },
+    { id: "wayuu", name: "Wayuu", region: "Colombia/Venezuela", lat: 11.95, lon: -71.80, desc: "Gente de arena, sol y viento." },
+    { id: "embera", name: "Emberá", region: "Colombia (Chocó)", lat: 5.80, lon: -76.80, desc: "Pueblo de río y selva húmeda." },
+    { id: "tikuna", name: "Tikuna", region: "Amazonas", lat: -3.80, lon: -70.10, desc: "Pueblo del agua, habitan el trapecio amazónico." },
+    { id: "kayapo", name: "Kayapó", region: "Brasil (Xingu)", lat: -7.50, lon: -52.00, desc: "Guerreros defensores del río Xingu." },
+    { id: "mapuche", name: "Mapuche", region: "Chile/Argentina", lat: -38.50, lon: -72.00, desc: "Gente de la tierra, nunca conquistados." },
+    { id: "quechua", name: "Quechua", region: "Perú/Ecuador", lat: -13.50, lon: -71.90, desc: "Descendientes del Imperio Inca." },
+    
+    // AMÉRICA DEL NORTE
+    { id: "maya", name: "Maya", region: "México/Guatemala", lat: 19.00, lon: -89.00, desc: "Constructores de pirámides y observadores del tiempo." },
+    { id: "navajo", name: "Navajo (Diné)", region: "USA (Arizona)", lat: 36.00, lon: -110.00, desc: "El pueblo sagrado de los cañones." },
+    { id: "inuit", name: "Inuit", region: "Canadá/Alaska", lat: 68.00, lon: -100.00, desc: "Maestros del hielo y el ártico." },
+    
+    // ÁFRICA
+    { id: "tuareg", name: "Tuareg", region: "Sahara", lat: 20.00, lon: 5.00, desc: "Hombres azules del desierto." },
+    { id: "maasai", name: "Maasai", region: "Kenia", lat: -1.50, lon: 36.00, desc: "Guerreros pastores de la sabana." },
+    { id: "himba", name: "Himba", region: "Namibia", lat: -18.00, lon: 13.00, desc: "Famosos por su piel cubierta de ocre rojo." },
+    
+    // ASIA & OCEANÍA
+    { id: "mongol", name: "Mongol", region: "Mongolia", lat: 47.00, lon: 103.00, desc: "Nómadas de la estepa eterna." },
+    { id: "tibetan", name: "Tibetano", region: "Tíbet", lat: 31.00, lon: 89.00, desc: "Habitantes del techo del mundo." },
+    { id: "aboriginal", name: "Aborigen", region: "Australia", lat: -25.00, lon: 133.00, desc: "La cultura viva más antigua de la Tierra." },
+    { id: "maori", name: "Maorí", region: "Nueva Zelanda", lat: -39.00, lon: 175.50, desc: "Guerreros y navegantes de Aotearoa." },
+    { id: "sami", name: "Sami", region: "Laponia", lat: 67.00, lon: 20.00, desc: "Pueblo del sol de medianoche." }
   ];
 
-  // Si no quieres copiar todo el array gigante aquí, usa la función generadora
-  // para multiplicar tus 3-4 ejemplos actuales x 100.
-  
+  // FUNCIÓN GENERADORA: Expande los datos para llenar el mapa
   function generarPueblosMasivos() {
-    const lista = [];
-    // Si etniasBase está vacío o tiene pocos, añade más manualmente o repite la lógica
-    // Lógica de dispersión:
+    const listaCompleta = [];
     etniasBase.forEach(etnia => {
-        // Principal
-        lista.push({...etnia, name: etnia.name, type: 'main'});
-        // Secundarios
-        for(let i=0; i<12; i++) { // Generamos 12 vecinos por cada pueblo para llenar mapa
-            const disp = 2.0; // Dispersión en grados
-            lista.push({
-                id: etnia.id,
-                name: `Comunidad ${etnia.name}`,
-                region: etnia.region,
-                lat: etnia.lat + (Math.random()-0.5)*disp,
-                lon: etnia.lon + (Math.random()-0.5)*disp,
-                desc: etnia.desc,
-                url: etnia.url,
-                type: 'village' // Marcador más pequeño
-            });
-        }
+      // 1. Etnias principales
+      listaCompleta.push({
+        ...etnia,
+        uniqueId: etnia.id + "_main",
+        type: 'main'
+      });
+
+      // 2. Generar comunidades cercanas (para poblar el mapa)
+      const numComunidades = Math.floor(Math.random() * 8) + 5; 
+      for (let i = 0; i < numComunidades; i++) {
+        const dispersion = 1.8; // Grados de separación
+        listaCompleta.push({
+          id: etnia.id, 
+          uniqueId: `${etnia.id}_${i}`,
+          name: `Comunidad ${etnia.name}`,
+          region: etnia.region,
+          lat: etnia.lat + (Math.random() - 0.5) * dispersion,
+          lon: etnia.lon + (Math.random() - 0.5) * dispersion,
+          desc: etnia.desc,
+          url: etnia.url || "#",
+          type: 'village'
+        });
+      }
     });
-    return lista;
+    return listaCompleta;
   }
   
-  const pueblos = generarPueblosMasivos(); // Esto generará aprox 500+ puntos si se tiene ~40 bases
+  const pueblos = generarPueblosMasivos(); 
 
-  // --- 2. CONFIGURACIÓN THREE.JS ---
+  // ==========================================
+  // 3. ESCENA THREE.JS
+  // ==========================================
   const container = document.getElementById("globe");
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x020205);
-  scene.fog = new THREE.FogExp2(0x020205, 0.03); // Niebla para profundidad
+  scene.fog = new THREE.FogExp2(0x020205, 0.02);
 
   const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
   camera.position.set(0, 0, 14);
@@ -259,30 +279,23 @@
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   container.appendChild(renderer.domElement);
 
-  // Luces
-   // Luz Ambiental (Relleno base): Subimos la intensidad para ver texturas
+  // --- ILUMINACIÓN (Corregida para evitar oscuridad) ---
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
   scene.add(ambientLight);
 
-  // Hemisphere Light (Clave para que no se vea negro):
-  // Simula luz del cielo (azulado) y del suelo (oscuro), dando volumen 3D inmediato.
   const hemiLight = new THREE.HemisphereLight(0xddeeff, 0x0f0e0d, 1.0);
   scene.add(hemiLight);
 
-  // Luz del Sol (Principal):
   const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
-  // La movemos a Z=20 para que ilumine la cara frontal de la Tierra
-  sunLight.position.set(5, 5, 20); 
+  sunLight.position.set(5, 5, 20); // Frente a la cámara
   scene.add(sunLight);
 
-  // Luz de Contorno (Rim Light) - Mantenemos el efecto neón trasero
   const rimLight = new THREE.SpotLight(0x00f3ff, 4); 
   rimLight.position.set(-10, 10, -5);
   rimLight.lookAt(0, 0, 0);
   scene.add(rimLight);
 
-  
-  // Estrellas
+  // --- ESTRELLAS ---
   const starGeo = new THREE.BufferGeometry();
   const starCount = 3000;
   const starPos = new Float32Array(starCount * 3);
@@ -291,70 +304,62 @@
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffffff, size: 0.5, transparent: true, opacity: 0.7}));
   scene.add(stars);
 
-  // --- 3. PLANETA TIERRA ---
+  // --- EL MUNDO ---
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
   const loader = new THREE.TextureLoader();
-  
-  // Usamos MeshPhongMaterial en lugar de Standard porque es más fácil de iluminar
-  // y da un resultado más "brillante" y nítido para globos terráqueos.
   const earthMat = new THREE.MeshPhongMaterial({
     map: loader.load("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"),
     bumpMap: loader.load("https://unpkg.com/three-globe/example/img/earth-topology.png"),
     bumpScale: 0.05,
     specularMap: loader.load("https://unpkg.com/three-globe/example/img/earth-water.png"),
-    specular: new THREE.Color(0x222222), // Brillo sutil en los océanos
+    specular: new THREE.Color(0x222222),
     shininess: 15,
-    color: 0xaaaaaa // Color base gris claro para aclarar la textura si es muy oscura
+    color: 0xaaaaaa 
   });
 
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), earthMat);
   earthGroup.add(earth);
 
-  // Atmósfera (Glow) - La hacemos un poco más visible
+  // Atmósfera
   const atmos = new THREE.Mesh(
     new THREE.SphereGeometry(2.1, 64, 64),
     new THREE.MeshPhongMaterial({
-      color: 0x4488ff, // Azul más claro
-      transparent: true, 
-      opacity: 0.2,    // Un poco más opaca
-      side: THREE.BackSide, 
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      color: 0x4488ff,
+      transparent: true, opacity: 0.2,
+      side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false
     })
   );
   scene.add(atmos);
 
-  // --- 4. MARCADORES INTELIGENTES ---
-    const markersGroup = new THREE.Group();
+  // ==========================================
+  // 4. MARCADORES (PUNTOS)
+  // ==========================================
+  const markersGroup = new THREE.Group();
   earthGroup.add(markersGroup);
 
-  // Materiales compartidos (Clave para rendimiento con 500 objetos)
-  const matMain = new THREE.MeshBasicMaterial({ color: 0xffd700 }); // Dorado
-  const matVillage = new THREE.MeshBasicMaterial({ color: 0xffeba0, transparent: true, opacity: 0.6 }); // Dorado pálido
-  const matSelected = new THREE.MeshBasicMaterial({ color: 0x00f3ff }); // Cian
+  // Materiales compartidos
+  const matMain = new THREE.MeshBasicMaterial({ color: 0xffd700 }); 
+  const matVillage = new THREE.MeshBasicMaterial({ color: 0xffeba0, transparent: true, opacity: 0.6 });
   const matRing = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
-
+  
   // Geometrías compartidas
   const geoMain = new THREE.SphereGeometry(0.015, 8, 8);
-  const geoVillage = new THREE.SphereGeometry(0.008, 4, 4); // Muy low poly para los 500 puntos
+  const geoVillage = new THREE.SphereGeometry(0.008, 4, 4);
   const geoRing = new THREE.RingGeometry(0.025, 0.035, 16);
   const geoBeam = new THREE.CylinderGeometry(0.005, 0.005, 1, 4);
   geoBeam.translate(0, 0.5, 0);
 
-  // Generación eficiente
+  // Crear Puntos
   pueblos.forEach((p, index) => {
     const pos = latLonToVector3(p.lat, p.lon, 2.005);
-    
-    // Decidir geometría según tipo
-    const isMain = p.type === 'main' || !p.type; // Si no tiene tipo, es main
+    const isMain = p.type === 'main';
+
     const mesh = new THREE.Mesh(isMain ? geoMain : geoVillage, isMain ? matMain.clone() : matVillage.clone());
     mesh.position.copy(pos);
     
-    // Solo las "capitales" tienen anillo y beam para no saturar
     let ring, beam;
-    
     if (isMain) {
         ring = new THREE.Mesh(geoRing, matRing.clone());
         ring.position.copy(pos);
@@ -371,70 +376,73 @@
         markersGroup.add(beam);
     }
 
-    // Hitbox (un poco más grande para facilitar click en móviles)
     const hitGeo = new THREE.SphereGeometry(isMain ? 0.06 : 0.03, 4, 4);
     const hit = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
     hit.position.copy(pos);
     
-    // Guardar datos en el objeto userData del hitbox
     hit.userData = { 
         id: p.id, 
-        uniqueId: index, // ID único para array
+        uniqueId: index, 
         data: p, 
         mesh: mesh, 
         ring: ring, 
-        beam: beam 
+        beam: beam,
+        isMain: isMain
     };
 
     markersGroup.add(mesh);
     markersGroup.add(hit);
   });
 
-  // --- 5. LÓGICA DE SELECCIÓN Y COLORES ---
+  // ==========================================
+  // 5. INTERACCIÓN Y SELECCIÓN
+  // ==========================================
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.5;
+  controls.minDistance = 2.5;
+  controls.maxDistance = 20;
+
   let currentSelectionId = null;
 
   function selectPueblo(id) {
     currentSelectionId = id;
-
-    // Actualizamos TODOS los marcadores
+    
+    // Resetear visuales
     markersGroup.children.forEach(child => {
-      // Solo nos interesan los hitboxes que tienen la data completa
-      if (child.userData && child.userData.id) {
-        const refs = child.userData;
-        const isSelected = (refs.id === id);
+      if (child.userData && child.userData.data) {
+        const u = child.userData;
+        const isSelected = (u.id === id);
 
-        if (isSelected) {
-          // --- ESTADO SELECCIONADO (CIAN) ---
-          refs.core.material.color.setHex(0x00f3ff); // Cambiar a Cian
-          refs.ring.material.color.setHex(0x00f3ff);
-          refs.ring.material.opacity = 1;
+        if (isSelected && u.isMain) {
+          // Seleccionado
+          u.mesh.material.color.setHex(0x00f3ff);
+          if(u.ring) u.ring.material.color.setHex(0x00f3ff);
+          if(u.ring) u.ring.material.opacity = 1;
           
-          // Efecto de explosión/crecimiento
-          gsap.to(refs.core.scale, { x:2, y:2, z:2, duration: 0.5, ease: "back.out(1.7)" });
-          gsap.to(refs.ring.scale, { x:2, y:2, duration: 0.5 });
-          
-          // Desplegar el rayo de luz (Beacon)
-          gsap.to(refs.beam.scale, { y: 1.5, duration: 0.8, ease: "power2.out" }); // Crece hacia el espacio
-          gsap.to(refs.beam.material, { opacity: 0.6, duration: 0.3 });
+          gsap.to(u.mesh.scale, { x:2, y:2, z:2, duration: 0.5 });
+          if(u.ring) gsap.to(u.ring.scale, { x:2, y:2, duration: 0.5 });
+          if(u.beam) {
+             gsap.to(u.beam.scale, { y: 1.5, duration: 0.8, ease: "power2.out" });
+             gsap.to(u.beam.material, { opacity: 0.6, duration: 0.3 });
+          }
+          showInfoCard(u.data);
 
-          // Mostrar tarjeta info
-          showInfoCard(refs.data);
-          
         } else {
-          // --- ESTADO NO SELECCIONADO (DIMMED) ---
-          refs.core.material.color.setHex(0xffd700); // Volver a Dorado
-          refs.ring.material.color.setHex(0xffd700);
+          // No seleccionado
+          const baseColor = u.isMain ? 0xffd700 : 0xffeba0;
+          u.mesh.material.color.setHex(baseColor);
+          if(u.ring) u.ring.material.color.setHex(0xffd700);
           
-          // Si hay una selección activa, los no seleccionados se atenúan
-          const dimOpacity = id ? 0.2 : 0.7; 
-          refs.ring.material.opacity = dimOpacity;
+          const dimOpacity = id ? 0.1 : (u.isMain ? 0.4 : 0.6);
+          if(u.ring) u.ring.material.opacity = dimOpacity;
           
-          // Reset escalas
-          gsap.to(refs.core.scale, { x:1, y:1, z:1, duration: 0.5 });
-          
-          // Ocultar rayo
-          gsap.to(refs.beam.scale, { y: 0, duration: 0.3 });
-          gsap.to(refs.beam.material, { opacity: 0, duration: 0.3 });
+          gsap.to(u.mesh.scale, { x:1, y:1, z:1, duration: 0.5 });
+          if(u.beam) {
+             gsap.to(u.beam.scale, { y: 0, duration: 0.3 });
+             gsap.to(u.beam.material, { opacity: 0, duration: 0.3 });
+          }
         }
       }
     });
@@ -444,8 +452,9 @@
       document.getElementById('info-card').classList.remove('active');
     } else {
       controls.autoRotate = false;
-      const p = pueblos.find(item => item.id === id);
-      focusCamera(p.lat, p.lon);
+      // Buscar coordenadas de la etnia principal para enfocar
+      const target = etniasBase.find(e => e.id === id);
+      if(target) focusCamera(target.lat, target.lon);
     }
   }
 
@@ -458,7 +467,7 @@
 
   function focusCamera(lat, lon) {
     const pVec = latLonToVector3(lat, lon, 1).normalize();
-    const targetDist = 4.5; // Zoom
+    const targetDist = 4.5;
     const endPos = pVec.clone().multiplyScalar(targetDist);
     
     gsap.to(camera.position, {
@@ -469,22 +478,21 @@
     });
   }
 
-  // --- 6. BUSCADOR (LÓGICA UX) ---
+  // --- BUSCADOR ---
   const searchInput = document.getElementById('searchInput');
   const resultsList = document.getElementById('resultsList');
 
-  // Filtrado en tiempo real
   searchInput.addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
-    resultsList.innerHTML = ''; // Limpiar
+    resultsList.innerHTML = ''; 
 
     if (term.length < 1) {
       resultsList.classList.remove('active');
-      return; // Si borra todo, ocultar lista
+      return; 
     }
 
-    // Filtrar pueblos
-    const filtered = pueblos.filter(p => 
+    // Filtrar solo las principales para no saturar resultados
+    const filtered = etniasBase.filter(p => 
       p.name.toLowerCase().includes(term) || 
       p.region.toLowerCase().includes(term)
     );
@@ -507,75 +515,44 @@
     }
   });
 
-  // Mostrar lista completa al hacer click en el input vacío
-  searchInput.addEventListener('focus', () => {
-    if(searchInput.value === "") {
-        // Opcional: mostrar todos o los más populares
-        // Por ahora lo dejamos vacío para no saturar si hay 500
-    }
-  });
-
-  // Cerrar tarjeta
   document.getElementById('close-card').addEventListener('click', () => {
     selectPueblo(null);
     searchInput.value = '';
   });
 
-  // --- 7. CONTROLES Y ANIMACIÓN ---
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.5;
-  controls.minDistance = 2.5;
-  controls.maxDistance = 20;
-
+  // --- CLICK EVENTS ---
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  const tooltip = document.getElementById('tooltip');
-
-  // Click en el globo
+  
   window.addEventListener('click', (event) => {
-    if(event.target.closest('.glass-panel')) return; // Ignorar clicks en UI
+    if(event.target.closest('.glass-panel')) return;
 
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
     
-    // Intersectamos solo con los hitboxes invisibles
     const hits = raycaster.intersectObjects(markersGroup.children);
     if(hits.length > 0) {
       const obj = hits[0].object;
       if(obj.userData && obj.userData.id) {
         selectPueblo(obj.userData.id);
-        searchInput.value = obj.userData.data.name; // Sincronizar input
+        searchInput.value = obj.userData.data.name.split(" Comunidad")[0]; 
       }
     } else {
-        // Click en el espacio vacío -> Deseleccionar
         selectPueblo(null);
         searchInput.value = '';
     }
   });
 
-  // Animación Loop
+  // --- ANIMACIÓN ---
   const clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
-    const time = clock.getElapsedTime();
     controls.update();
-
-    // Animación de los anillos (solo los visibles)
-    markersGroup.children.forEach(child => {
-        // Animar anillos
-      if(child.userData.ring) {
-        // Si es el seleccionado, pulsa más rápido y grande
-        // Si no, pulso lento
-      }
-    });
-
     renderer.render(scene, camera);
   }
   
-  // Loader
+  // INIT
   window.addEventListener('load', () => {
      setTimeout(() => {
        document.getElementById('loader').style.opacity = 0;
