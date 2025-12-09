@@ -16,7 +16,8 @@ const etniasBase = [
     region: "La Guajira (Col/Ven)", 
     lat: 11.95, lon: -71.80, 
     video: "video/wayuu_video.mp4",
-    desc: "El pueblo del sol, la arena y el viento. Los Wayuu poseen una estructura social matrilineal compleja organizada en clanes. Son maestros tejedores; sus coloridas mochilas narran historias de su cosmogonía. Su sistema de justicia, guiado por el 'Pütchipü'ü' (palabrero), es reconocido como Patrimonio Inmaterial de la Humanidad." 
+    desc: "El pueblo del sol, la arena y el viento. Los Wayuu poseen una estructura social matrilineal compleja organizada en clanes. Son maestros tejedores; sus coloridas mochilas narran historias de su cosmogonía. Su sistema de justicia, guiado por el 'Pütchipü'ü' (palabrero), es reconocido como Patrimonio Inmaterial de la Humanidad." ,
+    url: "dsc/wayuu/index.html"
   },
   { 
     id: "embera", 
@@ -977,7 +978,7 @@ function generarPueblosMasivos() {
         lat: etnia.lat + (Math.random() - 0.5) * dispersion,
         lon: etnia.lon + (Math.random() - 0.5) * dispersion,
         desc: etnia.desc, // Heredan la descripción larga
-        url: "#",
+        url: "etnia.url || #",
         type: 'village'
       });
     }
