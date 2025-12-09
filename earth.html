@@ -168,9 +168,16 @@
 
   // Usamos texturas. Si fallan las rutas locales, fallará la carga.
   // Asegúrate de que la carpeta 'textures' esté junto al html.
+  /*
   const earthMap    = textureLoader.load("textures/8k_earth_daymap.jpg");
   const normalMap   = textureLoader.load("textures/Earth-normal-8k.png");
   const specMap     = textureLoader.load("textures/EarthSpec.png");
+*/
+// --- 2K ----
+  const earthMap    = textureLoader.load("textures/2k/2k_earth_daymap.jpg");
+  const normalMap   = textureLoader.load("textures/2k/EarthNormal.png");
+  const specMap     = textureLoader.load("textures/2k/EarthSpec.png");
+  
 
   const earthGeo = new THREE.SphereGeometry(2, 64, 64);
   const earthMat = new THREE.MeshPhongMaterial({
