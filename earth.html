@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ULULATO – Earth</title>
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#050b15; font-family:system-ui; }
+    #app { display:flex; height:100%; }
+    #ui { width:280px; padding:16px; color:#f5f5f5; box-sizing:border-box; background:#050b15; }
+    #globe { flex:1; }
+    select, button { width:100%; margin-top:8px; padding:6px 8px; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div id="ui">
+    <h2>ULULATO – Pueblos de origen</h2>
+    <label for="puebloSelect">Selecciona un pueblo:</label>
+    <select id="puebloSelect">
+      <option value="">-- Selecciona --</option>
+      <option value="arhuaco">Arhuaco</option>
+      <option value="wayuu">Wayuu</option>
+      <option value="embera">Emberá</option>
+    </select>
+  </div>
+  <div id="globe"></div>
+</div>
+
+<script src="https://unpkg.com/three@0.165.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.165.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+  // ----- Datos de pueblos (lat, lon, url) -----
+  const pueblos = {
+    arhuaco: { name:"Arhuaco", lat:10.85, lon:-73.7, url:"/ululato/arhuaco" },
+    wayuu:   { name:"Wayuu",   lat:11.8,  lon:-72.9, url:"/ululato/wayuu" },
+    embera:  { name:"Emberá",  lat:6.0,   lon:-76.0, url:"/ululato/embera" }
+  };
+
+  const container = document.getElementById("globe");
+
+  // ----- Escena básica -----
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+  camera.position.set(0, 0, 5);
+
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  // Luces
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(5, 3, 5);
+  scene.add(dirLight);
+  scene.add(new THREE.AmbientLight(0x404040, 1.4));
+
+  // Fondo (oscuro tipo espacio)
+  scene.background = new THREE.Color(0x050b15);
+
+  // ----- Texturas de la Tierra -----
+  const loader = new THREE.TextureLoader();
+  const earthMap   = loader.load("textures/8k_earth_daymap.jpg");
+  const normalMap    = loader.load("textures/Earth-normal-8k.png");
+  const specMap    = loader.load("textures/earthSpec.png");
+
+  const earthGeo = new THREE.SphereGeometry(2, 128, 128);
+  const earthMat = new THREE.MeshPhongMaterial({
+    map: earthMap,
+    normalpMap: normalMap,
+    normalScale: 0.06,
+    specularMap: specMap,
+    specular: new THREE.Color(0x333333),
+    shininess: 20
+  });
+  const earth = new THREE.Mesh(earthGeo, earthMat);
+  scene.add(earth);
+
+  // Puntos luminosos
+  const spotGroup = new THREE.Group();
+  scene.add(spotGroup);
+  const spotGeo = new THREE.SphereGeometry(0.04, 12, 12);
+
+  function latLonToVector3(lat, lon, radius) {
+    const phi   = (90 - lat) * Math.PI / 180;
+    const theta = (lon + 180) * Math.PI / 180;
+    const x = -radius * Math.sin(phi) * Math.cos(theta);
+    const z =  radius * Math.sin(phi) * Math.sin(theta);
+    const y =  radius * Math.cos(phi);
+    return new THREE.Vector3(x, y, z);
+  }
+
+  Object.values(pueblos).forEach((p) => {
+    const mat = new THREE.MeshBasicMaterial({ color:0xffd966, emissive:0xffd966 });
+    const m = new THREE.Mesh(spotGeo, mat);
+    m.position.copy(latLonToVector3(p.lat, p.lon, 2.02));
+    m.userData = { puebloId: Object.keys(pueblos).find(k => pueblos[k]===p) };
+    spotGroup.add(m);
+  });
+
+  // Controles
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enablePan = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.4;
+
+  // Raycaster para click en puntos
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  renderer.domElement.addEventListener("click", (e) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(spotGroup.children);
+    if (hits.length > 0) {
+      const id = hits[0].object.userData.puebloId;
+      const p  = pueblos[id];
+      if (p && p.url) {
+        window.location.href = p.url;   // aquí luego puedes cambiar por Framer o modal
+      }
+    }
+  });
+
+  // Animación
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.05;
+    // efecto titilar
+    spotGroup.children.forEach((m, i) => {
+      const s = 0.9 + 0.3 * Math.sin(t + i);
+      m.scale.set(s,s,s);
+    });
+    earth.rotation.y += 0.0008;
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive
+  window.addEventListener("resize", () => {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  // ----- 3. Gira la tierra al seleccionar un pueblo -----
+  const select = document.getElementById("puebloSelect");
+
+  function focusPueblo(id) {
+    const p = pueblos[id];
+    if (!p) return;
+    // Convertir lat/lon a target de rotación
+    const target = latLonToVector3(p.lat, p.lon, 2);
+    // Queremos ese punto mirando a la cámara (eje Z+)
+    // Calculamos ángulos aproximados:
+    const phi   = (90 - p.lat) * Math.PI / 180;
+    const theta = (p.lon + 180) * Math.PI / 180;
+
+    // Animación simple de rotación hacia ese ángulo
+    const startY = earth.rotation.y;
+    const endY   = theta;
+    const startX = earth.rotation.x;
+    const endX   = phi - Math.PI/2; // ajusta inclinación
+
+    const duration = 1200; // ms
+    const start = performance.now();
+
+    function spin(now) {
+      const k = Math.min(1, (now - start) / duration);
+      const ease = k*k*(3 - 2*k); // smoothstep
+      earth.rotation.y = startY + (endY - startY)*ease;
+      earth.rotation.x = startX + (endX - startX)*ease;
+      if (k < 1) requestAnimationFrame(spin);
+    }
+    requestAnimationFrame(spin);
+  }
+
+  select.addEventListener("change", (e) => {
+    const id = e.target.value;
+    if (id) focusPueblo(id);
+  });
+</script>
+</body>
+</html>
