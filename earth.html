@@ -224,9 +224,10 @@
   scene.add(rimLight);
 
   // --- ESTRELLAS DENSAS ---
-  function createDenseStars() {
+ /*
+ function createDenseStars() {
     const starGeo1 = new THREE.BufferGeometry();
-    const count1 = 12000; // Fondo denso
+    const count1 = 15000; // Fondo denso
     const pos1 = new Float32Array(count1 * 3);
     for(let i=0; i<count1*3; i++) pos1[i] = (Math.random()-0.5) * 2000;
     starGeo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
@@ -248,6 +249,49 @@
     scene.add(new THREE.Points(starGeo2, new THREE.PointsMaterial({vertexColors:true, size:0.9, transparent:true, opacity:0.9})));
   }
   createDenseStars();
+  */
+  
+  function createRealisticStars() {
+  // Capa 1: Fondo profundo (15,000 estrellas)
+  const starGeo1 = new THREE.BufferGeometry();
+  const count1 = 15000; // Antes eran 5000
+  const pos1 = new Float32Array(count1 * 3);
+  for(let i=0; i<count1*3; i++) pos1[i] = (Math.random()-0.5) * 2000; // Más dispersión
+  starGeo1.setAttribute('position', new THREE.BufferAttribute(pos1, 3));
+  const stars1 = new THREE.Points(starGeo1, new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.3, transparent: true, opacity: 0.5, sizeAttenuation: true
+  }));
+  scene.add(stars1);
+
+  // Capa 2: Estrellas brillantes y cercanas (4,000 estrellas)
+  const starGeo2 = new THREE.BufferGeometry();
+  const count2 = 4000; // Antes eran 1500
+  const pos2 = new Float32Array(count2 * 3);
+  const colors2 = new Float32Array(count2 * 3);
+  for(let i=0; i<count2; i++) {
+      // Coordenadas esféricas para evitar "caja" de estrellas
+      const r = 800 + Math.random() * 800; 
+      const theta = 2 * Math.PI * Math.random();
+      const phi = Math.acos(2 * Math.random() - 1);
+      
+      pos2[i*3] = r * Math.sin(phi) * Math.cos(theta);
+      pos2[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+      pos2[i*3+2] = r * Math.cos(phi);
+      
+      const shade = Math.random();
+      colors2[i*3] = shade > 0.8 ? 0.9 : 1.0;     
+      colors2[i*3+1] = shade > 0.8 ? 0.9 : 1.0;   
+      colors2[i*3+2] = 1.0; // Azulado
+  }
+  starGeo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+  starGeo2.setAttribute('color', new THREE.BufferAttribute(colors2, 3));
+  const stars2 = new THREE.Points(starGeo2, new THREE.PointsMaterial({
+    vertexColors: true, size: 0.8, transparent: true, opacity: 0.9, sizeAttenuation: true
+  }));
+  scene.add(stars2);
+}
+
+   createRealisticStars();
 
   // --- PLANETA ---
   const earthGroup = new THREE.Group();
