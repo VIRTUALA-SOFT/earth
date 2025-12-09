@@ -218,6 +218,9 @@
   controls.minDistance = 3;
   controls.maxDistance = 10;
 
+  controls.minPolarAngle = 0.5; // No ver el polo norte puro
+  controls.maxPolarAngle = 2.5; // No ver el polo sur puro
+
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
