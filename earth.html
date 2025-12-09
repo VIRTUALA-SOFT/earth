@@ -54,7 +54,7 @@
 <body>
 
 <!-- Pantalla de Carga -->
-<div id="loader">Cargando Planeta...</div>
+<div id="loader">Cargando Texturas 8K...</div>
 
 <div id="app">
   <div id="ui">
@@ -74,11 +74,19 @@
   <div id="globe"></div>
 </div>
 
-<!-- SCRIPTS: Usamos enlaces directos (CDN) para evitar el error de "module specifier" -->
+<!-- Importmap para versiones modernas (opcional pero recomendado) -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+</script>
+
 <script type="module">
-  // IMPORTANTE: Aquí están los enlaces directos que arreglan el error
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-  import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
   // 1. CONFIGURACIÓN DE DATOS
   const pueblos = {
@@ -92,14 +100,14 @@
 
   // 2. ESCENA BÁSICA
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x050b15);
+  scene.background = new THREE.Color(0x050b15); // Fondo espacio oscuro
 
   const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-  camera.position.set(0, 0, 6.5);
+  camera.position.set(0, 0, 6.5); // Un poco más lejos para ver bien
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimización retina
   container.appendChild(renderer.domElement);
 
   // 3. ILUMINACIÓN
@@ -110,41 +118,38 @@
   sunLight.position.set(5, 3, 5);
   scene.add(sunLight);
 
+  // Luz de rebote (rim light) para que se vea bonito el borde oscuro
   const backLight = new THREE.DirectionalLight(0x445566, 0.5);
   backLight.position.set(-5, -3, -10);
   scene.add(backLight);
 
-  // 4. GESTOR DE CARGA
+  // 4. GESTOR DE CARGA (Loading Manager)
   const loadingManager = new THREE.LoadingManager();
   
   loadingManager.onLoad = () => {
+    // Cuando todo cargue, ocultamos el loader
     loaderDiv.style.opacity = '0';
     setTimeout(() => { loaderDiv.style.display = 'none'; }, 500);
-  };
-
-  // Si algo falla al cargar una imagen, lo veremos en consola
-  loadingManager.onError = (url) => {
-    console.error('Hubo un error cargando la textura:', url);
   };
 
   const textureLoader = new THREE.TextureLoader(loadingManager);
 
   // 5. LA TIERRA
+  // NOTA: Asegúrate de que las rutas sean correctas en tu servidor
   const earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
-  // IMPORTANTE: Asegúrate de que los nombres de archivo coincidan EXACTAMENTE con lo que subiste a GitHub
-  // (mayúsculas y minúsculas importan en GitHub).
-  // Si usas jpg, asegúrate que sea .jpg o .jpeg
-  const earthMap    = textureLoader.load("textures/8k_earth_daymap.jpg"); 
+  // Usamos texturas. Si fallan las rutas locales, fallará la carga.
+  // Asegúrate de que la carpeta 'textures' esté junto al html.
+  const earthMap    = textureLoader.load("textures/8k_earth_daymap.jpg");
   const normalMap   = textureLoader.load("textures/Earth-normal-8k.png");
   const specMap     = textureLoader.load("textures/earthSpec.png");
 
   const earthGeo = new THREE.SphereGeometry(2, 64, 64);
   const earthMat = new THREE.MeshPhongMaterial({
     map: earthMap,
-    normalMap: normalMap,
-    normalScale: new THREE.Vector2(0.5, 0.5),
+    normalMap: normalMap,        // CORREGIDO: antes decía normalpMap
+    normalScale: new THREE.Vector2(0.5, 0.5), // CORREGIDO: Vector2 requerido
     specularMap: specMap,
     specular: new THREE.Color(0x333333),
     shininess: 15
@@ -153,7 +158,7 @@
   const earth = new THREE.Mesh(earthGeo, earthMat);
   earthGroup.add(earth);
 
-  // Atmósfera
+  // Atmósfera simple (brillo externo)
   const atmosGeo = new THREE.SphereGeometry(2.03, 64, 64);
   const atmosMat = new THREE.MeshPhongMaterial({
     color: 0x00aaff,
@@ -166,16 +171,21 @@
   earthGroup.add(atmosphere);
 
 
-  // 6. PUNTOS
+  // 6. PUNTOS (MARCADORES)
   const spotGroup = new THREE.Group();
-  earth.add(spotGroup);
+  earth.add(spotGroup); // Añadimos al mesh de la tierra para que roten con ella
 
+  // Función para convertir Lat/Lon a Vector3 en la superficie de la esfera
   function latLonToVector3(lat, lon, radius) {
     const phi   = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
+
+    // Three.js coord system: Y is up.
+    // Mapeo estándar esférico:
     const x = -(radius * Math.sin(phi) * Math.cos(theta));
     const z = (radius * Math.sin(phi) * Math.sin(theta));
     const y = (radius * Math.cos(phi));
+
     return new THREE.Vector3(x, y, z);
   }
 
@@ -184,21 +194,23 @@
 
   Object.entries(pueblos).forEach(([key, p]) => {
     const mesh = new THREE.Mesh(spotGeo, spotMat);
+    // Un poquito más de 2.0 para que no atraviese la textura
     const pos = latLonToVector3(p.lat, p.lon, 2.005); 
     mesh.position.copy(pos);
     mesh.userData = { puebloId: key, url: p.url };
     
+    // Anillo exterior para resaltar
     const ringGeo = new THREE.RingGeometry(0.05, 0.06, 32);
     const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd966, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.position.copy(pos);
-    ring.lookAt(new THREE.Vector3(0,0,0));
+    ring.lookAt(new THREE.Vector3(0,0,0)); // Orientar hacia el centro
     
     spotGroup.add(mesh);
     spotGroup.add(ring);
   });
 
-  // 7. CONTROLES Y CLICK
+  // 7. INTERACCIÓN Y CONTROLES
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enablePan = false;
   controls.enableDamping = true;
@@ -209,39 +221,54 @@
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
+  // Click evento
   renderer.domElement.addEventListener("click", (e) => {
+    // Si estamos arrastrando (moviendo cámara), no activar click
+    // Una forma simple de evitar clicks falsos al rotar es medir el tiempo de mousedown/up
+    // pero aquí usaremos lógica directa del raycaster.
+    
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
     raycaster.setFromCamera(mouse, camera);
+    // Intersectamos con spotGroup.children
     const hits = raycaster.intersectObjects(spotGroup.children);
 
     if (hits.length > 0) {
+      // Buscamos el objeto que tenga userData (porque el anillo no tiene ID)
       const hit = hits.find(h => h.object.userData.puebloId);
       if (hit) {
         const url = hit.object.userData.url;
         console.log("Navegando a:", url);
-        // window.location.href = url; // Descomentar para navegar
-        alert("Ir a: " + url);
+        // Descomenta la siguiente línea para navegar de verdad:
+        // window.location.href = url;
+        alert(`Navegar a: ${url}`);
       }
     }
   });
 
-  // 8. ANIMACIÓN
+  // 8. ANIMACIÓN Y GIRO AUTOMÁTICO
   let isAutoRotating = true;
-  let isFocusing = false; 
+  let targetRotationY = 0;
+  let targetRotationX = 0;
+  let isFocusing = false; // Si estamos en medio de una animación de enfoque
 
   function animate() {
     requestAnimationFrame(animate);
+    
     const time = performance.now() * 0.001;
 
+    // Efecto pulsante en los marcadores
     spotGroup.children.forEach((obj, i) => {
+      // Solo escalar los anillos, no las esferas centrales (opcional)
       if (obj.geometry.type === 'RingGeometry') {
         const s = 1 + 0.3 * Math.sin(time * 3 + i);
         obj.scale.set(s, s, s);
       }
     });
 
+    // Rotación automática suave si no hay selección activa
     if (isAutoRotating && !isFocusing) {
       earthGroup.rotation.y += 0.0005; 
     }
@@ -251,15 +278,16 @@
   }
   animate();
 
-  // 9. LOGICA DE SELECCION
+  // 9. LÓGICA DE SELECCIÓN (FOCUS PUEBLO)
   const select = document.getElementById("puebloSelect");
 
   select.addEventListener("change", (e) => {
     const id = e.target.value;
     if (!id) {
-      isAutoRotating = true;
+      isAutoRotating = true; // Volver a rotar libre
       return;
     }
+    
     const p = pueblos[id];
     if (p) focusPueblo(p);
   });
@@ -267,29 +295,45 @@
   function focusPueblo(p) {
     isAutoRotating = false;
     isFocusing = true;
+
+    // Calcular ángulos target
+    // Longitud: offset de textura. Usually textura empieza en meridiano de Greenwich o similar.
+    // ThreeJS esfera: UV mapping hace que 0 este en +Z o -Z dependiendo setup.
+    // Ajuste empírico: -lon * deg2rad - PI/2
     
     const latRad = p.lat * (Math.PI / 180);
     const lonRad = p.lon * (Math.PI / 180);
-    const targetY = -lonRad + (Math.PI / 2); 
+
+    // Queremos rotar el GRUPO TIERRA (earthGroup) para que el punto (lat,lon) quede mirando a Z+ (donde está la cámara)
+    // Rotación Y (Longitud): 
+    const targetY = -lonRad + (Math.PI / 2); // Ajuste de fase para centrar
+    
+    // Rotación X (Latitud):
     const targetX = latRad;
 
-    const startY = earthGroup.rotation.y;
+    // Animación suave con GSAP sería ideal, pero haremos interpolación manual simple
+    const startY = earthGroup.rotation.y; // Cuidado con vueltas completas
     const startX = earthGroup.rotation.x;
     
+    // Resolver el problema de giros de 360 grados (shortest path)
+    // Simplificación: reseteamos el modulo de Y para que no de vueltas locas
     const currentY = earthGroup.rotation.y % (Math.PI * 2);
     earthGroup.rotation.y = currentY;
 
     let diffY = targetY - currentY;
+    // Buscar camino más corto
     if (diffY > Math.PI) diffY -= Math.PI * 2;
     if (diffY < -Math.PI) diffY += Math.PI * 2;
 
     const finalY = currentY + diffY;
-    const duration = 1500;
+
+    const duration = 1500; // ms
     const startTime = performance.now();
 
     function tween() {
       const now = performance.now();
       const progress = Math.min(1, (now - startTime) / duration);
+      // Easing function (easeInOutCubic)
       const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
       earthGroup.rotation.y = currentY + (finalY - currentY) * ease;
@@ -312,6 +356,7 @@
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
   });
+
 </script>
 </body>
 </html>
