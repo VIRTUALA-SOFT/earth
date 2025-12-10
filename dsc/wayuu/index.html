@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Experiencia Inmersiva - Wayuu</title>
   
-  <!-- Fuentes Premium -->
+  <!-- Fuentes -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
   
-  <!-- GSAP para animaciones de cine -->
+  <!-- Librerías de Animación -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
@@ -16,10 +16,9 @@
   <style>
     :root {
       --gold: #d4af37;
-      --sand: #f4e4bc;
-      --dark: #0a0a0a;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --dark: #050505; /* Negro casi puro */
+      --glass: rgba(20, 20, 20, 0.7);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     body, html {
@@ -30,22 +29,38 @@
       overflow-x: hidden;
     }
 
-    /* CANVAS DE FONDO (PARTÍCULAS) */
-    #ambient-canvas {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
+    /* 1. PATRÓN LATERAL (SOLUCIÓN) */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      /* Asegúrate que la ruta sea correcta. Si el html está en raíz, es img/ */
+      background-image: url('img/patron_wayuu.jpeg'); 
+      background-repeat: repeat-y; /* Repetir solo verticalmente si es lateral */
+      background-size: contain;
+      opacity: 0.08; /* Un poco más visible */
+      pointer-events: none;
+      z-index: 0; /* Detrás del contenido */
+      mix-blend-mode: overlay; /* Mejor integración */
     }
 
-     /* CONTENIDO: Debe estar encima del canvas */
-    main { position: relative; z-index: 1; }
+    /* CANVAS PARTICULAS */
+    #ambient-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none; opacity: 0.6;
+    }
 
-    /* NAVEGACIÓN FLOTANTE */
+    /* CONTENIDO PRINCIPAL */
+    main { position: relative; z-index: 2; }
+
+    /* NAVEGACIÓN */
     nav {
       position: fixed; top: 0; left: 0; width: 100%;
       padding: 20px 40px;
       display: flex; justify-content: space-between; align-items: center;
       z-index: 100;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+      box-sizing: border-box;
     }
     .back-btn {
       color: white; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
@@ -53,117 +68,135 @@
     }
     .back-btn:hover { color: var(--gold); }
 
-    /* SECCIONES GENERALES */
+    /* BOTÓN SONIDO */
+    .sound-toggle {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: 0.3s;
+      backdrop-filter: blur(5px);
+    }
+    .sound-toggle:hover { background: var(--gold); color: black; }
+
+    /* SECCIONES (ESPACIADO OPTIMIZADO) */
     section {
       position: relative;
-      min-height: 100vh;
+      /* Eliminamos el min-height: 100vh forzado para reducir espacios */
+      padding: 120px 10%; 
       display: flex; flex-direction: column; justify-content: center;
-      padding: 0 10%;
       box-sizing: border-box;
     }
 
     h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
     
-    /* --- HERO SECTION --- */    
+    /* --- HERO SECTION CON VIDEO --- */    
     .hero {
+      min-height: 100vh; /* Solo el hero ocupa toda la pantalla */
       align-items: center; text-align: center;
-      /* Imagen dinámica se cargará via JS */
-      background-size: cover; background-position: center; background-attachment: fixed;
+      overflow: hidden;
+      padding: 0;
     }
-    /* Overlay oscuro para leer texto */
-    .hero::before {
-      content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.5); z-index: 1;
-    }
-    .hero-content { position: relative; z-index: 2; opacity: 0; transform: translateY(30px); }
     
-    .hero h1 { font-size: 5rem; margin: 0; color: var(--gold); line-height: 1; text-transform: uppercase; letter-spacing: 5px; }
-    .hero p { font-size: 1.5rem; letter-spacing: 3px; margin-top: 10px; font-weight: 300; }
+    .hero-video-container {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+    }
+    
+    #hero-video {
+      width: 100%; height: 100%; 
+      object-fit: cover; /* Clave para llenar pantalla */
+      opacity: 0.6; /* Oscurecer para leer texto */
+    }
+    
+    /* Degradado sobre el video para mejorar lectura */
+    .hero::after {
+      content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8));
+      z-index: 1;
+    }
+
+    .hero-content { position: relative; z-index: 3; opacity: 0; transform: translateY(30px); }
+    .hero h1 { font-size: 6rem; margin: 0; color: var(--gold); line-height: 1; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .hero p { font-size: 1.5rem; letter-spacing: 3px; margin-top: 10px; font-weight: 300; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    
     .scroll-indicator {
-      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 3;
       animation: bounce 2s infinite; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7;
     }
 
-    /* --- DATA SECTION (POBLACIÓN & SOCIOECONOMÍA) --- */
+    /* --- ESTADÍSTICAS --- */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px; width: 100%; max-width: 1200px; margin: 0 auto;
     }
     .stat-card {
       background: var(--glass); border: var(--glass-border);
-      backdrop-filter: blur(10px); padding: 30px; border-radius: 4px;
+      backdrop-filter: blur(10px); padding: 25px; border-radius: 12px;
       transition: transform 0.3s;
     }
-    .stat-card:hover { transform: translateY(-10px); border-color: var(--gold); }
-    .stat-number { font-size: 2.5rem; color: var(--gold); font-family: 'Cormorant Garamond', serif; display: block; margin-bottom: 5px; }
-    .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #aaa; }
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--gold); background: rgba(30,30,30,0.8); }
+    .stat-number { font-size: 2.2rem; color: var(--gold); font-family: 'Cormorant Garamond', serif; display: block; margin-bottom: 5px; }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #aaa; }
 
-    /* --- CULTURA (SLIDER HORIZONTAL) --- */
-    .culture-section { overflow: hidden; }
-    .culture-container { display: flex; align-items: center; gap: 50px; }
+    /* --- CULTURA --- */
+    .culture-section { overflow: visible; }
+    .culture-container { display: flex; align-items: center; gap: 60px; }
     .culture-text { flex: 1; max-width: 500px; z-index: 2; }
-    .culture-text h2 { font-size: 3.5rem; color: var(--gold); margin-bottom: 20px; }
-    .culture-text p { line-height: 1.8; font-size: 1.1rem; color: #ddd; }
+    .culture-text h2 { font-size: 3.5rem; color: var(--gold); margin-bottom: 20px; line-height: 1; }
+    .culture-text p { line-height: 1.8; font-size: 1.05rem; color: #ddd; margin-bottom: 15px; }
     
-    .culture-gallery { flex: 1.5; display: flex; gap: 20px; perspective: 1000px; }
+    .culture-gallery { flex: 1.5; display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; position: relative; }
     .gallery-img {
-      width: 300px; height: 400px; object-fit: cover; border-radius: 8px;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-      transition: 0.5s; opacity: 0.8;
+      width: 100%; height: 350px; object-fit: cover; border-radius: 8px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5); opacity: 0.9;
+      transition: 0.5s; grid-column: span 6;
     }
-    .gallery-img:hover { transform: scale(1.05) rotateY(-5deg); opacity: 1; z-index: 10; border: 1px solid var(--gold); }
+    .gallery-img:nth-child(2) { margin-top: 50px; } /* Desfase estético */
+    .gallery-img:hover { transform: scale(1.03); opacity: 1; z-index: 10; border: 1px solid var(--gold); }
 
-    /* --- ENTORNO (FULL WIDTH) --- */
+    /* --- IDIOMA (TARJETAS AUDIO) --- */
+    .word-grid { display: flex; justify-content: center; gap: 30px; margin-top: 40px; flex-wrap: wrap;}
+    .word-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+      padding: 25px 50px; border-radius: 50px; cursor: pointer;
+      transition: 0.3s; position: relative; overflow: hidden; display: flex; align-items: center; gap: 15px;
+    }
+    .word-card:hover { background: var(--gold); border-color: var(--gold); }
+    .word-card:hover span, .word-card:hover .play-icon { color: #000; }
+    
+    .native { font-size: 1.8rem; display: block; font-family: 'Cormorant Garamond'; line-height: 1;}
+    .translation { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px;}
+    .play-icon { font-size: 1.2rem; color: var(--gold); transition: 0.3s; }
+
+    /* --- ENTORNO --- */
     .env-section {
-      background: linear-gradient(90deg, #0a0a0a 0%, transparent 50%, #0a0a0a 100%),
-                  url('../../img/wayuu_desierto.jpeg?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover;
+      /* Fondo Parallax en CSS */
+      background: linear-gradient(90deg, #050505 10%, transparent 60%, #050505 100%),
+                  url('../../img/wayuu_desierto.jpeg?q=80&w=1920&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed; /* Efecto Parallax nativo */
       align-items: flex-start;
+      min-height: 80vh;
     }
     .env-card {
-      background: rgba(0,0,0,0.7); padding: 40px; max-width: 500px;
+      background: rgba(10,10,10,0.85); padding: 50px; max-width: 500px;
       border-left: 4px solid var(--gold);
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
-    .sound-toggle {
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-      color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer;
-      display: flex; align-items: center; gap: 8px; transition: 0.3s;
-    }
-    .sound-toggle:hover { background: var(--gold); color: black; }
-
-   .word-card {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--gold);
-    padding: 20px 40px; border-radius: 50px; cursor: pointer;
-    transition: 0.3s; position: relative; overflow: hidden;
-  }
-    .word-card:hover { background: var(--gold); color: black; }
-    .native { font-size: 1.5rem; display: block; font-family: 'Cormorant Garamond'; }
-    .translation { font-size: 0.8rem; opacity: 0.7; }
-
-    body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url('../../img/patron_wayuu.jpeg');
-    background-repeat: repeat;
-    opacity: 0.03; /* Muy sutil */
-    pointer-events: none;
-    z-index: 0;
-  }
-    
-
-    /* FOOTER */
-    footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; }
+    footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; position: relative; z-index: 2;}
 
     @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
 
     /* RESPONSIVE */
     @media(max-width: 768px) {
-      .hero h1 { font-size: 3rem; }
+      .hero h1 { font-size: 3.5rem; }
       .culture-container { flex-direction: column; }
-      section { padding: 50px 20px; }
-      .gallery-img { width: 100%; height: 250px; }
+      .culture-gallery { display: flex; overflow-x: auto; width: 100%; padding-bottom: 20px; }
+      .gallery-img { width: 250px; height: 300px; flex-shrink: 0; margin-top: 0 !important;}
+      section { padding: 80px 20px; }
+      .word-card { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -174,156 +207,224 @@
 
   <!-- NAVEGACIÓN -->
   <nav>
-    
     <a href="javascript:history.back()" class="back-btn">← Volver al Globo</a>
-    <div style="font-size:0.8rem; letter-spacing:1px;">ULULATO EXPERIENCE</div>
-    <button id="sound-btn" class="sound-toggle">
-     <span class="icon">🔇</span> Sonido
-    </button>
+    
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="font-size:0.75rem; letter-spacing:2px; color:#aaa; display:none; @media(min-width:768px){display:block;}">ULULATO ORIGINS</div>
+        <button id="sound-btn" class="sound-toggle">
+            <span class="icon">🔊</span> Sonido On
+        </button>
+    </div>
+
+    <!-- AUDIO AMBIENTAL (VIENTO) -->
     <audio id="bg-audio" loop>
-      <!-- Usa un audio de viento o música ambiental suave -->
       <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mp3">
     </audio>
-    
   </nav>
 
   <main>
-  <!-- 1. HERO: IMPACTO VISUAL -->
-  <section class="hero">
-    <div class="hero-content" id="hero-content">
-      <p>PUEBLO DE ORIGEN</p>
-      <h1 id="pueblo-title">WAYUU</h1>
-      <p id="pueblo-subtitle">Hijos de la lluvia y la sequía</p>
-    </div>
-    <div class="scroll-indicator">Descubre su historia</div>
-  </section>
+    <!-- 1. HERO CON VIDEO DE FONDO -->
+    <section class="hero">
+        <div class="hero-video-container">
+            <!-- Coloca tu video en videos/wayuu_hero.mp4 o usa este link de ejemplo -->
+            <video id="hero-video" autoplay muted loop playsinline>
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-sand-dunes-in-the-desert-4654-large.mp4" type="video/mp4">
+            </video>
+        </div>
 
-  <!-- 2. POBLACIÓN Y SOCIOECONOMÍA (STATS) -->
-  <section id="stats">
-    <div style="margin-bottom: 40px; text-align:center;">
-      <h2 style="font-size: 2.5rem; color: #fff;">Radiografía Social</h2>
-      <p style="color: #aaa; max-width: 600px; margin: 0 auto;">Una mirada a la estructura demográfica y económica actual.</p>
-    </div>
+        <div class="hero-content" id="hero-content">
+            <p style="color: #ddd;">PUEBLO DE ORIGEN</p>
+            <h1 id="pueblo-title">WAYUU</h1>
+            <p id="pueblo-subtitle">Hijos de la lluvia y la sequía</p>
+        </div>
+        <div class="scroll-indicator">Descubre su historia</div>
+    </section>
+
+    <!-- 2. DATA (MENOS ESPACIO) -->
+    <section id="stats">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number">380k+</span>
+                <span class="stat-label">Población</span>
+                <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">La etnia indígena más numerosa de Colombia y Venezuela.</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">Matrilineal</span>
+                <span class="stat-label">Organización</span>
+                <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">El apellido y la herencia pasan a través de la madre.</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">Pesca</span>
+                <span class="stat-label">& Pastoreo</span>
+                <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Economía basada en la cría de chivos y recursos marinos.</p>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">Tejido</span>
+                <span class="stat-label">Arte Sagrado</span>
+                <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Las mochilas narran la cosmogonía a través de figuras geométricas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. CULTURA -->
+    <section class="culture-section" id="culture">
+        <div class="culture-container">
+            <div class="culture-text">
+                <h2>La Palabra Sagrada</h2>
+                <p>
+                    Para los Wayuu, la palabra (Pütchikalü) tiene un valor incalculable. Los conflictos se resuelven a través del <strong>Pütchipü'ü</strong> (Palabrero), un mediador que utiliza la retórica para restaurar la armonía.
+                </p>
+                <p>
+                    Sus sueños son mensajes de los ancestros. La realidad y el mundo onírico se entrelazan, guiando decisiones sobre salud y viajes.
+                </p>
+            </div>
+            <div class="culture-gallery">
+                <img src="img/wayuu_1.jpg" class="gallery-img" alt="Cultura" onerror="this.src='https://i.pinimg.com/736x/8e/9b/72/8e9b7274092497876a604246944e0049.jpg'">
+                <img src="img/wayuu_2.jpg" class="gallery-img" alt="Rostros" onerror="this.src='https://off2colombia.com.co/images/destinations/guajira/wayuu-culture/wayuu-culture-4.jpg'">
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. LENGUAJE (INTERACTIVO CON SONIDO) -->
+    <section class="language-section" style="text-align: center;">
+        <h2 style="color: var(--gold); margin-bottom: 10px;">La Voz Viva</h2>
+        <p style="color:#aaa; margin-bottom: 40px;">Escucha el idioma Wayuunaiki</p>
+        
+        <div class="word-grid">
+            <div class="word-card" onclick="playWord('jamaya', 'Jamaya')">
+                <div>
+                    <span class="native">Jamaya</span>
+                    <span class="translation">Hola (Saludo)</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </div>
     
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-number">380k+</span>
-        <span class="stat-label">Población Estimada</span>
-        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">La etnia indígena más numerosa de Colombia y Venezuela.</p>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">Clanes</span>
-        <span class="stat-label">Organización Social</span>
-        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Estructura matrilineal. El apellido y la herencia pasan por la madre.</p>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">Pesca</span>
-        <span class="stat-label">& Pastoreo</span>
-        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Economía de subsistencia basada en chivos y recursos marinos.</p>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">Tejido</span>
-        <span class="stat-label">Arte & Comercio</span>
-        <p style="font-size:0.85rem; margin-top:10px; color:#ccc;">Las mochilas Wayuu son su principal producto de exportación cultural.</p>
-      </div>
-    </div>
-  </section>
+            <div class="word-card" onclick="playWord('mma', 'Mma')">
+                <div>
+                    <span class="native">Mma</span>
+                    <span class="translation">Tierra</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </div>
 
-  <!-- 3. CULTURA (INMERSIVA) -->
-  <section class="culture-section" id="culture">
-    <div class="culture-container">
-      <div class="culture-text">
-        <h2>La Palabra Sagrada</h2>
-        <p>
-          Para los Wayuu, la palabra (Pütchikalü) tiene un valor incalculable. Los conflictos no se resuelven con violencia, sino a través del <strong>Pütchipü'ü</strong> (Palabrero), un mediador que utiliza la retórica y la compensación para restaurar la armonía.
-        </p>
-        <p>
-          Sus sueños son mensajes de los ancestros. La realidad y el mundo onírico se entrelazan en su vida diaria, guiando decisiones sobre salud, viajes y vida comunitaria.
-        </p>
-      </div>
-      <div class="culture-gallery">
-        <img src="../../img/Baile_cortejo_Wayuu.jpg" class="gallery-img" alt="Baile Yonna">
-        <img src="../../img/Mujeres-wayuu.jpg" class="gallery-img" alt="Rostros">
-        <img src="../../img/banner-chinchorros.jpg" class="gallery-img" alt="Chinchorros">
-      </div>
-    </div>
-  </section>
+            <div class="word-card" onclick="playWord('juya', 'Juya')">
+                <div>
+                    <span class="native">Juya</span>
+                    <span class="translation">Lluvia (Padre)</span>
+                </div>
+                <div class="play-icon">▶</div>
+            </div>
+        </div>
+    </section>
 
-    <!-- 4. LENGUA NATIVA -->
-   <section class="language-section" style="padding: 100px 10%; text-align: center;">
-    <h2 style="color: var(--gold);">El Idioma Wayuunaiki</h2>
-    <div class="word-grid" style="display:flex; justify-content:center; gap:20px; margin-top:30px;">
-      
-      <!-- Botón de palabra -->
-      <div class="word-card" onclick="playWord('hola')">
-        <span class="native">Jamaya</span>
-        <span class="translation">Hola (Saludo)</span>
-        <div class="play-icon">▶</div>
-      </div>
-  
-      <div class="word-card" onclick="playWord('tierra')">
-        <span class="native">Mma</span>
-        <span class="translation">Tierra</span>
-        <div class="play-icon">▶</div>
-      </div>
-  
-    </div>
-  </section>
-    
-
-  <!-- 5. ENTORNO AMBIENTAL -->
-  <section class="env-section" id="env">
-    <div class="env-card">
-      <h2 style="font-size: 2.5rem; color: var(--gold); margin-top:0;">El Desierto Vivo</h2>
-      <p>
-        La Guajira es un territorio de contrastes extremos. Un desierto que se encuentra abruptamente con el Mar Caribe.
-      </p>
-      <ul style="list-style: none; padding: 0; line-height: 2;">
-        <li>✦ <strong>Clima:</strong> Árido y seco, con vientos alisios constantes.</li>
-        <li>✦ <strong>Flora:</strong> Cactus, trupillos y manglares costeros.</li>
-        <li>✦ <strong>Desafío:</strong> La escasez de agua dulce es la lucha constante de este pueblo resiliente.</li>
-      </ul>
-    </div>
-  </section>
- </main>
+    <!-- 5. ENTORNO -->
+    <section class="env-section" id="env">
+        <div class="env-card">
+            <h2 style="font-size: 2.5rem; color: var(--gold); margin-top:0;">El Desierto Vivo</h2>
+            <p>
+                La Guajira es un territorio de contrastes extremos. Un desierto que se encuentra abruptamente con el Mar Caribe.
+            </p>
+            <ul style="list-style: none; padding: 0; line-height: 2; margin-top: 20px;">
+                <li>✦ <strong>Clima:</strong> Árido y seco, con vientos alisios constantes.</li>
+                <li>✦ <strong>Flora:</strong> Cactus, trupillos y manglares costeros.</li>
+                <li>✦ <strong>Desafío:</strong> La escasez de agua dulce es la lucha constante de este pueblo resiliente.</li>
+            </ul>
+        </div>
+    </section>
+  </main>
   
   <footer>
     © 2024 Proyecto Ululato - Preservando la Memoria Ancestral
   </footer>
 
   <script>
-    // 1. ANIMACIONES CON GSAP (SCROLLTELLING)
+    // --- 1. CONFIGURACIÓN INICIAL ---
     gsap.registerPlugin(ScrollTrigger);
+    
+    // Smooth Scroll (Lenis)
+    const lenis = new Lenis({ duration: 1.2, smooth: true });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+    lenis.on('scroll', ScrollTrigger.update); // Conectar con GSAP
 
-    // Intro Hero
-    gsap.to("#hero-content", { duration: 1.5, opacity: 1, y: 0, ease: "power3.out", delay: 0.5 });
+    // --- 2. SISTEMA DE AUDIO (SOLUCIÓN A PROBLEMAS DE SONIDO) ---
+    const audio = document.getElementById('bg-audio');
+    const soundBtn = document.getElementById('sound-btn');
+    let isMuted = false;
 
-    // Stats (Aparecen una por una)
-    gsap.from(".stat-card", {
-      scrollTrigger: { trigger: "#stats", start: "top 80%" },
-      y: 50, opacity: 0, duration: 0.8, stagger: 0.2
+    // Intentar reproducir al cargar (Autoplay Policy puede bloquearlo)
+    window.addEventListener('load', () => {
+        audio.volume = 0.4;
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // Autoplay exitoso
+                soundBtn.innerHTML = '<span class="icon">🔊</span> Sonido On';
+            }).catch(error => {
+                // Autoplay bloqueado por navegador -> Mostrar Muteado
+                isMuted = true;
+                soundBtn.innerHTML = '<span class="icon">🔇</span> Activar Sonido';
+                console.log("Autoplay bloqueado. Esperando interacción.");
+            });
+        }
     });
 
-    // Cultura (Texto desliza izquierda, fotos derecha)
+    // Toggle botón sonido
+    soundBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+            soundBtn.innerHTML = '<span class="icon">🔊</span> Sonido On';
+        } else {
+            audio.pause();
+            soundBtn.innerHTML = '<span class="icon">🔇</span> Sonido Off';
+        }
+    });
+
+    // Función para reproducir palabras (LENGUAJE)
+    // Busca archivo en audio/palabra.mp3, si no existe, usa voz del navegador (TTS)
+    function playWord(filename, text) {
+        const wordAudio = new Audio(`audio/${filename}.mp3`);
+        
+        wordAudio.play().catch(e => {
+            console.warn("Archivo de audio no encontrado, usando síntesis de voz.", e);
+            // Fallback: Web Speech API (Voz robótica si no hay mp3)
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES'; // O 'es-LA'
+            utterance.rate = 0.9;
+            speechSynthesis.speak(utterance);
+        });
+    }
+
+    // --- 3. ANIMACIONES GSAP ---
+    // Hero
+    gsap.to("#hero-content", { duration: 2, opacity: 1, y: 0, ease: "power3.out", delay: 0.5 });
+
+    // Stats
+    gsap.from(".stat-card", {
+        scrollTrigger: { trigger: "#stats", start: "top 85%" },
+        y: 50, opacity: 0, duration: 0.8, stagger: 0.15
+    });
+
+    // Cultura
     gsap.from(".culture-text", {
-      scrollTrigger: { trigger: "#culture", start: "top 70%" },
-      x: -50, opacity: 0, duration: 1
+        scrollTrigger: { trigger: "#culture", start: "top 75%" },
+        x: -50, opacity: 0, duration: 1
     });
     gsap.from(".gallery-img", {
-      scrollTrigger: { trigger: "#culture", start: "top 70%" },
-      x: 50, opacity: 0, duration: 1, stagger: 0.2
+        scrollTrigger: { trigger: "#culture", start: "top 75%" },
+        y: 50, opacity: 0, duration: 1, stagger: 0.2
     });
 
-    // Entorno (Fade in suave)
+    // Entorno
     gsap.from(".env-card", {
-      scrollTrigger: { trigger: "#env", start: "top 75%" },
-      scale: 0.9, opacity: 0, duration: 1
+        scrollTrigger: { trigger: "#env", start: "top 80%" },
+        scale: 0.95, opacity: 0, duration: 1
     });
 
-    // 2. EFECTO DE PARTÍCULAS EN EL CANVAS (AMBIENTE MÁGICO)
+    // --- 4. CANVAS DE PARTÍCULAS (OPTIMIZADO) ---
     const canvas = document.getElementById('ambient-canvas');
     const ctx = canvas.getContext('2d');
-    
     let width, height;
     let particles = [];
 
@@ -335,85 +436,35 @@
     resize();
 
     class Particle {
-      constructor() {
-        this.reset();
-      }
+      constructor() { this.reset(); }
       reset() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.5; // Movimiento lento
-        this.vy = (Math.random() - 0.5) * 0.5;
+        this.vx = (Math.random() - 0.5) * 0.2; // Muy lento
+        this.vy = (Math.random() - 0.5) * 0.2;
         this.size = Math.random() * 2;
-        this.alpha = Math.random() * 0.5;
-        this.life = Math.random() * 100;
+        this.alpha = Math.random() * 0.5 + 0.1;
       }
       update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.life--;
-        
-        if(this.life < 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-          this.reset();
-        }
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
       }
       draw() {
-        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`; // Color dorado suave
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Crear 100 partículas
-    for(let i=0; i<100; i++) particles.push(new Particle());
+    for (let i = 0; i < 60; i++) particles.push(new Particle()); // Menos partículas, más elegante
 
     function animateCanvas() {
       ctx.clearRect(0, 0, width, height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
+      particles.forEach(p => { p.update(); p.draw(); });
       requestAnimationFrame(animateCanvas);
     }
     animateCanvas();
-
-    const soundBtn = document.getElementById('sound-btn');
-    const audio = document.getElementById('bg-audio');
-    audio.volume = 0.3; // Volumen bajo
-    
-    soundBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play();
-        soundBtn.innerHTML = '<span class="icon">🔊</span> Sonido On';
-      } else {
-        audio.pause();
-        soundBtn.innerHTML = '<span class="icon">🔇</span> Sonido Off';
-      }
-    });
-    
-    // Inicializar Lenis para scroll suave
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true
-    });
-    
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-    
-    // Conectar Lenis con ScrollTrigger de GSAP
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time)=>{
-      lenis.raf(time * 1000);
-    });
-    
-    // 3. LÓGICA DINÁMICA (SIMULACIÓN)
-    // En una app real, leerías la URL ?id=wayuu y llenarías los datos desde data_pueblos.js
-    // Aquí está pre-llenado para Wayuu como ejemplo visual.
-    
   </script>
 </body>
 </html>
