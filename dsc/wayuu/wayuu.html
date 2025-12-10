@@ -119,6 +119,25 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 20%, transparent 80%, rgba(0,0,0,0.9));
             z-index: 1; /* Encima del video, debajo de las partículas */
         }
+
+        /* SOMBRA TIPO CINE (Viñeta) */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Negro arriba (para el menú), Transparente al medio (para las mujeres), Negro abajo (para el texto) */
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.6) 0%,   /* Arriba oscuro */
+                rgba(0,0,0,0) 30%,    /* Centro transparente */
+                rgba(0,0,0,0) 70%,    /* Centro transparente */
+                rgba(0,0,0,0.8) 100%  /* Abajo oscuro */
+            );
+            z-index: 1; /* Encima del video */
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +185,7 @@
                     PUEBLO DE ORIGEN
                 </p>
                 
-                <h1 class="hero-anim text-7xl md:text-[9rem] font-serif text-[#D4A056] leading-none mb-2">
+                <h1 class="hero-anim text-7xl md:text-[10rem] font-serif text-[#D4A056] leading-none mb-4 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
                     WAYUU
                 </h1>
                 
