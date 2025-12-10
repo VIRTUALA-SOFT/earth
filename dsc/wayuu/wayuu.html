@@ -522,16 +522,28 @@
             // --- 3. ANIMACIONES GSAP (INTERACCIONES AVANZADAS) ---
             gsap.registerPlugin(ScrollTrigger);
 
-            // A. YONNA SCROLL-JACKING
-            // Gira la imagen de la bailarina al hacer scroll
+            
+            // A. YONNA SCROLL-JACKING (ACTUALIZADO PARA VIDEO)
+            // Zoom dramático al video
             gsap.to(".dancer-video", {
-                rotation: 360,
-                scale: 1.1,
+                scale: 1.3, // El video crece dentro del círculo
+                opacity: 1,
+                scrollTrigger: {
+                    trigger: "#yonna-section",
+                    start: "top bottom", // Empieza cuando la sección asoma abajo
+                    end: "bottom top",   // Termina cuando la sección se va por arriba
+                    scrub: 1             // Vinculado al scroll suavemente
+                }
+            });
+            
+            // Opcional: Rotar LIGERAMENTE el borde del círculo (solo el contenedor, no el video)
+            gsap.to(".dancer-container", {
+                rotation: 15, // Solo gira 15 grados, muy sutil
                 scrollTrigger: {
                     trigger: "#yonna-section",
                     start: "top bottom",
                     end: "bottom top",
-                    scrub: 1
+                    scrub: 2
                 }
             });
 
