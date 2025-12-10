@@ -37,8 +37,16 @@
         /* CANVAS FONDO */
         #webgl-canvas {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0; transition: opacity 2s ease;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* TRUCO PRO: */
+            z-index: -1; /* 2 Lo ponemos POR ENCIMA del video */
+            pointer-events: none; /* Crucial: permite dar clic a lo que esté debajo */
+            mix-blend-mode: screen; /* Hace que las partículas brillen sobre el video oscuro */
+            opacity: 0; 
+            transition: opacity 2s ease;
         }
 
         ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -87,6 +95,27 @@
             background: linear-gradient(90deg, var(--c-weave), var(--c-sand));
             transition: width 0.2s linear;
         }
+
+        .hero-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Al fondo */
+            overflow: hidden;
+        }
+        
+        .hero-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Gradiente cinemático: Oscuro arriba y abajo, transparente en el centro */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 20%, transparent 80%, rgba(0,0,0,0.9));
+            z-index: 1; /* Encima del video, debajo de las partículas */
+        }
     </style>
 </head>
 <body>
@@ -111,18 +140,42 @@
 
     <main class="relative z-10 opacity-0" id="main-content">
 
-        <!-- 1. HERO -->
-        <section class="h-screen w-full flex flex-col justify-center items-center px-4 relative">
-            <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-[#FF2E63] rounded-full blur-[100px] opacity-20 animate-pulse"></div>
-            <div class="text-center z-10">
-                <p class="hero-anim tech-font text-[#00C4CC] text-[10px] md:text-xs tracking-[0.5em] mb-4 uppercase">Península Sagrada</p>
-                <h1 class="hero-anim text-6xl md:text-9xl font-serif italic text-white mix-blend-overlay leading-[0.9]">
-                    Hijos del<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#D4A056] to-[#FF2E63] not-italic font-bold title-font">Viento</span>
-                </h1>
-                <p class="hero-anim mt-8 max-w-lg mx-auto text-gray-400 font-light text-sm md:text-base leading-relaxed">
-                    Donde el desierto besa al mar Caribe. Una inmersión en la nación indígena más resiliente de América del Sur.
+       <!-- SECCIÓN 1: HERO CON VIDEO BACKGROUND -->
+        <section class="h-screen w-full flex flex-col justify-center items-center px-4 relative overflow-hidden">
+            
+            <!-- 1. VIDEO DE FONDO -->
+            <div class="absolute inset-0 z-0">
+                <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                    <!-- Puse un video de ejemplo de telas rojas/viento. 
+                         Cámbialo por tu archivo real (ej: assets/wayuu-hero.mp4) -->
+                    <source src="https://player.vimeo.com/external/370467553.sd.mp4?s=96de8b9272497d5a8ccb057929fc5f3560731174&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+                </video>
+                
+                <!-- 2. OVERLAY OSCURO (Para que el texto resalte) -->
+                <!-- Gradiente: Negro abajo para leer el footer, transparente al medio, oscuro arriba -->
+                <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80 mix-blend-multiply"></div>
+                <div class="absolute inset-0 bg-black/30"></div> <!-- Capa extra de oscurecimiento general -->
+            </div>
+        
+            <!-- 3. CONTENIDO (TEXTO) -->
+            <div class="text-center z-10 relative">
+                <p class="hero-anim tech-font text-white/80 text-[10px] md:text-xs tracking-[0.5em] mb-4 uppercase">
+                    PUEBLO DE ORIGEN
                 </p>
+                
+                <h1 class="hero-anim text-7xl md:text-[9rem] font-serif text-[#D4A056] leading-none mb-2">
+                    WAYUU
+                </h1>
+                
+                <p class="hero-anim text-white/90 font-light tracking-widest text-sm md:text-lg uppercase">
+                    Hijos de la lluvia y la sequía
+                </p>
+            </div>
+            
+            <!-- FLECHA SCROLL -->
+            <div class="absolute bottom-10 animate-bounce z-10 text-white/50">
+                <p class="text-[9px] tracking-[0.3em] mb-2 uppercase">Descubre su historia</p>
+                <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
             </div>
         </section>
 
