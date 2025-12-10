@@ -107,7 +107,7 @@
     
     .culture-gallery { flex: 1.5; display: flex; gap: 20px; perspective: 1000px; }
     .gallery-img {
-      width: 300px; height: 400px; object-fit: cover; border-radius: 8px;
+      width: 300px; height: 400px; object-fit: contain; border-radius: 8px;
       box-shadow: 0 15px 30px rgba(0,0,0,0.5);
       transition: 0.5s; opacity: 0.8;
     }
@@ -145,7 +145,7 @@
     content: '';
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url('img/patron_wayuu.jpeg');
+    background-image: url('../../img/patron_wayuu.jpeg');
     background-repeat: repeat;
     opacity: 0.03; /* Muy sutil */
     pointer-events: none;
@@ -242,7 +242,7 @@
         </p>
       </div>
       <div class="culture-gallery">
-        <img src="../..img/Baile_cortejo_Wayuu.jpg" class="gallery-img" alt="Baile">
+        <img src="../../img/Baile_cortejo_Wayuu.jpg" class="gallery-img" alt="Baile">
         <img src="../../img/Mujeres-wayuu.jpg" class="gallery-img" alt="Rostros">
         <img src="../../img/danza-tipica-wayuu.jpg" class="gallery-img" alt="Danza Yonna">
       </div>
