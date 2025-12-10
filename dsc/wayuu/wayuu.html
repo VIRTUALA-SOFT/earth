@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guardianes del Valle | Experiencia Inmersiva</title>
+    <!-- Evitar error de favicon en consola -->
+    <link rel="icon" href="data:,">
     
-    <!-- FUENTES PREMIUM -->
+    <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Manrope:wght@200;400;600&display=swap" rel="stylesheet">
@@ -15,13 +17,17 @@
     
     <style>
         :root {
-            --c-bg: #030303;
+            --c-bg: #050505;
             --c-gold: #D4AF37;
             --c-neon: #00f2ff;
         }
 
+        html {
+            background-color: var(--c-bg); /* El color de fondo va al HTML, no al body */
+        }
+
         body {
-            background-color: var(--c-bg);
+            background-color: transparent; /* IMPORTANTE: Transparente para ver el 3D detrás */
             color: #e5e5e5;
             font-family: 'Manrope', sans-serif;
             overflow-x: hidden;
@@ -39,11 +45,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: -1; /* Detrás de todo */
             opacity: 0; 
             transition: opacity 2s ease;
         }
 
+        /* Ocultar barra de scroll nativa para estética */
         ::-webkit-scrollbar {
             width: 0px;
             background: transparent;
@@ -62,7 +69,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #030303; /* Aseguramos fondo negro solido */
+            background: #050505;
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -89,7 +96,7 @@
 </head>
 <body>
 
-    <!-- CANVAS 3D -->
+    <!-- CANVAS 3D (Fondo) -->
     <canvas id="webgl-canvas"></canvas>
 
     <!-- PRELOADER -->
@@ -112,7 +119,7 @@
     </nav>
 
     <!-- CONTENIDO -->
-    <main class="relative z-10 opacity-0" id="main-content"> <!-- Oculto inicialmente -->
+    <main class="relative z-10 opacity-0" id="main-content">
 
         <!-- HERO -->
         <section class="h-screen w-full flex flex-col justify-center items-center relative">
@@ -149,120 +156,100 @@
         </section>
 
         <footer class="h-[50vh] flex items-center justify-center border-t border-white/10 bg-black relative z-20">
-            <h2 class="text-4xl md:text-6xl text-[#333] font-bold">FIN DE LA DEMO</h2>
+            <h2 class="text-4xl md:text-6xl text-[#333] font-bold">FIN</h2>
         </footer>
 
     </main>
 
-    <!-- SCRIPTS LIBRARIES -->
+    <!-- SCRIPTS ACTUALIZADOS Y BLINDADOS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
+    <!-- Lenis versión más estable para CDN directo -->
+    <script src="https://unpkg.com/lenis@1.0.42/dist/lenis.min.js"></script>
 
     <script>
-        // ESPERAR A QUE EL DOM ESTÉ LISTO (SOLUCIÓN AL BLOQUEO)
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Cargado. Iniciando scripts...");
+            console.log("Iniciando experiencia...");
 
-            // 1. LÓGICA DEL LOADER (Prioritaria)
+            // ELEMENTOS DOM
             const loaderBar = document.getElementById('loader-bar');
             const loaderText = document.getElementById('loader-text');
             const loader = document.getElementById('loader');
             const mainContent = document.getElementById('main-content');
             const canvasEl = document.getElementById('webgl-canvas');
 
+            // --- 1. CARGA SIMULADA ---
             let loadProgress = 0;
-            
-            // Simulación de carga robusta
             const loadInterval = setInterval(() => {
-                loadProgress += Math.random() * 5; // Velocidad aleatoria
-                
+                loadProgress += Math.random() * 8;
                 if (loadProgress >= 100) {
                     loadProgress = 100;
                     clearInterval(loadInterval);
                     revealSite();
                 }
-                
                 if(loaderBar) loaderBar.style.width = `${loadProgress}%`;
                 if(loaderText) loaderText.innerText = `${Math.floor(loadProgress)}%`;
-            }, 50);
+            }, 60);
 
             function revealSite() {
-                console.log("Revelando sitio...");
                 const tl = gsap.timeline();
-
-                // Desaparecer loader
-                tl.to(loader, {
-                    opacity: 0,
-                    duration: 1,
-                    pointerEvents: 'none',
-                    ease: "power2.inOut",
-                    onComplete: () => { loader.style.display = 'none'; }
-                })
-                // Aparecer contenido
-                .to(canvasEl, { opacity: 1, duration: 2 }, "-=0.5")
-                .to(mainContent, { opacity: 1, duration: 1 }, "-=1.5")
-                .from(".hero-anim", {
-                    y: 50,
-                    opacity: 0,
-                    duration: 1.5,
-                    stagger: 0.2,
-                    ease: "power3.out"
-                }, "-=0.5");
+                tl.to(loader, { opacity: 0, duration: 1, pointerEvents: 'none', onComplete: () => loader.style.display = 'none' })
+                  .to(canvasEl, { opacity: 1, duration: 2 }, "-=0.5")
+                  .to(mainContent, { opacity: 1, duration: 1 }, "-=1.5")
+                  .from(".hero-anim", { y: 50, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power3.out" }, "-=0.5");
             }
 
-            // 2. CONFIGURACIÓN THREE.JS (Protegida contra errores)
+            // --- 2. THREE.JS (FONDO DE PARTÍCULAS) ---
             try {
                 const scene = new THREE.Scene();
-                scene.fog = new THREE.FogExp2(0x030303, 0.002);
+                // Ajustamos la niebla para que coincida con el fondo CSS
+                scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
                 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
                 const renderer = new THREE.WebGLRenderer({
                     canvas: canvasEl,
                     antialias: true,
-                    alpha: true
+                    alpha: true // Crucial para ver el fondo
                 });
                 
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-                // Partículas
-                const particlesGeometry = new THREE.BufferGeometry();
-                const particlesCount = 2000;
+                // Crear partículas
+                const geometry = new THREE.BufferGeometry();
+                const count = 2500;
+                const positions = new Float32Array(count * 3);
+                const colors = new Float32Array(count * 3);
                 
-                const posArray = new Float32Array(particlesCount * 3);
-                const colorArray = new Float32Array(particlesCount * 3);
-                const color1 = new THREE.Color(0xD4AF37);
-                const color2 = new THREE.Color(0x00f2ff);
+                const c1 = new THREE.Color(0xD4AF37);
+                const c2 = new THREE.Color(0x00f2ff);
 
-                for(let i = 0; i < particlesCount * 3; i+=3) {
-                    posArray[i] = (Math.random() - 0.5) * 15;
-                    posArray[i+1] = (Math.random() - 0.5) * 15;
-                    posArray[i+2] = (Math.random() - 0.5) * 15;
+                for(let i = 0; i < count * 3; i+=3) {
+                    positions[i] = (Math.random() - 0.5) * 18;
+                    positions[i+1] = (Math.random() - 0.5) * 18;
+                    positions[i+2] = (Math.random() - 0.5) * 18;
 
-                    const mixedColor = Math.random() > 0.5 ? color1 : color2;
-                    colorArray[i] = mixedColor.r;
-                    colorArray[i+1] = mixedColor.g;
-                    colorArray[i+2] = mixedColor.b;
+                    let c = Math.random() > 0.5 ? c1 : c2;
+                    colors[i] = c.r; colors[i+1] = c.g; colors[i+2] = c.b;
                 }
 
-                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-                particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
                 const material = new THREE.PointsMaterial({
-                    size: 0.025,
+                    size: 0.03,
                     vertexColors: true,
                     transparent: true,
                     opacity: 0.8,
                     blending: THREE.AdditiveBlending
                 });
 
-                const particlesMesh = new THREE.Points(particlesGeometry, material);
-                scene.add(particlesMesh);
+                const particles = new THREE.Points(geometry, material);
+                scene.add(particles);
                 camera.position.z = 4;
 
-                // Mouse interaction
+                // Mouse
                 let mouseX = 0;
                 let mouseY = 0;
                 let targetX = 0;
@@ -275,63 +262,60 @@
                     mouseY = (event.clientY - windowHalfY);
                 });
 
-                // Loop Animation
+                // Loop
                 const clock = new THREE.Clock();
                 const tick = () => {
-                    targetX = mouseX * 0.001;
-                    targetY = mouseY * 0.001;
-                    const elapsedTime = clock.getElapsedTime();
+                    const elapsed = clock.getElapsedTime();
+                    targetX = mouseX * 0.0005;
+                    targetY = mouseY * 0.0005;
 
-                    particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
-                    particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
-                    particlesMesh.rotation.y += 0.002; // Rotación automática constante
+                    particles.rotation.y += 0.05 * (targetX - particles.rotation.y);
+                    particles.rotation.x += 0.05 * (targetY - particles.rotation.x);
+                    particles.rotation.y += 0.002; // Rotación constante
 
                     renderer.render(scene, camera);
                     window.requestAnimationFrame(tick);
                 }
                 tick();
 
-                // Resize handle
+                // Resize
                 window.addEventListener('resize', () => {
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize(window.innerWidth, window.innerHeight);
                 });
 
-                // Parallax Scroll (GSAP)
+                // GSAP Scroll Effect
                 gsap.registerPlugin(ScrollTrigger);
-                gsap.to(particlesMesh.position, {
-                    scrollTrigger: {
-                        trigger: "body",
-                        start: "top top",
-                        end: "bottom bottom",
-                        scrub: 2
-                    },
-                    z: 5, 
-                    y: 1
+                gsap.to(particles.position, {
+                    scrollTrigger: { trigger: "body", start: "top top", end: "bottom bottom", scrub: 1 },
+                    z: 6, // Viaje hacia adentro
+                    y: 2
                 });
 
-            } catch (error) {
-                console.error("Error iniciando Three.js:", error);
-                // Si falla el 3D, forzamos la revelación del sitio para que no se quede pegado
-                revealSite();
-            }
-
-            // 3. SMOOTH SCROLL (Lenis)
-            try {
-                const lenis = new Lenis({
-                    duration: 1.2,
-                    smooth: true
-                });
-                function raf(time) {
-                    lenis.raf(time);
-                    requestAnimationFrame(raf);
-                }
-                requestAnimationFrame(raf);
             } catch (e) {
-                console.log("Lenis no cargó, usando scroll nativo");
+                console.error("Error en 3D:", e);
             }
 
+            // --- 3. LENIS SCROLL (FIX PARA GITHUB PAGES) ---
+            try {
+                if (typeof Lenis !== 'undefined') {
+                    const lenis = new Lenis({
+                        duration: 1.2,
+                        smooth: true
+                    });
+                    function raf(time) {
+                        lenis.raf(time);
+                        requestAnimationFrame(raf);
+                    }
+                    requestAnimationFrame(raf);
+                    console.log("Lenis activo");
+                } else {
+                    console.warn("Lenis no cargó correctamente, usando scroll nativo.");
+                }
+            } catch (e) {
+                console.warn("Error iniciando Lenis:", e);
+            }
         });
     </script>
 </body>
