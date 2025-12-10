@@ -124,6 +124,14 @@
       backdrop-filter: blur(5px);
     }
 
+    .sound-toggle {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: 0.3s;
+    }
+    .sound-toggle:hover { background: var(--gold); color: black; }
+    
+
     /* FOOTER */
     footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; }
 
@@ -145,8 +153,17 @@
 
   <!-- NAVEGACIÓN -->
   <nav>
+    
     <a href="javascript:history.back()" class="back-btn">← Volver al Globo</a>
     <div style="font-size:0.8rem; letter-spacing:1px;">ULULATO EXPERIENCE</div>
+    <button id="sound-btn" class="sound-toggle">
+     <span class="icon">🔇</span> Sonido
+    </button>
+    <audio id="bg-audio" loop>
+      <!-- Usa un audio de viento o música ambiental suave -->
+      <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mp3">
+    </audio>
+    
   </nav>
 
   <main>
@@ -317,9 +334,25 @@
     }
     animateCanvas();
 
+    const soundBtn = document.getElementById('sound-btn');
+    const audio = document.getElementById('bg-audio');
+    audio.volume = 0.3; // Volumen bajo
+    
+    soundBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        soundBtn.innerHTML = '<span class="icon">🔊</span> Sonido On';
+      } else {
+        audio.pause();
+        soundBtn.innerHTML = '<span class="icon">🔇</span> Sonido Off';
+      }
+    });
+    
+
     // 3. LÓGICA DINÁMICA (SIMULACIÓN)
     // En una app real, leerías la URL ?id=wayuu y llenarías los datos desde data_pueblos.js
     // Aquí está pre-llenado para Wayuu como ejemplo visual.
+    
   </script>
 </body>
 </html>
