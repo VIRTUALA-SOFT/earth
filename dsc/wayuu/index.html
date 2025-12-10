@@ -188,6 +188,45 @@
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
+    /* ESTILOS PARA SECCIÓN DE VIDEO */
+    .video-container-glass {
+        background: var(--glass);
+        border: var(--glass-border);
+        backdrop-filter: blur(10px);
+        padding: 40px; /* Espacio interno generoso */
+        border-radius: 20px;
+        max-width: 1000px; /* Ancho máximo para que no se estire demasiado */
+        width: 100%;
+        margin: 0 auto; /* Centrar */
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Truco para mantener el video responsivo (16:9) */
+    .video-wrapper {
+        position: relative;
+        padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+        height: 0;
+        overflow: hidden;
+        border-radius: 12px; /* Bordes redondeados al video */
+        border: 1px solid rgba(255, 215, 0, 0.3); /* Borde dorado sutil */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .video-wrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Ajuste para móviles */
+    @media(max-width: 768px) {
+        .video-container-glass {
+            padding: 20px; /* Menos borde en celular */
+        }
+    }
+    
     footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; position: relative; z-index: 2;}
 
     @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
@@ -289,7 +328,37 @@
         </div>
     </section>
 
-    <!-- 4. LENGUAJE (INTERACTIVO CON SONIDO) -->
+    <!-- 4. SECCIÓN DE VIDEO YOUTUBE -->
+    <section class="video-section" style="text-align: center;">
+        <div class="video-container-glass">
+            <h2 style="color: var(--gold); margin-bottom: 20px;">Relatos de la Tierra</h2>
+            <p style="color: #ccc; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Sumérgete en la realidad cotidiana y espiritual a través de este registro documental.
+            </p>
+            
+            <!-- Wrapper para hacer el video responsive -->
+            <div class="video-wrapper">
+                <!-- 
+                   Parámetros clave en la URL:
+                   rel=0 -> No mostrar videos recomendados de otros canales al final.
+                   modestbranding=1 -> Minimiza el logo de YouTube.
+                   color=white -> Barra de progreso blanca (más elegante).
+                -->
+                <iframe 
+                    width="560" 
+                    height="315" 
+                    src="https://www.youtube.com/embed/TU_ID_VIDEO?rel=0&modestbranding=1&color=white" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </section>
+    
+
+    <!-- 5. LENGUAJE (INTERACTIVO CON SONIDO) -->
     <section class="language-section" style="text-align: center;">
         <h2 style="color: var(--gold); margin-bottom: 10px;">La Voz Viva</h2>
         <p style="color:#aaa; margin-bottom: 40px;">Escucha el idioma Wayuunaiki</p>
@@ -321,7 +390,7 @@
         </div>
     </section>
 
-    <!-- 5. ENTORNO -->
+    <!-- 6. ENTORNO -->
     <section class="env-section" id="env">
         <div class="env-card">
             <h2 style="font-size: 2.5rem; color: var(--gold); margin-top:0;">El Desierto Vivo</h2>
