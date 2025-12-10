@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Manrope:wght@200;400;600&display=swap" rel="stylesheet">
     
-    <!-- ESTILOS (Tailwind CSS via CDN) -->
+    <!-- TAILWIND CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
@@ -33,7 +33,6 @@
             font-family: 'Cinzel', serif;
         }
 
-        /* Canvas 3D de fondo */
         #webgl-canvas {
             position: fixed;
             top: 0;
@@ -41,21 +40,13 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0; /* Empieza oculto para la intro */
+            opacity: 0; 
             transition: opacity 2s ease;
         }
 
-        /* Scrollbar oculto para inmersión */
         ::-webkit-scrollbar {
             width: 0px;
             background: transparent;
-        }
-
-        /* Clases de utilidad personalizadas */
-        .text-gradient {
-            background: linear-gradient(to right, #ffffff, #888888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .glass-panel {
@@ -64,44 +55,53 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Loader */
+        /* LOADER */
         .loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            z-index: 100;
+            background: #030303; /* Aseguramos fondo negro solido */
+            z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
         
+        .loader-bar-container {
+            width: 200px;
+            height: 2px;
+            background: #333;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
         .loader-line {
             width: 0%;
-            height: 2px;
+            height: 100%;
             background: linear-gradient(90deg, var(--c-gold), var(--c-neon));
-            transition: width 0.5s ease;
+            transition: width 0.2s linear;
         }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND 3D (Partículas Mágicas) -->
+    <!-- CANVAS 3D -->
     <canvas id="webgl-canvas"></canvas>
 
     <!-- PRELOADER -->
     <div class="loader" id="loader">
-        <div class="serif text-2xl tracking-[0.5em] mb-4 text-gold-400 text-[#D4AF37]">ANCESTRALIDAD</div>
-        <div class="w-64 h-[1px] bg-gray-800 rounded overflow-hidden">
-            <div class="loader-line h-full" id="loader-bar"></div>
+        <div class="serif text-2xl tracking-[0.5em] text-[#D4AF37]">ANCESTRALIDAD</div>
+        <div class="loader-bar-container">
+            <div class="loader-line" id="loader-bar"></div>
         </div>
         <div class="mt-2 text-xs text-gray-500 font-mono" id="loader-text">0%</div>
     </div>
 
-    <!-- UI FLOTANTE -->
+    <!-- UI SUPERIOR -->
     <nav class="fixed top-0 left-0 w-full p-8 flex justify-between items-center z-50 mix-blend-difference pointer-events-none">
         <div class="text-sm tracking-widest uppercase font-bold pointer-events-auto cursor-pointer">Kogi / <span class="text-[#D4AF37]">The Lost City</span></div>
         <div class="pointer-events-auto cursor-pointer group">
@@ -111,83 +111,45 @@
         </div>
     </nav>
 
-    <!-- INDICADOR DE SCROLL -->
-    <div class="fixed bottom-10 right-10 z-40 flex flex-col items-center gap-2 mix-blend-difference animate-pulse">
-        <span class="text-[10px] tracking-widest uppercase vertical-rl writing-mode-vertical-rl transform rotate-180">Explora</span>
-        <div class="w-[1px] h-12 bg-white/50"></div>
-    </div>
+    <!-- CONTENIDO -->
+    <main class="relative z-10 opacity-0" id="main-content"> <!-- Oculto inicialmente -->
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="relative z-10">
-
-        <!-- SECCIÓN 1: HERO -->
-        <section class="h-screen w-full flex flex-col justify-center items-center relative perspective-1000">
-            <div class="text-center">
+        <!-- HERO -->
+        <section class="h-screen w-full flex flex-col justify-center items-center relative">
+            <div class="text-center p-4">
                 <p class="hero-anim text-[#D4AF37] text-sm tracking-[0.4em] mb-6 uppercase">Patrimonio Vivo</p>
-                <h1 class="hero-anim text-6xl md:text-9xl font-bold leading-none tracking-tighter mix-blend-overlay opacity-90">
+                <h1 class="hero-anim text-5xl md:text-8xl font-bold leading-none tracking-tighter mix-blend-overlay text-white opacity-90">
                     ESPÍRITUS<br>
-                    <span class="italic font-light text-white/80">DEL VALLE</span>
+                    <span class="italic font-light text-white/70">DEL VALLE</span>
                 </h1>
                 <div class="hero-anim mt-12 max-w-md mx-auto text-center text-gray-400 font-light leading-relaxed glass-panel p-6 rounded-lg">
-                    <p>Una inmersión digital en la cosmogonía de los pueblos originarios. Donde la tecnología se encuentra con lo sagrado.</p>
+                    <p>Una inmersión digital en la cosmogonía de los pueblos originarios. Desliza para entrar.</p>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN 2: NARRATIVA -->
+        <!-- CONTENIDO DETALLADO -->
         <section class="min-h-screen w-full py-32 px-6 md:px-20 flex items-center">
             <div class="max-w-4xl">
                 <span class="block text-[#00f2ff] text-xs font-mono mb-4 section-tag">01 — EL ORIGEN</span>
-                <h2 class="text-4xl md:text-6xl mb-10 leading-tight section-title">
+                <h2 class="text-4xl md:text-6xl mb-10 leading-tight section-title text-white">
                     "La tierra no nos pertenece, <br>
                     <span class="text-gray-500">nosotros pertenecemos a la tierra."</span>
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <p class="text-gray-400 leading-loose section-text">
-                        En el corazón de la sierra, las estructuras no son simples viviendas, son reflejos del cosmos. Cada choza está alineada con las estrellas, construida con materiales que respiran y mueren, retornando al ciclo natural.
+                    <p class="text-gray-400 leading-loose">
+                        En el corazón de la sierra, las estructuras no son simples viviendas, son reflejos del cosmos. Cada choza está alineada con las estrellas.
                     </p>
                     <div class="glass-panel p-8 rounded-xl border-l-2 border-[#D4AF37]">
                         <h3 class="text-xl mb-2 text-white">La Maloka</h3>
-                        <p class="text-sm text-gray-400">Centro ceremonial y de pensamiento. Aquí, los Mamos tejen el equilibrio del mundo espiritual y material.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 3: GALLERY IMMERSION (Placeholder para multimedia) -->
-        <section class="min-h-screen w-full py-20 px-4 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div class="text-center mb-20">
-                <h2 class="text-5xl md:text-7xl section-title">ARQUITECTURA</h2>
-                <p class="text-[#D4AF37] mt-4 font-serif italic text-2xl">Sagrada</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl h-[60vh]">
-                <!-- Card 1 -->
-                <div class="group relative overflow-hidden rounded-2xl glass-panel hover:bg-white/5 transition-all duration-500 cursor-none">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-                    <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        <span class="text-xs text-[#00f2ff] font-mono">FIG. 01</span>
-                        <h3 class="text-2xl mt-2">Tejido Solar</h3>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="md:col-span-2 group relative overflow-hidden rounded-2xl glass-panel border border-[#D4AF37]/30 hover:border-[#D4AF37] transition-all duration-500">
-                    <!-- Aquí iría un video o imagen de fondo -->
-                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518182170546-0766ce6fec56?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700 group-hover:scale-105 transform"></div>
-                    <div class="absolute bottom-0 left-0 p-10">
-                        <h3 class="text-4xl mb-2">Conexión Ancestral</h3>
-                        <p class="text-gray-300 max-w-md">Descubre los rituales que han mantenido el equilibrio ecológico del valle durante milenios.</p>
-                        <button class="mt-6 px-6 py-2 border border-white/30 rounded-full hover:bg-white hover:text-black transition-colors duration-300 text-sm tracking-widest uppercase">Ver Detalle</button>
+                        <p class="text-sm text-gray-400">Centro ceremonial y de pensamiento. Aquí, los Mamos tejen el equilibrio del mundo.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <footer class="h-[50vh] flex items-center justify-center border-t border-white/10 bg-black relative z-20">
-            <div class="text-center">
-                <h2 class="text-8xl md:text-[12rem] font-bold text-[#111] select-none pointer-events-none">FIN</h2>
-                <a href="#" class="text-[#D4AF37] hover:text-white transition-colors duration-300 text-sm tracking-[0.3em] uppercase mt-[-4rem] block relative z-10">Volver al Inicio</a>
-            </div>
+            <h2 class="text-4xl md:text-6xl text-[#333] font-bold">FIN DE LA DEMO</h2>
         </footer>
 
     </main>
@@ -198,211 +160,179 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
 
-    <!-- LÓGICA DE LA EXPERIENCIA -->
     <script>
-        // 1. INICIALIZAR SMOOTH SCROLL (Lenis)
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false,
-            touchMultiplier: 2,
-        })
+        // ESPERAR A QUE EL DOM ESTÉ LISTO (SOLUCIÓN AL BLOQUEO)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Cargado. Iniciando scripts...");
 
-        function raf(time) {
-            lenis.raf(time)
-            requestAnimationFrame(raf)
-        }
-        requestAnimationFrame(raf)
+            // 1. LÓGICA DEL LOADER (Prioritaria)
+            const loaderBar = document.getElementById('loader-bar');
+            const loaderText = document.getElementById('loader-text');
+            const loader = document.getElementById('loader');
+            const mainContent = document.getElementById('main-content');
+            const canvasEl = document.getElementById('webgl-canvas');
 
-
-        // 2. ESCENA 3D (THREE.JS) - Efecto de Partículas Mágicas
-        const scene = new THREE.Scene();
-        // Niebla negra para fundir profundidad
-        scene.fog = new THREE.FogExp2(0x030303, 0.002);
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({
-            canvas: document.querySelector('#webgl-canvas'),
-            antialias: true,
-            alpha: true
-        });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Creación de partículas (Estrellas / Polvo de oro)
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 3000; // Cantidad de partículas
-        
-        const posArray = new Float32Array(particlesCount * 3);
-        const colorArray = new Float32Array(particlesCount * 3);
-
-        // Colores base: Oro y Cian
-        const color1 = new THREE.Color(0xD4AF37); // Oro
-        const color2 = new THREE.Color(0x00f2ff); // Cian
-
-        for(let i = 0; i < particlesCount * 3; i+=3) {
-            // Posición aleatoria en un espacio 3D
-            posArray[i] = (Math.random() - 0.5) * 15; // X
-            posArray[i+1] = (Math.random() - 0.5) * 15; // Y
-            posArray[i+2] = (Math.random() - 0.5) * 15; // Z
-
-            // Mezcla de colores aleatoria
-            const mixedColor = Math.random() > 0.5 ? color1 : color2;
-            colorArray[i] = mixedColor.r;
-            colorArray[i+1] = mixedColor.g;
-            colorArray[i+2] = mixedColor.b;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
-
-        // Material de las partículas (puntos brillantes)
-        const material = new THREE.PointsMaterial({
-            size: 0.02,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        // Crear Malla
-        const particlesMesh = new THREE.Points(particlesGeometry, material);
-        scene.add(particlesMesh);
-
-        // Geometría Torus (Anillo de energía sutil en el fondo)
-        const torusGeo = new THREE.TorusGeometry(3, 0.05, 16, 100);
-        const torusMat = new THREE.MeshBasicMaterial({ color: 0xD4AF37, transparent: true, opacity: 0.1, wireframe: true });
-        const torus = new THREE.Mesh(torusGeo, torusMat);
-        scene.add(torus);
-
-        camera.position.z = 4;
-
-        // INTERACCIÓN CON EL MOUSE
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX - windowHalfX);
-            mouseY = (event.clientY - windowHalfY);
-        });
-
-        // ANIMACIÓN 3D LOOP
-        const clock = new THREE.Clock();
-
-        const tick = () => {
-            targetX = mouseX * 0.001;
-            targetY = mouseY * 0.001;
-
-            const elapsedTime = clock.getElapsedTime();
-
-            // Rotación suave de las partículas
-            particlesMesh.rotation.y = .1 * elapsedTime;
-            particlesMesh.rotation.x = .05 * elapsedTime;
-
-            // Movimiento suave basado en el mouse (Lerp)
-            particlesMesh.rotation.y += 0.5 * (targetX - particlesMesh.rotation.y);
-            particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
-
-            // Animar el anillo
-            torus.rotation.x = elapsedTime * 0.1;
-            torus.rotation.y = elapsedTime * 0.15;
-
-            renderer.render(scene, camera);
-            window.requestAnimationFrame(tick);
-        }
-
-        tick();
-
-        // 3. ANIMACIONES UI (GSAP)
-        
-        // Simulación de carga (Loader)
-        const loaderBar = document.getElementById('loader-bar');
-        const loaderText = document.getElementById('loader-text');
-        const loader = document.getElementById('loader');
-        const canvasEl = document.getElementById('webgl-canvas');
-
-        let loadProgress = 0;
-        const loadInterval = setInterval(() => {
-            loadProgress += Math.random() * 10;
-            if (loadProgress > 100) loadProgress = 100;
+            let loadProgress = 0;
             
-            loaderBar.style.width = `${loadProgress}%`;
-            loaderText.innerText = `${Math.floor(loadProgress)}%`;
+            // Simulación de carga robusta
+            const loadInterval = setInterval(() => {
+                loadProgress += Math.random() * 5; // Velocidad aleatoria
+                
+                if (loadProgress >= 100) {
+                    loadProgress = 100;
+                    clearInterval(loadInterval);
+                    revealSite();
+                }
+                
+                if(loaderBar) loaderBar.style.width = `${loadProgress}%`;
+                if(loaderText) loaderText.innerText = `${Math.floor(loadProgress)}%`;
+            }, 50);
 
-            if (loadProgress === 100) {
-                clearInterval(loadInterval);
+            function revealSite() {
+                console.log("Revelando sitio...");
+                const tl = gsap.timeline();
+
+                // Desaparecer loader
+                tl.to(loader, {
+                    opacity: 0,
+                    duration: 1,
+                    pointerEvents: 'none',
+                    ease: "power2.inOut",
+                    onComplete: () => { loader.style.display = 'none'; }
+                })
+                // Aparecer contenido
+                .to(canvasEl, { opacity: 1, duration: 2 }, "-=0.5")
+                .to(mainContent, { opacity: 1, duration: 1 }, "-=1.5")
+                .from(".hero-anim", {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1.5,
+                    stagger: 0.2,
+                    ease: "power3.out"
+                }, "-=0.5");
+            }
+
+            // 2. CONFIGURACIÓN THREE.JS (Protegida contra errores)
+            try {
+                const scene = new THREE.Scene();
+                scene.fog = new THREE.FogExp2(0x030303, 0.002);
+
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({
+                    canvas: canvasEl,
+                    antialias: true,
+                    alpha: true
+                });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                // Partículas
+                const particlesGeometry = new THREE.BufferGeometry();
+                const particlesCount = 2000;
+                
+                const posArray = new Float32Array(particlesCount * 3);
+                const colorArray = new Float32Array(particlesCount * 3);
+                const color1 = new THREE.Color(0xD4AF37);
+                const color2 = new THREE.Color(0x00f2ff);
+
+                for(let i = 0; i < particlesCount * 3; i+=3) {
+                    posArray[i] = (Math.random() - 0.5) * 15;
+                    posArray[i+1] = (Math.random() - 0.5) * 15;
+                    posArray[i+2] = (Math.random() - 0.5) * 15;
+
+                    const mixedColor = Math.random() > 0.5 ? color1 : color2;
+                    colorArray[i] = mixedColor.r;
+                    colorArray[i+1] = mixedColor.g;
+                    colorArray[i+2] = mixedColor.b;
+                }
+
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 0.025,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particlesMesh = new THREE.Points(particlesGeometry, material);
+                scene.add(particlesMesh);
+                camera.position.z = 4;
+
+                // Mouse interaction
+                let mouseX = 0;
+                let mouseY = 0;
+                let targetX = 0;
+                let targetY = 0;
+                const windowHalfX = window.innerWidth / 2;
+                const windowHalfY = window.innerHeight / 2;
+
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX - windowHalfX);
+                    mouseY = (event.clientY - windowHalfY);
+                });
+
+                // Loop Animation
+                const clock = new THREE.Clock();
+                const tick = () => {
+                    targetX = mouseX * 0.001;
+                    targetY = mouseY * 0.001;
+                    const elapsedTime = clock.getElapsedTime();
+
+                    particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+                    particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+                    particlesMesh.rotation.y += 0.002; // Rotación automática constante
+
+                    renderer.render(scene, camera);
+                    window.requestAnimationFrame(tick);
+                }
+                tick();
+
+                // Resize handle
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                // Parallax Scroll (GSAP)
+                gsap.registerPlugin(ScrollTrigger);
+                gsap.to(particlesMesh.position, {
+                    scrollTrigger: {
+                        trigger: "body",
+                        start: "top top",
+                        end: "bottom bottom",
+                        scrub: 2
+                    },
+                    z: 5, 
+                    y: 1
+                });
+
+            } catch (error) {
+                console.error("Error iniciando Three.js:", error);
+                // Si falla el 3D, forzamos la revelación del sitio para que no se quede pegado
                 revealSite();
             }
-        }, 100);
 
-        function revealSite() {
-            // Secuencia de entrada
-            const tl = gsap.timeline();
+            // 3. SMOOTH SCROLL (Lenis)
+            try {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    smooth: true
+                });
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+                requestAnimationFrame(raf);
+            } catch (e) {
+                console.log("Lenis no cargó, usando scroll nativo");
+            }
 
-            tl.to(loader, {
-                opacity: 0,
-                duration: 1,
-                pointerEvents: 'none',
-                ease: "power2.inOut"
-            })
-            .to(canvasEl, { opacity: 1, duration: 2 }, "-=0.5")
-            .from(".hero-anim", {
-                y: 100,
-                opacity: 0,
-                duration: 1.5,
-                stagger: 0.2,
-                ease: "power4.out"
-            }, "-=1.5");
-        }
-
-        // Animaciones al hacer Scroll
-        gsap.registerPlugin(ScrollTrigger);
-
-        // Animación de textos en la sección narrativa
-        gsap.utils.toArray('.section-title').forEach(title => {
-            gsap.from(title, {
-                scrollTrigger: {
-                    trigger: title,
-                    start: "top 80%",
-                    end: "bottom 20%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 50,
-                opacity: 0,
-                duration: 1.2,
-                ease: "power3.out"
-            });
         });
-
-        // Parallax simple para el fondo de partículas al bajar
-        gsap.to(particlesMesh.position, {
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1
-            },
-            z: 8, // La cámara "entra" en las estrellas
-            y: 2
-        });
-
-        // RESPONSIVE
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
     </script>
 </body>
 </html>
