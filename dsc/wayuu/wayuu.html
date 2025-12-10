@@ -67,6 +67,23 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* DEGRADADO DE TEXTO */
+        .text-gradient-fix {
+            background: linear-gradient(90deg, #D4A056, #00C4CC); /* Dorado a Turquesa */
+            -webkit-background-clip: text; /* Mágico: Recorta el fondo con la forma del texto */
+            background-clip: text;
+            color: transparent; /* Hace el texto transparente para ver el fondo */
+            display: inline-block; /* Necesario para que el clip funcione bien */
+        }
+        
+        /* EFECTO CRISTAL (GLASSMORPHISM) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03); /* Casi transparente */
+            backdrop-filter: blur(20px); /* Desenfoque fuerte del fondo */
+            -webkit-backdrop-filter: blur(20px); /* Safari support */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
         /* CARD AUDIO ANIMATION */
         .voice-card:hover { border-color: var(--c-sand); background: rgba(255,255,255,0.08); }
         .play-icon { transition: all 0.3s ease; }
@@ -200,24 +217,67 @@
         </section>
 
         <!-- 2. SOCIODEMOGRAFÍA -->
-        <section class="min-h-[80vh] py-20 px-6 md:px-24 flex items-center border-t border-white/5 bg-gradient-to-b from-transparent to-black/80">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <span class="text-[#FF2E63] text-xs font-mono mb-4 block">01 — SOCIEDAD</span>
-                    <h2 class="text-4xl md:text-6xl mb-8 title-font">Nación <br><span class="text-gradient italic">Sin Fronteras</span></h2>
-                    <div class="space-y-8">
-                        <div class="glass-panel p-6 rounded-lg border-l-4 border-[#D4A056]">
-                            <h3 class="text-2xl font-bold text-white mb-1">600,000+</h3>
-                            <p class="mt-2 text-gray-300 text-sm">Habitantes en la península binacional (Colombia-Venezuela). Nunca conquistados.</p>
+        <!-- SECCIÓN 2: SOCIEDAD (REDISEÑADA - GLASSMORPHISM) -->
+        <section class="min-h-screen w-full py-24 px-6 md:px-24 flex items-center justify-center relative z-10">
+            
+            <!-- FONDO DE SECCIÓN (Para oscurecer partículas y dar legibilidad) -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#0b0500]/0 via-[#0b0500]/80 to-[#0b0500] pointer-events-none"></div>
+        
+            <!-- CONTENEDOR PRINCIPAL (GRID) -->
+            <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+        
+                <!-- COLUMNA IZQUIERDA: DATOS & TEXTO -->
+                <div class="lg:col-span-5 space-y-8">
+                    <div class="border-l-2 border-[#FF2E63] pl-6">
+                        <span class="text-[#D4A056] text-xs font-mono tracking-[0.3em] uppercase mb-2 block">01 — Identidad</span>
+                        <h2 class="text-5xl md:text-7xl font-serif text-white leading-tight">
+                            Nación <br>
+                            <!-- Clase corregida para el degradado -->
+                            <span class="text-gradient-fix italic font-light">Sin Fronteras</span>
+                        </h2>
+                    </div>
+        
+                    <p class="text-gray-400 text-lg leading-relaxed font-light">
+                        La etnia indígena más numerosa de Colombia y Venezuela. Un pueblo que no conoce líneas imaginarias, solo el horizonte y el rastro de sus ancestros.
+                    </p>
+        
+                    <!-- DATO DESTACADO (COUNTER) -->
+                    <div class="glass-card p-8 rounded-2xl border border-white/10 relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-[#00C4CC] blur-[80px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
+                        
+                        <h3 class="text-6xl font-bold text-white mb-2 tech-font">600k<span class="text-[#FF2E63] text-4xl">+</span></h3>
+                        <p class="text-sm text-gray-400 uppercase tracking-widest border-t border-white/10 pt-4 mt-2">
+                            Habitantes binacionales
+                        </p>
+                    </div>
+                </div>
+        
+                <!-- COLUMNA DERECHA: IMAGEN DE IMPACTO (Rostro o Territorio) -->
+                <div class="lg:col-span-7 h-[600px] relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl group">
+                    
+                    <!-- IMAGEN 1: ROSTRO (La que te gustó antes) -->
+                    <img src="https://images.unsplash.com/photo-1534062823678-75704a29a0f0?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Mujer Wayuu" 
+                         class="absolute inset-0 w-full h-full object-cover transition duration-[1.5s] group-hover:scale-105 opacity-80 group-hover:opacity-100">
+                    
+                    <!-- OVERLAY GRADIENTE -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
+        
+                    <!-- TEXTO FLOTANTE EN LA FOTO -->
+                    <div class="absolute bottom-10 left-10 right-10">
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <p class="text-[#D4A056] text-xs tracking-[0.4em] mb-2 uppercase">Territorio Ancestral</p>
+                                <h3 class="text-3xl md:text-4xl font-serif italic text-white">La Alta Guajira</h3>
+                            </div>
+                            <!-- Botón circular -->
+                            <div class="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center backdrop-blur-md group-hover:bg-white group-hover:text-black transition duration-500 cursor-pointer">
+                                <svg class="w-6 h-6 transform -rotate-45 group-hover:rotate-0 transition duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="relative h-[400px] w-full rounded-2xl overflow-hidden glass-panel group">
-                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534062823678-75704a29a0f0?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-60"></div>
-                    <div class="absolute bottom-8 left-8">
-                        <h3 class="text-3xl font-serif italic">Territorio Ancestral</h3>
-                    </div>
-                </div>
+        
             </div>
         </section>
 
