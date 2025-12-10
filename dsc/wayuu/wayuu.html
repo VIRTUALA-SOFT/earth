@@ -13,6 +13,9 @@
     
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+     <!-- LIBRERÍA LENIS CORRECTA (Soluciona el error de consola) -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
     
     <style>
         :root {
@@ -342,7 +345,20 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            const count = 3000;
+             // CREAR TEXTURA REDONDA PARA LAS PARTÍCULAS (SOLUCIÓN A CUADRADOS)
+            function getCircleTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 32; canvas.height = 32;
+                const ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.arc(16, 16, 15, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                const texture = new THREE.CanvasTexture(canvas);
+                return texture;
+            }
+            
+            const count = 2500;
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
             const initialColors = new Float32Array(count * 3); // Guardar colores originales (Arena)
@@ -506,6 +522,7 @@
             requestAnimationFrame(raf);
 
         });
+                
     </script>
 </body>
 </html>
