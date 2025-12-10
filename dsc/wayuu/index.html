@@ -227,7 +227,34 @@
         }
     }
     
-    footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; position: relative; z-index: 2;}
+    /*footer { padding: 50px; text-align: center; font-size: 0.8rem; color: #666; position: relative; z-index: 2;}*/
+
+    footer {
+      padding: 50px 20px; /* Un poco de padding lateral por si es móvil */
+      color: #666; 
+      position: relative; 
+      z-index: 2;      
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: center; /* Centra todo el bloque horizontalmente */
+      align-items: center;     /* Centra verticalmente texto e imagen */
+      gap: 15px;               /* Espacio entre el texto y el logo */
+      font-size: 0.8rem;
+      flex-wrap: wrap;         /* Permite que baje a dos líneas en móviles muy pequeños */
+    }
+    
+    .footer-logo {
+      height: 24px;            /* Tamaño pequeño y discreto */
+      width: auto;             /* Mantiene la proporción */
+      opacity: 0.7;            /* Un toque premium: no hacerlo 100% brillante */
+      transition: opacity 0.3s;
+    }
+    
+    .footer-logo:hover {
+      opacity: 1;              /* Brilla al pasar el mouse */
+    }
 
     @keyframes bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
 
@@ -407,9 +434,12 @@
     </section>
   </main>
   
-  <footer>
-    © 2025 Proyecto Ululato - Preservando la Memoria Ancestral - Derechos reservados.
-  </footer>
+<footer>
+  <div class="footer-content">
+    <span>© 2025 Proyecto Ululato - Preservando la Memoria Ancestral - Derechos reservados.</span>   
+    <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo">
+  </div>
+</footer>
 
   <script>
     // --- 1. CONFIGURACIÓN INICIAL ---
