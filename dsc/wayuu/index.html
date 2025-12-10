@@ -225,12 +225,13 @@
   <main>
     <!-- 1. HERO CON VIDEO DE FONDO -->
     <section class="hero">
-        <div class="hero-video-container">
-            <!-- Coloca tu video en videos/wayuu_hero.mp4 o usa este link de ejemplo -->
-            <video id="hero-video" autoplay muted loop playsinline>
-                <source src="https://assets.mixkit.co/videos/preview/mixkit-sand-dunes-in-the-desert-4654-large.mp4" type="video/mp4">
-            </video>
-        </div>
+       <div class="hero-video-container">
+        <!-- QUITAMOS 'loop', mantenemos autoplay, muted y playsinline -->
+        <video id="hero-video" autoplay muted playsinline>
+            <!-- Este será el primer video que se reproduzca -->
+            <source src="../../video/wayuu-rojas2.mp4" type="video/mp4">
+        </video>
+       </div>
 
         <div class="hero-content" id="hero-content">
             <p style="color: #ddd;">PUEBLO DE ORIGEN</p>
@@ -465,6 +466,33 @@
       requestAnimationFrame(animateCanvas);
     }
     animateCanvas();
+
+     const heroVideo = document.getElementById('hero-video');
+    
+    // Lista de tus videos (asegúrate de que las rutas sean correctas)
+    const videoPlaylist = [
+        "../../video/wayuu-rojas2.mp4",
+        "../../video/wayuu_rojas1.mp4" 
+        // Puedes agregar más aquí si quieres: "../../video/tercero.mp4"
+    ];
+
+    let currentVideoIndex = 0;
+
+    // Escuchar cuando el video termina
+    heroVideo.addEventListener('ended', () => {
+        // Pasar al siguiente índice
+        currentVideoIndex++;
+        
+        // Si llegamos al final de la lista, volver al principio (Loop infinito de la lista)
+        if (currentVideoIndex >= videoPlaylist.length) {
+            currentVideoIndex = 0;
+        }
+
+        // Cambiar la fuente y reproducir
+        heroVideo.src = videoPlaylist[currentVideoIndex];
+        heroVideo.play().catch(e => console.log("Error al reproducir siguiente video:", e));
+    });
+    
   </script>
 </body>
 </html>
