@@ -137,9 +137,20 @@
     padding: 20px 40px; border-radius: 50px; cursor: pointer;
     transition: 0.3s; position: relative; overflow: hidden;
   }
-  .word-card:hover { background: var(--gold); color: black; }
-  .native { font-size: 1.5rem; display: block; font-family: 'Cormorant Garamond'; }
-  .translation { font-size: 0.8rem; opacity: 0.7; }
+    .word-card:hover { background: var(--gold); color: black; }
+    .native { font-size: 1.5rem; display: block; font-family: 'Cormorant Garamond'; }
+    .translation { font-size: 0.8rem; opacity: 0.7; }
+
+    body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('img/patron_wayuu.jpeg');
+    background-repeat: repeat;
+    opacity: 0.03; /* Muy sutil */
+    pointer-events: none;
+    z-index: 0;
+  }
     
 
     /* FOOTER */
