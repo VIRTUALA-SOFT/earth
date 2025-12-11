@@ -36,21 +36,73 @@
 
         /* CURSOR */
         #cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border: 1px solid rgba(255,255,255,0.6); border-radius: 50%;
-            pointer-events: none; z-index: 10001;
-            transform: translate(-50%, -50%); transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), background 0.3s;
-            mix-blend-mode: difference;
-            display: flex; justify-content: center; align-items: center;
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 20px; 
+            height: 20px;
+            background: #ffffff; /* Blanco puro por defecto */
+            border-radius: 50%;
+            pointer-events: none; /* Crucial para poder dar clic a través de él */
+            z-index: 99999; /* Por encima de TODO (Loader, Nav, Canvas) */
+            transform: translate(-50%, -50%); 
+            transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                        height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                        background-color 0.3s;
+            mix-blend-mode: difference; /* Efecto de inversión sobre fondos claros */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        #cursor span { opacity: 0; font-size: 10px; font-weight: bold; color: black; transition: opacity 0.2s; font-family: 'Syncopate', sans-serif;}
+        #cursor span { 
+            opacity: 0; 
+            font-size: 10px; 
+            font-weight: 800; 
+            color: white; 
+            font-family: 'Syncopate', sans-serif;
+            letter-spacing: 1px;
+            transition: opacity 0.2s;
+        }
         
-        #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
-        #cursor.audio-mode { width: 80px; height: 80px; background: var(--c-sand); border-color: transparent; mix-blend-mode: normal; }
-        #cursor.audio-mode span { opacity: 1; content: "OÍR"; color: black; }
-        #cursor.video-mode { width: 90px; height: 90px; background: var(--c-accent); border-color: transparent; mix-blend-mode: normal; }
-        #cursor.video-mode span { opacity: 1; color: white; }
-        #cursor.dream-mode { width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border: none; mix-blend-mode: screen; }
+        /* ESTADO: HOVER GENÉRICO */
+        #cursor.hovered { 
+            width: 50px; 
+            height: 50px; 
+            background: white; 
+            mix-blend-mode: difference; 
+        }
+
+       /* ESTADO: AUDIO/TARJETAS (EL ROJO QUE QUIERES) */
+        #cursor.audio-mode { 
+            width: 90px; 
+            height: 90px; 
+            background: #FF3B3B; /* ROJO VIBRANTE */
+            mix-blend-mode: normal; /* Normal para que el rojo se vea puro */
+            border: none;
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.4); /* Resplandor rojo */
+        }
+        #cursor.audio-mode span { 
+            opacity: 1; 
+            color: white; 
+        }
+      /* ESTADO: VIDEO */
+        #cursor.video-mode { 
+            width: 100px; 
+            height: 100px; 
+            background: white; 
+            mix-blend-mode: difference; 
+        }
+        #cursor.video-mode span { 
+            opacity: 1; 
+            color: black; /* Texto negro sobre fondo blanco */
+        }
+       /* ESTADO: SUEÑOS (LAPÜ) */
+        #cursor.dream-mode { 
+            width: 150px; 
+            height: 150px; 
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); 
+            mix-blend-mode: overlay;
+        }
 
         /* UTILIDADES VISUALES */
         #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
@@ -655,36 +707,56 @@
             // --- CURSOR ---
             const cursor = document.getElementById('cursor');
             const cursorText = document.getElementById('cursor-text');
+            
+            // 1. Movimiento Suave
             window.addEventListener('mousemove', (e) => {
                 if(typeof gsap !== 'undefined') {
                     gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
                 } else {
-                    // Fallback CSS
                     cursor.style.left = e.clientX + 'px';
                     cursor.style.top = e.clientY + 'px';
                 }
             });
-
-            const addHover = (cls, txt = "") => { cursor.classList.add(cls); cursorText.innerText = txt; };
-            const removeHover = (cls) => { cursor.classList.remove(cls); cursorText.innerText = ""; };
-
-            document.querySelectorAll('.hover-trigger').forEach(el => {
-                el.addEventListener('mouseenter', () => addHover('hovered'));
-                el.addEventListener('mouseleave', () => removeHover('hovered'));
-            });
-
-            document.getElementById('lapu-section')?.addEventListener('mouseenter', () => addHover('dream-mode'));
-            document.getElementById('lapu-section')?.addEventListener('mouseleave', () => removeHover('dream-mode'));
             
-            document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => addHover('video-mode', 'VER'));
-            document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => removeHover('video-mode'));
-
-            document.querySelectorAll('.audio-trigger').forEach(el => {
-                el.addEventListener('mouseenter', () => addHover('audio-mode', 'OÍR'));
-                el.addEventListener('mouseleave', () => removeHover('audio-mode'));
+            // 2. Función Maestra para cambiar estados (Limpia antes de añadir)
+            const setCursor = (mode, text = "") => {
+                // IMPORTANTE: Quitamos todas las posibles clases de estado primero
+                cursor.classList.remove('hovered', 'audio-mode', 'video-mode', 'dream-mode');
+                
+                // Añadimos la nueva clase si existe
+                if (mode) cursor.classList.add(mode);
+                
+                // Cambiamos el texto
+                if (cursorText) cursorText.innerText = text;
+            };
+            
+            // 3. Listeners Generales (Enlaces y botones)
+            document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
+                el.addEventListener('mouseenter', () => setCursor('hovered'));
+                el.addEventListener('mouseleave', () => setCursor(''));
             });
-
-            // --- TILT ---
+            
+            // 4. Listeners para Tarjetas de Audio (AQUI SE ACTIVA EL ROJO)
+            document.querySelectorAll('.audio-trigger').forEach(el => {
+                el.addEventListener('mouseenter', () => setCursor('audio-mode', 'OÍR'));
+                el.addEventListener('mouseleave', () => setCursor(''));
+            });
+            
+            // 5. Listener para Video
+            const videoArea = document.querySelector('.video-cursor-area');
+            if(videoArea) {
+                videoArea.addEventListener('mouseenter', () => setCursor('video-mode', 'VER'));
+                videoArea.addEventListener('mouseleave', () => setCursor(''));
+            }
+            
+            // 6. Listener para Lapü (Sueños)
+            const dreamArea = document.getElementById('lapu-section');
+            if(dreamArea) {
+                dreamArea.addEventListener('mouseenter', () => setCursor('dream-mode'));
+                dreamArea.addEventListener('mouseleave', () => setCursor(''));
+            }
+            
+            // --- TILT (Mantenemos tu código de Tilt que estaba bien) ---
             const cards = document.querySelectorAll(".tilt-card");
             if(cards.length > 0 && typeof VanillaTilt !== 'undefined') {
                  VanillaTilt.init(cards, { max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05 });
