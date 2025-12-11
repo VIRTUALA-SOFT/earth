@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nación Wayuu | Inmersión Digital</title>
+    <title>Nación Wayuu | El Tejido de los Sueños</title>
     
-    <!-- FUENTES PREMIUM FEEL -->
+    <!-- FUENTES DE IMPACTO -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet">
     
@@ -14,9 +14,10 @@
     
     <style>
         :root {
-            --c-bg: #050200; /* Negro más cálido/profundo */
+            --c-bg: #050200;
             --c-sand: #C89F65;
-            --c-accent: #FF3B3B; /* Rojo Wayuu vibrante */
+            --c-accent: #FF3B3B;
+            --c-star: #A5D8FF;
         }
 
         body { 
@@ -24,89 +25,123 @@
             color: #f3f3f3; 
             font-family: 'Manrope', sans-serif; 
             overflow-x: hidden; 
-            cursor: none; /* OCULTAMOS CURSOR NATIVO */
+            cursor: none; 
+            margin: 0;
         }
 
         .font-display { font-family: 'Playfair Display', serif; }
         .font-decor { font-family: 'Cinzel Decorative', serif; }
         .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        /* CURSOR PERSONALIZADO */
+        /* --- CURSOR AVANZADO --- */
         #cursor {
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border: 1px solid rgba(255,255,255,0.5); border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.6); border-radius: 50%;
             pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background 0.3s;
+            transform: translate(-50%, -50%); transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), background 0.3s;
             mix-blend-mode: difference;
+            display: flex; justify-content: center; align-items: center;
         }
-        #cursor.hovered { width: 50px; height: 50px; background: white; border-color: transparent; opacity: 0.5; }
-        #cursor.hovered-video { width: 80px; height: 80px; background: var(--c-accent); opacity: 0.8; mix-blend-mode: normal; }
-        #cursor.hovered-video::after { content: 'VER'; font-size: 10px; color: white; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-weight:bold;}
+        #cursor span { opacity: 0; font-size: 10px; font-weight: bold; color: black; transition: opacity 0.2s; font-family: 'Syncopate', sans-serif;}
+        
+        /* Estados del cursor */
+        #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
+        
+        #cursor.audio-mode { width: 80px; height: 80px; background: var(--c-sand); border-color: transparent; mix-blend-mode: normal; }
+        #cursor.audio-mode span { opacity: 1; content: "OÍR"; color: black; }
+        
+        #cursor.video-mode { width: 90px; height: 90px; background: var(--c-accent); border-color: transparent; mix-blend-mode: normal; }
+        #cursor.video-mode span { opacity: 1; color: white; }
 
-        /* THREE.JS CANVAS */
-        #webgl-canvas {
+        #cursor.dream-mode { width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border: none; mix-blend-mode: screen; }
+
+        /* --- BACKGROUND GLOBAL --- */
+        #global-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; pointer-events: none; opacity: 0;
             transition: opacity 2s ease;
         }
 
-        /* TEXTO CINEMÁTICO */
-        .title-reveal {
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-        }
-        .char { display: inline-block; transform: translateY(100%); opacity: 0; }
-
-        /* HERO VIDEO MASKING */
-        .hero-container {
-            position: relative; height: 100vh; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .hero-video-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.4; filter: contrast(1.2) sepia(0.2);
-            mask-image: radial-gradient(circle, black 40%, transparent 100%); /* Viñeta suave */
-        }
-
-        /* TIPOGRAFÍA DE IMPACTO */
+        /* --- ESTILOS COMPARTIDOS --- */
         .giant-text {
             font-size: clamp(4rem, 15vw, 20rem);
             line-height: 0.8;
             color: transparent;
             -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-            position: relative; z-index: 10;
             mix-blend-mode: overlay;
         }
         .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
 
-        /* RED DE SUEÑOS (SPOTLIGHT MEJORADO) */
-        .dream-mask {
-            background: radial-gradient(circle 300px at var(--x) var(--y), transparent 10%, rgba(0,0,0,0.95) 50%);
+        /* Hero Video */
+        .hero-video-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.5; filter: contrast(1.1) brightness(0.8);
+            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         }
 
-        /* ESTILO SCROLLBAR */
+        /* Audio Cards */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s ease;
+        }
+        .glass-panel:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--c-sand);
+            transform: translateY(-10px);
+        }
+
+        /* LOADER */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--c-bg); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .loader-line {
+            width: 0%; height: 2px;
+            background: linear-gradient(90deg, var(--c-weave), var(--c-sand));
+            transition: width 0.2s linear;
+        }
+
+        /* Jepira Gradient */
+        .cosmos-bg {
+            position: absolute; inset: 0; 
+            background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
+            opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
+        }
+
         ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body>
 
     <!-- CURSOR -->
-    <div id="cursor"></div>
+    <div id="cursor"><span id="cursor-text"></span></div>
 
-    <!-- CANVAS -->
-    <canvas id="webgl-canvas"></canvas>
+    <!-- CANVAS PARTICULAS GLOBALES -->
+    <canvas id="global-canvas"></canvas>
 
-    <!-- NAV FLOTANTE -->
+       <!-- LOADER -->
+    <div class="loader" id="loader">
+        <div class="tech-font text-xl tracking-[0.3em] text-[#D4A056] mb-4">WAYUU</div>
+        <div class="w-48 h-[1px] bg-white/10 rounded overflow-hidden">
+            <div class="loader-line h-full" id="loader-bar"></div>
+        </div>
+    </div>
+    
+    <!-- NAV -->
     <nav class="fixed top-8 left-8 right-8 z-50 flex justify-between items-center mix-blend-difference">
         <div class="text-xs font-tech tracking-[0.3em] text-white hover-trigger">NACIÓN WAYUU</div>
-        <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center cursor-pointer hover-trigger hover:bg-white hover:text-black transition-all">
+        <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center cursor-pointer hover-trigger transition-all hover:bg-white hover:text-black">
             <div class="w-4 h-[1px] bg-current"></div>
         </div>
     </nav>
 
     <main id="smooth-wrapper">
         
-        <!-- HERO: ATMÓSFERA -->
-        <section class="hero-container">
+        <!-- 1. HERO -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden">
             <video autoplay muted loop playsinline class="hero-video-bg">
                 <source src="../../video/wayuu_desierto_ss.mp4" type="video/mp4">
             </video>
@@ -116,93 +151,183 @@
                 <h1 class="giant-text font-display reveal-title">
                     WA<span>YUU</span>
                 </h1>
-                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text">
-                    HIJOS DE LA LLUVIA Y LA SEQUÍA
+                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">
+                    Hijos de la lluvia y la sequía
                 </p>
-            </div>
-            
-            <!-- Scroll Indicator -->
-            <div class="absolute bottom-10 w-[1px] h-24 bg-white/10 overflow-hidden">
-                <div class="w-full h-1/2 bg-[#C89F65] animate-scroll-down"></div>
             </div>
         </section>
 
-        <!-- SECCIÓN: IDENTIDAD (PARALLAX TEXTURA) -->
-        <section class="min-h-screen py-32 px-6 relative flex items-center">
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-20">
+        <!-- 2. IDENTIDAD -->
+        <section class="min-h-screen py-32 px-6 md:px-24 relative flex items-center">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
                 <div class="space-y-12 z-20">
-                    <h2 class="text-6xl md:text-8xl font-display leading-none text-white title-split">
+                    <h2 class="text-5xl md:text-8xl font-display leading-none text-white">
                         Sangre de <br> <span class="text-[#C89F65] italic">Cactus</span>
                     </h2>
                     <p class="text-xl text-gray-400 font-light leading-relaxed max-w-md hover-trigger">
-                        Un pueblo milenario que teje su historia en cada hilo. La aridez no es un vacío, es un lienzo.
+                        Un pueblo milenario que teje su historia en cada hilo. La aridez no es un vacío, es un lienzo donde escriben su resistencia.
                     </p>
-                    <div class="inline-block border-b border-[#C89F65] pb-2 text-xs tracking-[0.2em] text-[#C89F65] cursor-pointer hover-trigger">
-                        DESCUBRIR LINAJE
+                    <div class="glass-panel p-6 inline-block rounded-xl">
+                        <span class="block text-4xl font-bold text-white mb-1">600k+</span>
+                        <span class="text-xs tracking-widest text-gray-500 uppercase">Habitantes Binacionales</span>
                     </div>
                 </div>
                 
-                <!-- Imagen Flotante con Parallax -->
-                <div class="relative h-[80vh] w-full" data-speed="0.5">
-                    <div class="absolute inset-0 bg-[#1a1a1a] overflow-hidden rounded-sm filter brightness-75 hover:brightness-100 transition duration-700">
-                         <!-- Placeholder image -->
-                        <img src="../../img/Mujeres-wayuu.jpg" class="w-full h-full object-cover scale-110" id="parallax-img">
+                <div class="relative h-[70vh] w-full" data-speed="0.5">
+                    <div class="absolute inset-0 bg-[#1a1a1a] overflow-hidden rounded-sm filter brightness-90 hover:brightness-110 transition duration-700">
+                        <img src="../../img/Mujeres-wayuu.jpg" class="w-full h-full object-cover scale-110" id="parallax-img" alt="Mujer Wayuu">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: YONNA (VIDEO FULL) -->
-        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black hover-trigger-video" id="video-section">
-            <div class="absolute inset-0 z-10 bg-black/20"></div>
-            <!-- Video en loop para fondo -->
-            <iframe class="absolute w-[150%] h-[150%] opacity-60 pointer-events-none" 
-                style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                src="https://www.youtube.com/embed/S_Jc8jOWgqg?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
-                frameborder="0" allow="autoplay; encrypted-media"></iframe>
-            
-            <h2 class="relative z-20 text-[12vw] font-display text-white mix-blend-overlay tracking-tighter opacity-80">
-                LA YONNA
-            </h2>
+        <!-- 3. ECOSISTEMA SONORO (AUDIO) -->
+        <section class="py-32 px-6 md:px-24 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-4">02 — WAYUUNAIKI</p>
+                <h2 class="text-4xl md:text-6xl font-display text-white mb-16">Voces del <span class="italic text-gray-500">Viento</span></h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Audio Card 1 -->
+                    <div class="glass-panel p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio1">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-5xl font-display text-white">Anasü</h3>
+                            <div class="w-2 h-2 bg-[#C89F65] rounded-full animate-pulse"></div>
+                        </div>
+                        <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien / Es bueno"</p>
+                        <audio id="audio1" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+                    </div>
+
+                    <!-- Audio Card 2 -->
+                    <div class="glass-panel p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-5xl font-display text-white">Mma</h3>
+                            <div class="w-2 h-2 bg-[#00C4CC] rounded-full animate-pulse"></div>
+                        </div>
+                        <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
+                        <audio id="audio2" src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3"></audio>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <!-- FOOTER -->
-        <footer class="py-20 bg-[#050200] border-t border-white/5 text-center">
-            <p class="font-tech text-xs text-gray-600">DISEÑADO CON ALMA</p>
-        </footer>
+        <!-- 4. LAPÜ (SUEÑOS) - SHADER LÍQUIDO -->
+        <!-- Seccion independiente que ejecuta su propio WebGL -->
+        <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
+            <!-- Canvas del Shader -->
+            <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
+            
+            <!-- Overlay HTML -->
+            <div class="relative z-10 text-center pointer-events-none mix-blend-exclusion px-4">
+                <span class="text-xs font-tech text-[#FF3B3B] tracking-[0.5em] block mb-2">03 — LAPÜ</span>
+                <p class="text-white/40 text-xs font-mono mt-[40vh] animate-pulse">( Mueve para revelar )</p>
+            </div>
+        </section>
+
+        <!-- 5. YONNA (VIDEO) -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
+            <div class="absolute inset-0 z-10 bg-black/40"></div>
+            <!-- Video Placeholder -->
+            <iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
+                style="top:50%; left:50%; transform:translate(-50%,-50%);"
+                src="https://www.youtube.com/embed/yJMXzvZEZlQ?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
+                frameborder="0" allow="autoplay; encrypted-media"></iframe>
+            
+            <div class="relative z-20 text-center mix-blend-overlay">
+                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">
+                    RITUAL
+                </h2>
+                <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
+            </div>
+        </section>
+
+        <!-- 6. JEPIRA (COSMOS) -->
+        <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
+            <div class="cosmos-bg" id="cosmos-overlay"></div>
+            
+            <div class="relative z-10 text-center px-6 max-w-3xl">
+                <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-widest">05 — JEPIRA</span>
+                <h2 class="text-5xl md:text-7xl font-display text-white mb-8">El Camino de las Almas</h2>
+                <p class="text-gray-300 text-lg font-light leading-relaxed mb-12">
+                    Hacia el Cabo de la Vela, donde la tierra termina y el mar comienza, viajan las almas para convertirse en lluvia y estrellas.
+                </p>
+                <a href="#" class="inline-block px-10 py-4 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger">
+                    Reiniciar Viaje
+                </a>
+            </div>
+        </section>
+
+        <footer class="py-12 bg-black border-t border-white/10 text-center relative z-20">
+            <p class="font-tech text-[10px] text-gray-600 tracking-[0.3em]">CULTURA WAYUU DIGITAL © 2025- DERECHOS RESERVADOS. ULULATO</p>
+             <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo">
+        </footer>        
 
     </main>
 
-    <!-- SCRIPTS -->
+    <!-- DEPENDENCIAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- Simplex Noise para movimiento orgánico -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
 
+    <!-- LOGICA PRINCIPAL -->
     <script>
-        // 1. INICIALIZACIÓN
         gsap.registerPlugin(ScrollTrigger);
-        const cursor = document.getElementById('cursor');
-        
-        // 2. CURSOR INTERACTIVO
-        document.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-        });
 
-        // Hover Effects
+        // --- 1. GESTOR DEL CURSOR ---
+        const cursor = document.getElementById('cursor');
+        const cursorText = document.getElementById('cursor-text');
+
+        const moveCursor = (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+        };
+        window.addEventListener('mousemove', moveCursor);
+
+        // Hover Genérico
         document.querySelectorAll('.hover-trigger').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
         });
-        
-        const videoSection = document.getElementById('video-section');
-        videoSection.addEventListener('mouseenter', () => cursor.classList.add('hovered-video'));
-        videoSection.addEventListener('mouseleave', () => cursor.classList.remove('hovered-video'));
 
-        // 3. THREE.JS AVANZADO (Partículas de Arena/Viento)
-        const initThree = () => {
-            const canvas = document.getElementById('webgl-canvas');
+        // Audio Hover
+        document.querySelectorAll('.audio-trigger').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('audio-mode');
+                cursorText.innerText = "OÍR";
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('audio-mode');
+                cursorText.innerText = "";
+            });
+            // Click play functionality
+            el.addEventListener('click', () => {
+                const audioId = el.getAttribute('data-audio');
+                const audio = document.getElementById(audioId);
+                audio.play();
+                gsap.fromTo(el, {scale: 0.95}, {scale: 1, duration: 0.3});
+            });
+        });
+
+        // Video Hover
+        const videoArea = document.querySelector('.video-cursor-area');
+        videoArea.addEventListener('mouseenter', () => {
+            cursor.classList.add('video-mode');
+            cursorText.innerText = "VER";
+        });
+        videoArea.addEventListener('mouseleave', () => {
+            cursor.classList.remove('video-mode');
+            cursorText.innerText = "";
+        });
+
+        // Dreams Hover
+        const dreamArea = document.getElementById('lapu-section');
+        dreamArea.addEventListener('mouseenter', () => cursor.classList.add('dream-mode'));
+        dreamArea.addEventListener('mouseleave', () => cursor.classList.remove('dream-mode'));
+
+
+        // --- 2. THREE.JS GLOBAL (PARTÍCULAS FONDO) ---
+        const initGlobalThree = () => {
+            const canvas = document.getElementById('global-canvas');
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -210,77 +335,274 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // Partículas
-            const particlesGeometry = new THREE.BufferGeometry();
-            const count = 3000;
-            const posArray = new Float32Array(count * 3);
-            const originalPos = new Float32Array(count * 3); // Para recordar posición base
-            
-            for(let i = 0; i < count * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 25; // Dispersión
-                originalPos[i] = posArray[i];
-            }
-            
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            // Geometría Partículas
+            const count = 2500;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const originalPos = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
 
-            // Material "Arena Dorada"
+            const colorSand = new THREE.Color('#C89F65');
+            const colorStar = new THREE.Color('#A5D8FF');
+
+            for(let i=0; i<count*3; i+=3) {
+                positions[i] = (Math.random() - 0.5) * 30;
+                positions[i+1] = (Math.random() - 0.5) * 40;
+                positions[i+2] = (Math.random() - 0.5) * 20;
+                originalPos[i] = positions[i];
+                originalPos[i+1] = positions[i+1];
+                
+                // Color inicial Arena
+                colors[i] = colorSand.r;
+                colors[i+1] = colorSand.g;
+                colors[i+2] = colorSand.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
             const material = new THREE.PointsMaterial({
-                size: 0.03,
-                color: 0xC89F65,
+                size: 0.04,
+                vertexColors: true,
                 transparent: true,
                 opacity: 0.8,
                 blending: THREE.AdditiveBlending
             });
 
-            const particlesMesh = new THREE.Points(particlesGeometry, material);
-            scene.add(particlesMesh);
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
             camera.position.z = 5;
 
-            // Simplex Noise (Viento)
+            // Animación Viento/Ruido
             const simplex = new SimplexNoise();
             const clock = new THREE.Clock();
 
-            // Animación
-            const tick = () => {
-                const elapsedTime = clock.getElapsedTime();
-                
-                // Rotación suave general
-                particlesMesh.rotation.y = elapsedTime * 0.05;
+            const animateGlobal = () => {
+                const time = clock.getElapsedTime();
+                particles.rotation.y = time * 0.02;
 
-                // Modificar posiciones con Noise (Efecto Duna Viva)
-                for(let i = 0; i < count; i++) {
-                    const i3 = i * 3;
-                    const x = originalPos[i3];
-                    const y = originalPos[i3+1];
-                    
-                    // El ruido afecta Y basado en X y el Tiempo
-                    const noise = simplex.noise2D(x * 0.1 + elapsedTime * 0.1, y * 0.1) * 0.5;
-                    
-                    posArray[i3+1] = originalPos[i3+1] + noise; // Movimiento ondulante vertical
+                // Modificar posiciones suavemente (Efecto Viento)
+                const pos = geometry.attributes.position.array;
+                for(let i=0; i<count; i++) {
+                    const i3 = i*3;
+                    const noise = simplex.noise2D(originalPos[i3] * 0.1, time * 0.2) * 0.2;
+                    pos[i3+1] = originalPos[i3+1] + noise;
                 }
-                particlesGeometry.attributes.position.needsUpdate = true;
+                geometry.attributes.position.needsUpdate = true;
 
                 renderer.render(scene, camera);
-                requestAnimationFrame(tick);
-            }
-            tick();
+                requestAnimationFrame(animateGlobal);
+            };
+            animateGlobal();
+            
+            // Fade In Inicial
+            gsap.to("#global-canvas", {opacity: 1, duration: 2, delay: 0.5});
 
-            // Fade in inicial
-            gsap.to("#webgl-canvas", { opacity: 1, duration: 3, delay: 0.5 });
+            // TRANSICIÓN JEPIRA (Arena -> Estrellas)
+            ScrollTrigger.create({
+                trigger: "#jepira-section",
+                start: "top center",
+                onEnter: () => {
+                    // Cambiar color a estrellas
+                    gsap.to("#cosmos-overlay", {opacity: 1, duration: 2}); // Fondo azulado
+                    const cols = geometry.attributes.color.array;
+                    // Tween manual de colores (Simulado)
+                    const tempObj = { t: 0 };
+                    gsap.to(tempObj, {
+                        t: 1,
+                        duration: 2,
+                        onUpdate: () => {
+                            for(let i=0; i<count*3; i+=3) {
+                                cols[i] = THREE.MathUtils.lerp(colorSand.r, colorStar.r, tempObj.t);
+                                cols[i+1] = THREE.MathUtils.lerp(colorSand.g, colorStar.g, tempObj.t);
+                                cols[i+2] = THREE.MathUtils.lerp(colorSand.b, colorStar.b, tempObj.t);
+                            }
+                            geometry.attributes.color.needsUpdate = true;
+                        }
+                    });
+                },
+                onLeaveBack: () => {
+                     // Volver a Arena
+                    gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                    const cols = geometry.attributes.color.array;
+                    const tempObj = { t: 0 };
+                    gsap.to(tempObj, {
+                        t: 1,
+                        duration: 2,
+                        onUpdate: () => {
+                            for(let i=0; i<count*3; i+=3) {
+                                cols[i] = THREE.MathUtils.lerp(colorStar.r, colorSand.r, tempObj.t);
+                                cols[i+1] = THREE.MathUtils.lerp(colorStar.g, colorSand.g, tempObj.t);
+                                cols[i+2] = THREE.MathUtils.lerp(colorStar.b, colorSand.b, tempObj.t);
+                            }
+                            geometry.attributes.color.needsUpdate = true;
+                        }
+                    });
+                }
+            });
         };
-        initThree();
+        initGlobalThree();
 
-        // 4. GSAP ANIMACIONES
-        
-        // Revelado de textos del Hero
+
+        // --- 3. THREE.JS LOCAL (SHADER SUEÑOS/LAPÜ) ---
+        // Usamos una IIFE para aislar variables y no romper el Three.js global
+        (function() {
+            const container = document.getElementById('dream-canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // Crear Textura con Canvas 2D
+            function createTextTexture() {
+                const cvs = document.createElement('canvas');
+                cvs.width = window.innerWidth; 
+                cvs.height = window.innerHeight;
+                const ctx = cvs.getContext('2d');
+                
+                // Texto Centrado
+                const cx = cvs.width / 2;
+                const cy = cvs.height / 2;
+                
+                // Título
+                ctx.font = "italic 700 15vw 'Playfair Display'";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("SUEÑOS", cx, cy);
+
+                // Subtexto
+                ctx.font = "300 1.5vw 'Manrope'";
+                ctx.fillStyle = "#C89F65";
+                ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
+
+                const tex = new THREE.CanvasTexture(cvs);
+                return tex;
+            }
+
+            const texture = createTextTexture();
+
+            // Shader FBM
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+                    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                    uTexture: { value: texture }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
+                `,
+                fragmentShader: `
+                    uniform float uTime;
+                    uniform vec2 uMouse;
+                    uniform vec2 uResolution;
+                    uniform sampler2D uTexture;
+                    varying vec2 vUv;
+
+                    // Simplex Noise
+                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                    float snoise(vec2 v) {
+                        const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                        vec2 i  = floor(v + dot(v, C.yy) );
+                        vec2 x0 = v -   i + dot(i, C.xx);
+                        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                        vec4 x12 = x0.xyxy + C.xxzz;
+                        x12.xy -= i1;
+                        i = mod289(i);
+                        vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                        m = m*m ; m = m*m ;
+                        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                        vec3 h = abs(x) - 0.5;
+                        vec3 ox = floor(x + 0.5);
+                        vec3 a0 = x - ox;
+                        m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                        vec3 g;
+                        g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                        return 130.0 * dot(m, g);
+                    }
+
+                    void main() {
+                        vec2 uv = vUv;
+                        vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
+                        vec2 st = uv * ratio;
+                        vec2 mouse = uMouse * ratio;
+                        
+                        // Distancia Mouse
+                        float dist = distance(st, mouse);
+
+                        // Ruido / Niebla
+                        float n = snoise(st * 3.0 - uTime * 0.1);
+                        float n2 = snoise(st * 8.0 + uTime * 0.05);
+                        float fog = n * 0.5 + n2 * 0.2;
+
+                        // Mascara de revelado (Agujero en la niebla)
+                        float reveal = smoothstep(0.25, 0.1, dist + fog * 0.2); // Invertido: 1 cerca mouse, 0 lejos
+
+                        // Distorsión del texto (Liquido)
+                        vec2 distort = vec2(fog * 0.1 * (1.0 - reveal));
+                        vec4 texColor = texture2D(uTexture, uv + distort);
+
+                        // Color Fondo Niebla
+                        vec3 bgColor = vec3(0.0, 0.0, 0.05);
+
+                        // Mezcla: Si reveal es alto, muestra texto. Si es bajo, muestra niebla.
+                        vec3 finalColor = mix(bgColor, texColor.rgb, reveal * texColor.a);
+                        
+                        // Borde Dorado Magico
+                        float edge = smoothstep(0.0, 0.1, reveal) * (1.0 - smoothstep(0.9, 1.0, reveal));
+                        finalColor += vec3(0.8, 0.6, 0.2) * edge * 0.2;
+
+                        gl_FragColor = vec4(finalColor, 1.0);
+                    }
+                `
+            });
+
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+            scene.add(mesh);
+
+            // Animación Local
+            const clock = new THREE.Clock();
+            const mouse = new THREE.Vector2(0.5, 0.5);
+            
+            // Listener específico para el container para coordenadas relativas correctas (opcional)
+            // Usamos window global para suavidad continua
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX / window.innerWidth;
+                mouse.y = 1.0 - (e.clientY / window.innerHeight);
+            });
+
+            function animate() {
+                material.uniforms.uTime.value = clock.getElapsedTime();
+                // Interpolación básica para suavidad
+                material.uniforms.uMouse.value.lerp(mouse, 0.1);
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // Resize Local
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+                material.uniforms.uTexture.value = createTextTexture();
+            });
+        })();
+
+
+        // --- 4. SCROLL & ANIMATIONS (GSAP) ---
         const tl = gsap.timeline();
-        tl.from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out", delay: 0.5 })
-          .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+        tl.from(".reveal-title", { y: 150, opacity: 0, duration: 1.5, ease: "power4.out", delay: 0.5 })
+          .from(".reveal-text", { y: 50, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
 
-        // Parallax de Imagen
         gsap.to("#parallax-img", {
             yPercent: 20,
-            scale: 1,
             ease: "none",
             scrollTrigger: {
                 trigger: "#parallax-img",
@@ -290,7 +612,7 @@
             }
         });
 
-        // 5. LENIS SCROLL
+        // Lenis Smooth Scroll
         const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
         function raf(time) {
             lenis.raf(time);
@@ -299,13 +621,5 @@
         requestAnimationFrame(raf);
 
     </script>
-    <style>
-        /* Animación indicador scroll */
-        @keyframes scroll-down {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-        .animate-scroll-down { animation: scroll-down 2s infinite; }
-    </style>
 </body>
 </html>
