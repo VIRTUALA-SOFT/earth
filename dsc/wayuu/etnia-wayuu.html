@@ -702,10 +702,20 @@
                     cvs.width = window.innerWidth; cvs.height = window.innerHeight;
                     const ctx = cvs.getContext('2d');
                     const cx = cvs.width/2, cy = cvs.height/2;
-                    ctx.font = "italic 700 15vw 'Playfair Display'"; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                    ctx.fillText("SUEÑOS", cx, cy);
-                    ctx.font = "300 1.5vw 'Manrope'"; ctx.fillStyle = "#C89F65";
-                    ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
+                    
+                    // Título Principal (Más Grande)
+                    ctx.font = "italic 700 18vw 'Playfair Display'"; // Aumenté el tamaño
+                    ctx.fillStyle = "white"; 
+                    ctx.textAlign = "center"; 
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("LAPÜ", cx, cy); // Cambiado de SUEÑOS a LAPÜ (nombre propio)
+                    
+                    // Mensaje de Sabiduría
+                    ctx.font = "300 1.2vw 'Manrope'"; 
+                    ctx.fillStyle = "#C89F65"; // Dorado
+                    // Mensaje profundo
+                    ctx.fillText("Los ancestros hablan cuando cierras los ojos.", cx, cy + (cvs.width * 0.15));
+                    
                     return new THREE.CanvasTexture(cvs);
                 }
                 const material = new THREE.ShaderMaterial({
