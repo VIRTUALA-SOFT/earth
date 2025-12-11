@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nación Wayuu | El Tejido de los Sueños</title>
+    <title>Nación Wayuu | Inmersión Digital</title>
     
     <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,11 +67,11 @@
             mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         }
 
-        /* TILT CARDS (Mejoradas para visibilidad) */
+        /* TILT CARDS */
         .tilt-card {
-            background: rgba(20, 20, 20, 0.6); /* Fondo más visible */
+            background: rgba(20, 20, 20, 0.6);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible */
+            border: 1px solid rgba(255, 255, 255, 0.15);
             transform-style: preserve-3d;
             transform: perspective(1000px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
@@ -85,9 +85,16 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--c-bg); z-index: 10000;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         .loader-line {
             width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear;
+        }
+        
+        /* Estado inicial del contenido principal */
+        #main-content {
+            opacity: 0;
+            transition: opacity 1.5s ease;
         }
 
         .cosmos-bg {
@@ -95,7 +102,6 @@
             opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
         }
         
-        /* Botón Play Visual */
         .play-btn {
             width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center; transition: all 0.3s;
@@ -126,7 +132,7 @@
     </nav>
 
     <!-- MAIN -->
-    <main id="main-content" style="opacity: 0;">
+    <main id="main-content">
         
         <!-- 1. HERO -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden">
@@ -176,7 +182,7 @@
             <div id="weaving-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
         </section>
 
-        <!-- 4. AUDIO (WEB AUDIO API - SIN ERRORES) -->
+        <!-- 4. AUDIO (WEB AUDIO API - GENERATIVO) -->
         <section class="py-32 px-6 md:px-24 relative z-10">
             <div class="max-w-7xl mx-auto">
                 <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-4">02 — WAYUUNAIKI</p>
@@ -226,14 +232,14 @@
             <div class="absolute inset-0 z-10 bg-black/40"></div>
             <iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
                 style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                src="https://www.youtube.com/embed/S_Jc8jOWgqg?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
+                src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF?autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&start=0&end=42" 
                 frameborder="0" allow="autoplay; encrypted-media"></iframe>
             <div class="relative z-20 text-center mix-blend-overlay">
                 <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
                 <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
             </div>
         </section>
-
+        
         <!-- 7. FINAL -->
         <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
             <div class="cosmos-bg" id="cosmos-overlay"></div>
@@ -250,7 +256,7 @@
         </footer>
     </main>
 
-    <!-- SCRIPTS -->
+    <!-- SCRIPTS DE DEPENDENCIAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -259,24 +265,20 @@
 
     <script>
         // --- FUNCIÓN DE AUDIO GENERATIVO (Solución Definitiva) ---
-        // Genera un sonido de "viento/campana" usando Web Audio API sin archivos externos
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+        let audioCtx;
         function playMysticalSound(tone) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            // Configuración
             osc.type = 'sine';
-            // Frecuencias pentatónicas para sonar "místico"
             osc.frequency.setValueAtTime(tone === 'low' ? 196.00 : 329.63, audioCtx.currentTime); // G3 o E4
             
-            // Envelope (Fade in - Fade out suave)
             gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); // Attack
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); // Release largo (eco)
+            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); 
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); 
             
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -285,45 +287,74 @@
             osc.stop(audioCtx.currentTime + 3);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            gsap.registerPlugin(ScrollTrigger);
-
-            // --- LOADER ---
+        // --- SISTEMA DE CARGA (FAILSAFE) ---
+        function revealSite() {
             const loader = document.getElementById('loader');
+            const main = document.getElementById('main-content');
+            const canvas = document.getElementById('global-canvas');
+            
+            if (loader.style.opacity === '0') return; // Ya revelado
+
+            try {
+                // Intento con GSAP
+                if (typeof gsap !== 'undefined') {
+                    const tl = gsap.timeline();
+                    tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
+                      .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
+                      .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
+                      .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
+                      .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+                } else {
+                    throw new Error("GSAP no cargó");
+                }
+            } catch (e) {
+                // Fallback manual si GSAP falla
+                loader.style.opacity = 0;
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
+                main.style.opacity = 1;
+                canvas.style.opacity = 1;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+
+            // --- LOADER SIMULADO ---
             const loaderBar = document.getElementById('loader-bar');
             let progress = 0;
             const interval = setInterval(() => {
                 progress += Math.random() * 8;
+                if(loaderBar) loaderBar.style.width = `${progress}%`;
+                
                 if(progress >= 100) {
-                    progress = 100;
                     clearInterval(interval);
-                    
-                    const tl = gsap.timeline();
-                    tl.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' })
-                      .to("#main-content", { opacity: 1, duration: 1.5 }, "-=0.5")
-                      .to("#global-canvas", { opacity: 1, duration: 2 }, "-=1.5")
-                      .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
-                      .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+                    revealSite();
                 }
-                loaderBar.style.width = `${progress}%`;
             }, 50);
+
+            // SEGURIDAD: Si falla el loader, abrir la web a los 4 segundos sí o sí
+            setTimeout(() => {
+                if (progress < 100) {
+                    clearInterval(interval);
+                    revealSite();
+                }
+            }, 4000);
 
             // --- CURSOR ---
             const cursor = document.getElementById('cursor');
             const cursorText = document.getElementById('cursor-text');
             window.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+                if(typeof gsap !== 'undefined') {
+                    gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+                } else {
+                    // Fallback CSS
+                    cursor.style.left = e.clientX + 'px';
+                    cursor.style.top = e.clientY + 'px';
+                }
             });
 
-            // Handlers Cursor
-            const addHover = (cls, txt = "") => {
-                cursor.classList.add(cls);
-                cursorText.innerText = txt;
-            };
-            const removeHover = (cls) => {
-                cursor.classList.remove(cls);
-                cursorText.innerText = "";
-            };
+            const addHover = (cls, txt = "") => { cursor.classList.add(cls); cursorText.innerText = txt; };
+            const removeHover = (cls) => { cursor.classList.remove(cls); cursorText.innerText = ""; };
 
             document.querySelectorAll('.hover-trigger').forEach(el => {
                 el.addEventListener('mouseenter', () => addHover('hovered'));
@@ -341,12 +372,10 @@
                 el.addEventListener('mouseleave', () => removeHover('audio-mode'));
             });
 
-            // --- TILT INIT (Solo si existen) ---
+            // --- TILT ---
             const cards = document.querySelectorAll(".tilt-card");
             if(cards.length > 0 && typeof VanillaTilt !== 'undefined') {
-                 VanillaTilt.init(cards, {
-                    max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05
-                });
+                 VanillaTilt.init(cards, { max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05 });
             }
 
             // --- THREE.JS GLOBAL ---
@@ -397,38 +426,39 @@
                 };
                 animate();
 
-                ScrollTrigger.create({
-                    trigger: "#jepira-section", start: "top center",
-                    onEnter: () => {
-                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
-                        const c = geometry.attributes.color.array;
-                        const obj = {t:0};
-                        gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
-                            for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
-                            }
-                            geometry.attributes.color.needsUpdate = true;
-                        }});
-                    },
-                    onLeaveBack: () => {
-                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                         const c = geometry.attributes.color.array;
-                         const obj = {t:0};
-                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
-                            for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
-                            }
-                            geometry.attributes.color.needsUpdate = true;
-                         }});
-                    }
-                });
+                if(typeof gsap !== 'undefined') {
+                    ScrollTrigger.create({
+                        trigger: "#jepira-section", start: "top center",
+                        onEnter: () => {
+                            gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
+                            const c = geometry.attributes.color.array;
+                            const obj = {t:0};
+                            gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                                for(let i=0; i<count*3; i+=3) {
+                                    c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
+                                    c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
+                                    c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
+                                }
+                                geometry.attributes.color.needsUpdate = true;
+                            }});
+                        },
+                        onLeaveBack: () => {
+                             gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                             const c = geometry.attributes.color.array;
+                             const obj = {t:0};
+                             gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                                for(let i=0; i<count*3; i+=3) {
+                                    c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
+                                    c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
+                                    c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
+                                }
+                                geometry.attributes.color.needsUpdate = true;
+                             }});
+                        }
+                    });
+                }
             };
             initGlobalThree();
-
 
             // --- THREE.JS WEAVING ---
             (function() {
@@ -441,14 +471,12 @@
                 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
                 renderer.setSize(container.clientWidth, container.clientHeight);
                 container.appendChild(renderer.domElement);
-
                 const group = new THREE.Group();
                 scene.add(group);
                 const pCount = 300;
                 const pData = [];
                 const pGeo = new THREE.BufferGeometry();
                 const pPos = new Float32Array(pCount*3);
-                
                 for(let i=0; i<pCount; i++) {
                     const theta = Math.random()*Math.PI*2;
                     const phi = Math.acos((Math.random()*2)-1);
@@ -461,7 +489,6 @@
                 pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
                 const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
                 group.add(points);
-
                 const lGeo = new THREE.BufferGeometry();
                 const lPos = new Float32Array(pCount*pCount*3);
                 const lCol = new Float32Array(pCount*pCount*3);
@@ -469,25 +496,21 @@
                 lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
                 const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
                 group.add(lines);
-
                 let mx=0, my=0;
                 container.addEventListener('mousemove', e => {
                     const rect = container.getBoundingClientRect();
                     mx = ((e.clientX - rect.left)/rect.width)*2 - 1;
                     my = -((e.clientY - rect.top)/rect.height)*2 + 1;
                 });
-
                 const animate = () => {
                     group.rotation.x += 0.002 + my*0.01;
                     group.rotation.y += 0.002 + mx*0.01;
                     let vPos=0, cPos=0, con=0;
                     for(let i=0; i<pCount; i++) pData[i].con=0;
-
                     for(let i=0; i<pCount; i++) {
                         pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
                         const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
                         if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
-
                         if(pData[i].con>=3) continue;
                         for(let j=i+1; j<pCount; j++) {
                             if(pData[j].con>=3) continue;
@@ -513,7 +536,6 @@
                 animate();
             })();
 
-
             // --- THREE.JS SHADER (SUEÑOS) ---
             (function() {
                 const container = document.getElementById('dream-canvas-container');
@@ -523,7 +545,6 @@
                 const renderer = new THREE.WebGLRenderer({ alpha: true });
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 container.appendChild(renderer.domElement);
-
                 function createTextTexture() {
                     const cvs = document.createElement('canvas');
                     cvs.width = window.innerWidth; cvs.height = window.innerHeight;
@@ -535,8 +556,58 @@
                     ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
                     return new THREE.CanvasTexture(cvs);
                 }
-
                 const material = new THREE.ShaderMaterial({
                     uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0.5,0.5)}, uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, uTexture: {value: createTextTexture()} },
                     vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
                     fragmentShader: `
+                        uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
+                        vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+                        float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
+                        void main(){
+                            vec2 uv = vUv; vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
+                            float dist = distance(uv*ratio, uMouse*ratio);
+                            float fog = snoise(uv*ratio*3.0 - uTime*0.1)*0.5 + snoise(uv*ratio*8.0 + uTime*0.05)*0.2;
+                            float reveal = smoothstep(0.25, 0.1, dist + fog*0.2);
+                            vec4 tex = texture2D(uTexture, uv + vec2(fog*0.1*(1.0-reveal)));
+                            vec3 col = mix(vec3(0.0,0.0,0.05), tex.rgb, reveal*tex.a);
+                            col += vec3(0.8,0.6,0.2) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.2;
+                            gl_FragColor = vec4(col, 1.0);
+                        }
+                    `
+                });
+                scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
+                const clock = new THREE.Clock();
+                const mouse = new THREE.Vector2(0.5,0.5);
+                window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/window.innerWidth; mouse.y=1.0-e.clientY/window.innerHeight; });
+                const animate = () => {
+                    material.uniforms.uTime.value = clock.getElapsedTime();
+                    material.uniforms.uMouse.value.lerp(mouse, 0.1);
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animate);
+                };
+                animate();
+                window.addEventListener('resize', ()=>{
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+                    material.uniforms.uTexture.value = createTextTexture();
+                });
+            })();
+
+            // Parallax
+            if(typeof gsap !== 'undefined') {
+                gsap.to("#parallax-img", {
+                    yPercent: 20, ease: "none",
+                    scrollTrigger: { trigger: "#parallax-img", start: "top bottom", end: "bottom top", scrub: true }
+                });
+            }
+
+            // Smooth Scroll
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
+                function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+                requestAnimationFrame(raf);
+            }
+        });
+    </script>
+</body>
+</html>
