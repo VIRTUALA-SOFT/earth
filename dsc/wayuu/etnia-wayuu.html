@@ -36,56 +36,44 @@
 
         /* CURSOR */
      #cursor {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 20px; 
-    height: 20px;
-    background: #ffffff; 
-    border-radius: 50%;
-    pointer-events: none; /* Vital para poder dar clic */
-    z-index: 99999; /* Siempre encima de todo */
-    transform: translate(-50%, -50%); 
-    transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
-                height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
-                background-color 0.3s;
-    mix-blend-mode: difference; /* Invierte color sobre fondos claros */
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-}
-  /* TEXTO DENTRO DEL CURSOR */
-#cursor span { 
-    opacity: 0; 
-    font-size: 10px; 
-    font-weight: 800; 
-    color: white; 
-    font-family: 'Syncopate', sans-serif;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            background: #ffffff; 
+            border-radius: 50%;
+            pointer-events: none; 
+            z-index: 99999; /* Máxima prioridad */
+            transform: translate(-50%, -50%); 
+            transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                        height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                        background-color 0.2s;
+            mix-blend-mode: difference; /* Inversión por defecto */
+            display: flex; justify-content: center; align-items: center;
+        }
         
-  /* --- ESTADO: HOVER GENÉRICO (Botones pequeños) --- */
-#cursor.hovered { 
-    width: 50px; 
-    height: 50px; 
-    background: white; 
-    mix-blend-mode: difference; 
-}
+        #cursor span { 
+            opacity: 0; 
+            font-size: 10px; font-weight: 800; color: white; 
+            font-family: 'Syncopate', sans-serif; letter-spacing: 1px;
+            pointer-events: none;
+        }
 
-   /* --- ESTADO: MODO AUDIO (ROJO Y GRANDE) --- */
-#cursor.audio-mode { 
-    width: 90px; 
-    height: 90px; 
-    background: #FF3B3B; /* ROJO PURO */
-    mix-blend-mode: normal; /* IMPORTANTE: Desactiva la inversión para que se vea rojo real */
-    border: none;
-    box-shadow: 0 4px 30px rgba(255, 59, 59, 0.5); /* Resplandor */
-}
-   /* Muestra el texto cuando está en modo audio */
-#cursor.audio-mode span { 
-    opacity: 1; 
-}
+        /* ESTADO: AUDIO (EL ROJO IMPORTANTE) */
+        #cursor.audio-mode { 
+            width: 90px !important; 
+            height: 90px !important; 
+            background: #FF3B3B !important; /* Rojo Forzado */
+            mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(255, 59, 59, 0.4);
+        }
+        #cursor.audio-mode span { opacity: 1; }
+        
+   /* ESTADO: HOVER SIMPLE */
+        #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
+
+        /* ESTADO: SUEÑOS */
+        #cursor.dream-mode { width: 150px; height: 150px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); mix-blend-mode: normal; }
+
+
       /* ESTADO: VIDEO */
         #cursor.video-mode { 
             width: 100px; 
@@ -97,13 +85,7 @@
             opacity: 1; 
             color: black; /* Texto negro sobre fondo blanco */
         }
-       /* ESTADO: SUEÑOS (LAPÜ) */
-        #cursor.dream-mode { 
-            width: 150px; 
-            height: 150px; 
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); 
-            mix-blend-mode: overlay;
-        }
+     
 
         /* UTILIDADES VISUALES */
         #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
@@ -725,58 +707,41 @@
                 }
             }, 4000);
 
-            // --- CURSOR ---
-           const cursor = document.getElementById('cursor');
-const cursorText = document.getElementById('cursor-text');
+// --- LOGICA DE CURSOR ---
+        const cursor = document.getElementById('cursor');
+        const cursorText = document.getElementById('cursor-text');
 
-// 1. Movimiento
-window.addEventListener('mousemove', (e) => {
-    if(typeof gsap !== 'undefined') {
-        gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-    } else {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-    }
-});
-            
-          // 2. Función para activar estados
-const setCursor = (mode, text = "") => {
-    // Limpiar clases previas
-    cursor.classList.remove('hovered', 'audio-mode', 'video-mode', 'dream-mode');
-    
-    // Activar nueva clase
-    if (mode) cursor.classList.add(mode);
-    
-    // Poner texto
-    if (cursorText) cursorText.innerText = text;
-};
-            
-         // 3. VINCULAR A LAS TARJETAS (Lo importante)
-// Busca todos los elementos con clase 'audio-trigger' (tus tarjetas tienen esta clase)
-document.querySelectorAll('.audio-trigger').forEach(el => {
-    el.addEventListener('mouseenter', () => setCursor('audio-mode', 'OÍR'));
-    el.addEventListener('mouseleave', () => setCursor(''));
-});
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+        });
 
-// 4. Vincular a otros botones (Hover simple)
-document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
-    el.addEventListener('mouseenter', () => setCursor('hovered'));
-    el.addEventListener('mouseleave', () => setCursor(''));
-});
+        // Función Maestra de Estado
+        const setCursor = (mode, text = "") => {
+            cursor.className = ''; // Limpia todo
+            if(mode) cursor.classList.add(mode);
+            if(cursorText) cursorText.innerText = text;
+        };
+
             
-            // 5. Listener para Video
-            const videoArea = document.querySelector('.video-cursor-area');
-            if(videoArea) {
-                videoArea.addEventListener('mouseenter', () => setCursor('video-mode', 'VER'));
-                videoArea.addEventListener('mouseleave', () => setCursor(''));
-            }
+  // Listeners Tarjetas Audio (ROJO)
+        document.querySelectorAll('.audio-trigger').forEach(el => {
+            el.addEventListener('mouseenter', () => setCursor('audio-mode', 'OÍR'));
+            el.addEventListener('mouseleave', () => setCursor(''));
+        });
+
+        // Listeners Generales
+        document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
+            el.addEventListener('mouseenter', () => setCursor('hovered'));
+            el.addEventListener('mouseleave', () => setCursor(''));
+        });
             
-            // 6. Listener para Lapü (Sueños)
-            const dreamArea = document.getElementById('lapu-section');
-            if(dreamArea) {
-                dreamArea.addEventListener('mouseenter', () => setCursor('dream-mode'));
-                dreamArea.addEventListener('mouseleave', () => setCursor(''));
-            }
+            // Video
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => setCursor('video-mode', 'VER'));
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => setCursor(''));
+
+        // Lapu
+        document.getElementById('lapu-section')?.addEventListener('mouseenter', () => setCursor('dream-mode'));
+        document.getElementById('lapu-section')?.addEventListener('mouseleave', () => setCursor(''));
             
             // --- TILT (Mantenemos tu código de Tilt que estaba bien) ---
             const cards = document.querySelectorAll(".tilt-card");
