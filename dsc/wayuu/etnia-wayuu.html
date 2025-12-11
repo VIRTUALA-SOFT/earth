@@ -111,6 +111,30 @@
         .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
 
         ::-webkit-scrollbar { width: 0px; }
+
+        /* --- ECUALIZADOR ANIMADO --- */
+        @keyframes equalize {
+            0% { height: 3px; }
+            50% { height: 100%; }
+            100% { height: 3px; }
+        }
+        
+        .bar {
+            width: 3px;
+            background-color: currentColor; /* Hereda el color del texto */
+            border-radius: 9999px;
+            animation: equalize 1s infinite ease-in-out;
+        }
+        
+        /* Retrasos para que parezca aleatorio */
+        .bar:nth-child(1) { animation-delay: -0.4s; height: 60%; }
+        .bar:nth-child(2) { animation-delay: -0.2s; height: 100%; }
+        .bar:nth-child(3) { animation-delay: -0.6s; height: 40%; }
+        .bar:nth-child(4) { animation-delay: -0.8s; height: 80%; }
+        
+        /* Estado Pausado (opcional, si quieres que se detengan al pausar) */
+        .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
+                
     </style>
 </head>
 <body>
@@ -205,7 +229,7 @@
 
       
         <!-- 4. SECCIÓN: VOCES (6 TARJETAS) -->
-        <section class="py-32 px-6 md:px-12 relative z-10">
+        <<section class="py-32 px-6 md:px-12 relative z-10 bg-[#050200]">
             <div class="max-w-[1400px] mx-auto">
                 <div class="mb-16 border-l-2 border-[#C89F65] pl-6">
                     <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2">02 — WAYUUNAIKI</p>
@@ -217,10 +241,20 @@
                     <!-- 1. Achonnii (Hijo) - Voz original solicitada -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio1')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">01</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Achonnii</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/a-cho-nii/ — "Hijo"</p>
                         </div>
@@ -230,10 +264,20 @@
                     <!-- 2. Eyüü (Madre) - Voz original solicitada -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio2')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">02</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                              <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Eyüü</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/e-yüü/ — "Madre"</p>
                         </div>
@@ -243,10 +287,20 @@
                     <!-- 3. Juya (Lluvia/Padre) -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio3')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">03</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                              <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#00C4CC] transition-colors">Aa, anayawatsi</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/Aa-a-na-ya-wat-si/ — "Sí, gracias"</p>
                         </div>
@@ -256,10 +310,20 @@
                     <!-- 4. Ka'i (Sol) -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio4')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">04</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                               <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#FF3B3B] transition-colors">Anayawatsi ma'in</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/A-na-ya-wat-si-main/ — "Muchas gracias"</p>
                         </div>
@@ -269,10 +333,20 @@
                     <!-- 5. Palaa (Mar) -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio5')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">05</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                              <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#00C4CC] transition-colors">Wattama'at</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/Wa-tta-ma-at/ — "Es de mañana(Saludo estándar)"</p>
                         </div>
@@ -282,10 +356,20 @@
                     <!-- 6. Aipirwa (Esencia/Espíritu) -->
                     <div class="tilt-card p-10 rounded-xl cursor-none audio-trigger group relative overflow-hidden" onclick="playRealAudio('audio6')">
                         <div class="tilt-inner relative z-10">
-                            <div class="flex justify-between items-start mb-12">
-                                <span class="text-xs font-mono text-gray-500">06</span>
-                                <div class="play-btn"><svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            <div class="flex justify-between items-start mb-12 h-8">
+                               <div class="flex items-end gap-2 h-full">
+                            <span class="text-xs font-mono text-gray-500 mb-1">01</span>
+                            <!-- ECUALIZADOR (ID único: eq-audio1) -->
+                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300 text-[#C89F65]">
+                                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
                             </div>
+                        </div>
+                        <!-- BOTÓN PLAY (ID único: btn-audio1) -->
+                        <div id="btn-audio1" class="play-btn">
+                            <!-- SVG Path de Play -->
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#A5D8FF] transition-colors">Paliijü taya</h3>
                             <p class="mt-2 text-gray-400 font-mono text-[10px] uppercase tracking-widest">/Pa-lii-jü-ta-ya/ — "Por favor"</p>
                         </div>
@@ -416,27 +500,60 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
     <script>
-         // --- FUNCIÓN DE AUDIO REAL ---
-        function playRealAudio(id) {
-            const allAudios = document.querySelectorAll('audio');
-            const target = document.getElementById(id);
+        
+           // --- SISTEMA DE AUDIO INTELIGENTE ---
+            function playRealAudio(id) {
+                const allAudios = document.querySelectorAll('audio');
+                const targetAudio = document.getElementById(id);
+                const targetBtn = document.getElementById(`btn-${id}`);
+                const targetEq = document.getElementById(`eq-${id}`);
+                
+                // ICONOS SVG
+                const playIcon = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                const pauseIcon = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
             
-            // Pausar todos los demás
-            allAudios.forEach(audio => {
-                if(audio !== target) {
+                // 1. Si el audio clickeado ya está sonando, lo pausamos
+                if (!targetAudio.paused) {
+                    targetAudio.pause();
+                    targetBtn.innerHTML = playIcon;
+                    targetEq.classList.remove('opacity-100');
+                    targetEq.classList.add('opacity-0');
+                    return; // Salimos de la función
+                }
+            
+                // 2. Reseteamos TODOS los audios, botones y ecualizadores
+                allAudios.forEach(audio => {
                     audio.pause();
                     audio.currentTime = 0;
-                }
-            });
-
-            if (target.paused) {
-                target.volume = 0.6;
-                // Promesa para evitar error "interact first"
-                target.play().catch(e => console.log("Interacción requerida para audio"));
-            } else {
-                target.pause();
+                    
+                    // Resetear botón visualmente
+                    const btn = document.getElementById(`btn-${audio.id}`);
+                    if(btn) btn.innerHTML = playIcon;
+                    
+                    // Ocultar ecualizador
+                    const eq = document.getElementById(`eq-${audio.id}`);
+                    if(eq) {
+                        eq.classList.remove('opacity-100');
+                        eq.classList.add('opacity-0');
+                    }
+                });
+            
+                // 3. Reproducir el nuevo audio
+                targetAudio.volume = 0.5;
+                targetAudio.play().then(() => {
+                    // Éxito: Cambiar icono a PAUSA y mostrar ecualizador
+                    targetBtn.innerHTML = pauseIcon;
+                    targetEq.classList.remove('opacity-0');
+                    targetEq.classList.add('opacity-100');
+                }).catch(e => console.error("Error al reproducir:", e));
+            
+                // 4. Listener para cuando termine el audio
+                targetAudio.onended = () => {
+                    targetBtn.innerHTML = playIcon;
+                    targetEq.classList.remove('opacity-100');
+                    targetEq.classList.add('opacity-0');
+                };
             }
-        }
 
 
         // --- SISTEMA DE CARGA (FAILSAFE) ---
