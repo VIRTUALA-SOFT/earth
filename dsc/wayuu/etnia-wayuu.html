@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nación Wayuu | El Tejido de los Sueños</title>
     
-    <!-- FUENTES DE IMPACTO -->
+    <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet">
     
+    <!-- LIBRERÍAS EXTERNAS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
     
@@ -33,93 +34,80 @@
         .font-decor { font-family: 'Cinzel Decorative', serif; }
         .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        /* --- CURSOR AVANZADO --- */
+        /* CURSOR */
         #cursor {
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
             border: 1px solid rgba(255,255,255,0.6); border-radius: 50%;
-            pointer-events: none; z-index: 9999;
+            pointer-events: none; z-index: 10001;
             transform: translate(-50%, -50%); transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), background 0.3s;
             mix-blend-mode: difference;
             display: flex; justify-content: center; align-items: center;
         }
         #cursor span { opacity: 0; font-size: 10px; font-weight: bold; color: black; transition: opacity 0.2s; font-family: 'Syncopate', sans-serif;}
         
-        /* Estados del cursor */
         #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
-        
         #cursor.audio-mode { width: 80px; height: 80px; background: var(--c-sand); border-color: transparent; mix-blend-mode: normal; }
         #cursor.audio-mode span { opacity: 1; content: "OÍR"; color: black; }
-        
         #cursor.video-mode { width: 90px; height: 90px; background: var(--c-accent); border-color: transparent; mix-blend-mode: normal; }
         #cursor.video-mode span { opacity: 1; color: white; }
-
         #cursor.dream-mode { width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border: none; mix-blend-mode: screen; }
 
-        /* --- BACKGROUND GLOBAL --- */
-        #global-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; pointer-events: none; opacity: 0;
-            transition: opacity 2s ease;
-        }
-
-        /* --- ESTILOS COMPARTIDOS --- */
+        /* UTILIDADES VISUALES */
+        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+        
         .giant-text {
-            font-size: clamp(4rem, 15vw, 20rem);
-            line-height: 0.8;
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-            mix-blend-mode: overlay;
+            font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
         }
         .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
 
-        /* Hero Video */
         .hero-video-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
             opacity: 0.5; filter: contrast(1.1) brightness(0.8);
             mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         }
 
-        /* Audio Cards */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
+        /* TILT CARDS (Mejoradas para visibilidad) */
+        .tilt-card {
+            background: rgba(20, 20, 20, 0.6); /* Fondo más visible */
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más visible */
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: border-color 0.3s;
         }
-        .glass-panel:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--c-sand);
-            transform: translateY(-10px);
-        }
+        .tilt-card:hover { border-color: var(--c-sand); }
+        .tilt-inner { transform: translateZ(30px); }
 
         /* LOADER */
         .loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c-bg); z-index: 10000; /* Z-index alto para tapar todo */
+            background: var(--c-bg); z-index: 10000;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
         .loader-line {
-            width: 0%; height: 2px;
-            background: linear-gradient(90deg, var(--c-accent), var(--c-sand));
-            transition: width 0.2s linear;
+            width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear;
         }
 
-        /* Jepira Gradient */
         .cosmos-bg {
-            position: absolute; inset: 0; 
-            background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
+            position: absolute; inset: 0; background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
             opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
         }
+        
+        /* Botón Play Visual */
+        .play-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s;
+        }
+        .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; }
 
         ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body>
 
-    <!-- CURSOR -->
     <div id="cursor"><span id="cursor-text"></span></div>
-
-    <!-- CANVAS PARTICULAS GLOBALES -->
     <canvas id="global-canvas"></canvas>
 
     <!-- LOADER -->
@@ -130,7 +118,6 @@
         </div>
     </div>
     
-    <!-- NAV -->
     <nav class="fixed top-8 left-8 right-8 z-50 flex justify-between items-center mix-blend-difference">
         <div class="text-xs font-tech tracking-[0.3em] text-white hover-trigger">NACIÓN WAYUU</div>
         <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center cursor-pointer hover-trigger hover:bg-white hover:text-black transition-all">
@@ -138,7 +125,7 @@
         </div>
     </nav>
 
-    <!-- MAIN (Agregado style opacity:0 para que empiece invisible) -->
+    <!-- MAIN -->
     <main id="main-content" style="opacity: 0;">
         
         <!-- 1. HERO -->
@@ -149,9 +136,7 @@
             
             <div class="text-center relative z-10 flex flex-col items-center">
                 <p class="font-tech text-xs tracking-[0.8em] text-white/60 mb-6 reveal-text">ORIGEN</p>
-                <h1 class="giant-text font-display reveal-title">
-                    WA<span>YUU</span>
-                </h1>
+                <h1 class="giant-text font-display reveal-title">WA<span>YUU</span></h1>
                 <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">
                     Hijos de la lluvia y la sequía
                 </p>
@@ -159,30 +144,30 @@
         </section>
 
         <!-- 2. IDENTIDAD -->
-        <section class="min-h-screen py-32 px-6 md:px-24 relative flex items-center">
+        <section class="min-h-screen py-32 px-6 md:px-24 relative flex items-center z-20">
             <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-                <div class="space-y-12 z-20">
+                <div class="space-y-12">
                     <h2 class="text-5xl md:text-8xl font-display leading-none text-white">
                         Sangre de <br> <span class="text-[#C89F65] italic">Cactus</span>
                     </h2>
                     <p class="text-xl text-gray-400 font-light leading-relaxed max-w-md hover-trigger">
-                        Un pueblo milenario que teje su historia en cada hilo. La aridez no es un vacío, es un lienzo donde escriben su resistencia.
+                        Un pueblo milenario que teje su historia en cada hilo. La aridez no es un vacío, es un lienzo.
                     </p>
-                    <div class="glass-panel p-6 inline-block rounded-xl">
+                    <div class="border border-white/10 bg-white/5 p-6 inline-block rounded-xl backdrop-blur-md">
                         <span class="block text-4xl font-bold text-white mb-1">600k+</span>
                         <span class="text-xs tracking-widest text-gray-500 uppercase">Habitantes Binacionales</span>
                     </div>
                 </div>
                 
-                <div class="relative h-[70vh] w-full" data-speed="0.5">
-                    <div class="absolute inset-0 bg-[#1a1a1a] overflow-hidden rounded-sm filter brightness-90 hover:brightness-110 transition duration-700">
+                <div class="relative h-[70vh] w-full">
+                    <div class="absolute inset-0 bg-[#1a1a1a] overflow-hidden rounded-sm filter brightness-90">
                         <img src="../../img/Mujeres-wayuu.jpg" class="w-full h-full object-cover scale-110" id="parallax-img" alt="Mujer Wayuu">
                     </div>
                 </div>
             </div>
         </section>
 
-         <!-- 3. ESFERA DE HILOS (INTERACTIVO 3D) -->
+        <!-- 3. ESFERA DE HILOS (3D INTERACTIVO) -->
         <section class="h-[80vh] w-full flex flex-col items-center justify-center relative bg-[#050200] overflow-hidden z-20">
             <div class="absolute top-10 w-full text-center z-20 pointer-events-none mix-blend-difference">
                 <span class="text-[#FF3B3B] text-xs font-mono tracking-[0.4em] uppercase">Interacción</span>
@@ -190,8 +175,8 @@
             </div>
             <div id="weaving-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
         </section>
-      
-         <!-- 4. AUDIO (CON EFECTO TILT) -->
+
+        <!-- 4. AUDIO (WEB AUDIO API - SIN ERRORES) -->
         <section class="py-32 px-6 md:px-24 relative z-10">
             <div class="max-w-7xl mx-auto">
                 <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-4">02 — WAYUUNAIKI</p>
@@ -199,126 +184,132 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Audio 1 -->
-                    <!-- Nota: He cambiado el src a un archivo de ejemplo confiable. Para producción usa tus archivos locales -->
-                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio1">
-                        <div class="tilt-inner">
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-5xl font-display text-white">Anasü</h3>
-                                <div class="w-3 h-3 bg-[#C89F65] rounded-full animate-pulse shadow-[0_0_15px_#C89F65]"></div>
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playMysticalSound('low')">
+                        <div class="tilt-inner flex justify-between items-start">
+                            <div>
+                                <h3 class="text-5xl font-display text-white group-hover:text-[#C89F65] transition-colors">Anasü</h3>
+                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien"</p>
                             </div>
-                            <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien"</p>
+                            <div class="play-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
                         </div>
-                        <!-- Audio de prueba (carrillon de viento) -->
-                        <audio id="audio1" src="https://cdn.freesound.org/previews/396/396502_5674468-lq.mp3"></audio>
                     </div>
 
                     <!-- Audio 2 -->
-                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio2">
-                        <div class="tilt-inner">
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-5xl font-display text-white">Mma</h3>
-                                <div class="w-3 h-3 bg-[#00C4CC] rounded-full animate-pulse shadow-[0_0_15px_#00C4CC]"></div>
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playMysticalSound('high')">
+                        <div class="tilt-inner flex justify-between items-start">
+                            <div>
+                                <h3 class="text-5xl font-display text-white group-hover:text-[#00C4CC] transition-colors">Mma</h3>
+                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
                             </div>
-                            <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
+                            <div class="play-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
                         </div>
-                        <audio id="audio2" src="https://cdn.freesound.org/previews/530/530663_6352932-lq.mp3"></audio>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. LAPÜ (SUEÑOS) - SHADER LÍQUIDO -->
+        <!-- 5. LAPÜ (SUEÑOS) -->
         <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
-            <!-- Canvas del Shader -->
             <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
-            
-            <!-- Overlay HTML -->
             <div class="relative z-10 text-center pointer-events-none mix-blend-exclusion px-4">
                 <span class="text-xs font-tech text-[#FF3B3B] tracking-[0.5em] block mb-2">03 — LAPÜ</span>
                 <p class="text-white/40 text-xs font-mono mt-[40vh] animate-pulse">( Mueve para revelar )</p>
             </div>
         </section>
 
-        <!-- 6. YONNA (VIDEO) -->
+        <!-- 6. VIDEO -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
             <div class="absolute inset-0 z-10 bg-black/40"></div>
-            <!-- Video Placeholder -->
             <iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
                 style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&amp;start=0&end=42&autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ" 
-                frameborder="0" allow="autoplay; encrypted-media">                
-             </iframe>
-
+                src="https://www.youtube.com/embed/S_Jc8jOWgqg?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
+                frameborder="0" allow="autoplay; encrypted-media"></iframe>
             <div class="relative z-20 text-center mix-blend-overlay">
-                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">
-                    RITUAL
-                </h2>
+                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
                 <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
             </div>
         </section>
 
-        <!-- 7. JEPIRA (COSMOS) -->
+        <!-- 7. FINAL -->
         <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
             <div class="cosmos-bg" id="cosmos-overlay"></div>
-            
             <div class="relative z-10 text-center px-6 max-w-3xl">
                 <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-widest">05 — JEPIRA</span>
                 <h2 class="text-5xl md:text-7xl font-display text-white mb-8">El Camino de las Almas</h2>
-                <p class="text-gray-300 text-lg font-light leading-relaxed mb-12">
-                    Hacia el Cabo de la Vela, donde la tierra termina y el mar comienza, viajan las almas para convertirse en lluvia y estrellas.
-                </p>
-                <a href="#" class="inline-block px-10 py-4 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger">
-                    Reiniciar Viaje
-                </a>
+                <a href="#" class="inline-block px-10 py-4 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger">Reiniciar</a>
             </div>
         </section>
 
         <footer class="py-12 bg-black border-t border-white/10 text-center relative z-20">
-            <p class="font-tech text-[10px] text-gray-600 tracking-[0.3em]">CULTURA WAYUU DIGITAL © 2025- DERECHOS RESERVADOS. ULULATO</p>
+            <p class="font-tech text-[10px] text-gray-600 tracking-[0.3em]">CULTURA WAYUU DIGITAL © 2025</p>
              <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo mx-auto mt-4 w-24">
-        </footer>        
-
+        </footer>
     </main>
 
-    <!-- DEPENDENCIAS -->
+    <!-- SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
-    <!-- LIBRERÍA PARA EFECTO TILT -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-    <!-- LOGICA PRINCIPAL -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- FUNCIÓN DE AUDIO GENERATIVO (Solución Definitiva) ---
+        // Genera un sonido de "viento/campana" usando Web Audio API sin archivos externos
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playMysticalSound(tone) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            // Configuración
+            osc.type = 'sine';
+            // Frecuencias pentatónicas para sonar "místico"
+            osc.frequency.setValueAtTime(tone === 'low' ? 196.00 : 329.63, audioCtx.currentTime); // G3 o E4
+            
+            // Envelope (Fade in - Fade out suave)
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); // Attack
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); // Release largo (eco)
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- 0. LOADER ---
+            // --- LOADER ---
             const loader = document.getElementById('loader');
             const loaderBar = document.getElementById('loader-bar');
             let progress = 0;
-            
-            // Simulación de carga
             const interval = setInterval(() => {
                 progress += Math.random() * 8;
                 if(progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
                     
-                    // Secuencia de entrada
                     const tl = gsap.timeline();
                     tl.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' })
-                      .to("#main-content", { opacity: 1, duration: 1.5 }, "-=0.5") // Revelar contenido
-                      .to("#global-canvas", { opacity: 1, duration: 2 }, "-=1.5") // Revelar partículas
+                      .to("#main-content", { opacity: 1, duration: 1.5 }, "-=0.5")
+                      .to("#global-canvas", { opacity: 1, duration: 2 }, "-=1.5")
                       .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
                       .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
                 }
                 loaderBar.style.width = `${progress}%`;
             }, 50);
 
-            // --- 1. GESTOR DEL CURSOR ---
-              const cursor = document.getElementById('cursor');
+            // --- CURSOR ---
+            const cursor = document.getElementById('cursor');
             const cursorText = document.getElementById('cursor-text');
             window.addEventListener('mousemove', (e) => {
                 gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
@@ -345,33 +336,20 @@
             document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => addHover('video-mode', 'VER'));
             document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => removeHover('video-mode'));
 
-            // --- AUDIO + TILT ---
-            // Inicializar Tilt en las tarjetas
-            VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
-                max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05
-            });
-
             document.querySelectorAll('.audio-trigger').forEach(el => {
                 el.addEventListener('mouseenter', () => addHover('audio-mode', 'OÍR'));
                 el.addEventListener('mouseleave', () => removeHover('audio-mode'));
-                el.addEventListener('click', () => {
-                    const audioId = el.getAttribute('data-audio');
-                    const audio = document.getElementById(audioId);
-                    
-                    // Pausar otros
-                    document.querySelectorAll('audio').forEach(a => { if(a !== audio) a.pause(); });
-                    
-                    if(audio.paused) {
-                        audio.volume = 0.5;
-                        audio.play().catch(e => console.log("Error de audio:", e));
-                    } else {
-                        audio.pause();
-                    }
-                });
             });
 
+            // --- TILT INIT (Solo si existen) ---
+            const cards = document.querySelectorAll(".tilt-card");
+            if(cards.length > 0 && typeof VanillaTilt !== 'undefined') {
+                 VanillaTilt.init(cards, {
+                    max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05
+                });
+            }
 
-            // --- THREE.JS GLOBAL (FONDO) ---
+            // --- THREE.JS GLOBAL ---
             const initGlobalThree = () => {
                 const canvas = document.getElementById('global-canvas');
                 if(!canvas) return;
@@ -419,7 +397,6 @@
                 };
                 animate();
 
-                // Transición Jepira
                 ScrollTrigger.create({
                     trigger: "#jepira-section", start: "top center",
                     onEnter: () => {
@@ -453,7 +430,7 @@
             initGlobalThree();
 
 
-            // --- THREE.JS HILOS (WEAVING) ---
+            // --- THREE.JS WEAVING ---
             (function() {
                 const container = document.getElementById('weaving-container');
                 if(!container) return;
@@ -563,54 +540,3 @@
                     uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0.5,0.5)}, uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, uTexture: {value: createTextTexture()} },
                     vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
                     fragmentShader: `
-                        uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
-                        vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
-                        float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
-                        void main(){
-                            vec2 uv = vUv; vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
-                            float dist = distance(uv*ratio, uMouse*ratio);
-                            float fog = snoise(uv*ratio*3.0 - uTime*0.1)*0.5 + snoise(uv*ratio*8.0 + uTime*0.05)*0.2;
-                            float reveal = smoothstep(0.25, 0.1, dist + fog*0.2);
-                            vec4 tex = texture2D(uTexture, uv + vec2(fog*0.1*(1.0-reveal)));
-                            vec3 col = mix(vec3(0.0,0.0,0.05), tex.rgb, reveal*tex.a);
-                            col += vec3(0.8,0.6,0.2) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.2;
-                            gl_FragColor = vec4(col, 1.0);
-                        }
-                    `
-                });
-                scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
-
-                const clock = new THREE.Clock();
-                const mouse = new THREE.Vector2(0.5,0.5);
-                window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/window.innerWidth; mouse.y=1.0-e.clientY/window.innerHeight; });
-                
-                const animate = () => {
-                    material.uniforms.uTime.value = clock.getElapsedTime();
-                    material.uniforms.uMouse.value.lerp(mouse, 0.1);
-                    renderer.render(scene, camera);
-                    requestAnimationFrame(animate);
-                };
-                animate();
-
-                window.addEventListener('resize', ()=>{
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-                    material.uniforms.uTexture.value = createTextTexture();
-                });
-            })();
-
-            // Parallax
-            gsap.to("#parallax-img", {
-                yPercent: 20, ease: "none",
-                scrollTrigger: { trigger: "#parallax-img", start: "top bottom", end: "bottom top", scrub: true }
-            });
-
-            // Smooth Scroll
-            const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-            requestAnimationFrame(raf);
-        });
-        
-    </script>
-</body>
-</html>
