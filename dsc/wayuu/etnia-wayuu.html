@@ -283,28 +283,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
     <script>
-        // --- FUNCIÓN DE AUDIO GENERATIVO (Solución Definitiva) ---
-        let audioCtx;
-        function playMysticalSound(tone) {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+         // --- FUNCIÓN DE AUDIO REAL ---
+        function playRealAudio(id) {
+            const allAudios = document.querySelectorAll('audio');
+            const target = document.getElementById(id);
             
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(tone === 'low' ? 196.00 : 329.63, audioCtx.currentTime); // G3 o E4
-            
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.1); 
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); 
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 3);
+            // Pausar todos los demás
+            allAudios.forEach(audio => {
+                if(audio !== target) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
+
+            if (target.paused) {
+                target.volume = 0.6;
+                // Promesa para evitar error "interact first"
+                target.play().catch(e => console.log("Interacción requerida para audio"));
+            } else {
+                target.pause();
+            }
         }
+
 
         // --- SISTEMA DE CARGA (FAILSAFE) ---
         function revealSite() {
