@@ -501,53 +501,51 @@
 
     <script>
         
-           // --- SISTEMA DE AUDIO INTELIGENTE ---
+            // --- 1. SISTEMA DE AUDIO (SIN PIANO, CON ICONOS) ---
             function playRealAudio(id) {
                 const allAudios = document.querySelectorAll('audio');
                 const targetAudio = document.getElementById(id);
                 const targetBtn = document.getElementById(`btn-${id}`);
                 const targetEq = document.getElementById(`eq-${id}`);
                 
-                // ICONOS SVG
-                const playIcon = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-                const pauseIcon = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-            
-                // 1. Si el audio clickeado ya está sonando, lo pausamos
+                // Iconos SVG
+                const playIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+                const pauseIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    
+                // Si no encuentra los elementos, detener para evitar errores de consola
+                if (!targetAudio || !targetBtn || !targetEq) return;
+    
+                // 1. Pausar si ya suena
                 if (!targetAudio.paused) {
                     targetAudio.pause();
                     targetBtn.innerHTML = playIcon;
                     targetEq.classList.remove('opacity-100');
                     targetEq.classList.add('opacity-0');
-                    return; // Salimos de la función
+                    return;
                 }
-            
-                // 2. Reseteamos TODOS los audios, botones y ecualizadores
+    
+                // 2. Resetear todos los demás
                 allAudios.forEach(audio => {
                     audio.pause();
                     audio.currentTime = 0;
-                    
-                    // Resetear botón visualmente
                     const btn = document.getElementById(`btn-${audio.id}`);
-                    if(btn) btn.innerHTML = playIcon;
-                    
-                    // Ocultar ecualizador
                     const eq = document.getElementById(`eq-${audio.id}`);
+                    if(btn) btn.innerHTML = playIcon;
                     if(eq) {
                         eq.classList.remove('opacity-100');
                         eq.classList.add('opacity-0');
                     }
                 });
-            
-                // 3. Reproducir el nuevo audio
-                targetAudio.volume = 0.5;
+    
+                // 3. Reproducir
+                targetAudio.volume = 0.6;
                 targetAudio.play().then(() => {
-                    // Éxito: Cambiar icono a PAUSA y mostrar ecualizador
                     targetBtn.innerHTML = pauseIcon;
                     targetEq.classList.remove('opacity-0');
                     targetEq.classList.add('opacity-100');
-                }).catch(e => console.error("Error al reproducir:", e));
-            
-                // 4. Listener para cuando termine el audio
+                }).catch(e => console.log("Interacción requerida para audio"));
+    
+                // 4. Al terminar
                 targetAudio.onended = () => {
                     targetBtn.innerHTML = playIcon;
                     targetEq.classList.remove('opacity-100');
