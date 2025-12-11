@@ -272,6 +272,25 @@
 
     <!-- LOGICA PRINCIPAL -->
     <script>
+         document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. LOADER ---
+            const loader = document.getElementById('loader');
+            const loaderBar = document.getElementById('loader-bar');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 8;
+                if(progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    gsap.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' });
+                    gsap.to("#webgl-canvas", { opacity: 1, duration: 2 });
+                    gsap.to("#main-content", { opacity: 1, duration: 1 });
+                    gsap.from(".hero-anim", { y: 60, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.5 });
+                }
+                loaderBar.style.width = `${progress}%`;
+            }, 50);
+             
         gsap.registerPlugin(ScrollTrigger);
 
         // --- 1. GESTOR DEL CURSOR ---
