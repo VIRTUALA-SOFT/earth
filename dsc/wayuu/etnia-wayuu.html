@@ -133,7 +133,7 @@
     <!-- NAV -->
     <nav class="fixed top-8 left-8 right-8 z-50 flex justify-between items-center mix-blend-difference">
         <div class="text-xs font-tech tracking-[0.3em] text-white hover-trigger">NACIÓN WAYUU</div>
-        <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center cursor-pointer hover-trigger transition-all hover:bg-white hover:text-black">
+        <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center cursor-pointer hover-trigger hover:bg-white hover:text-black transition-all">
             <div class="w-4 h-[1px] bg-current"></div>
         </div>
     </nav>
@@ -182,52 +182,52 @@
             </div>
         </section>
 
-        <!-- SECCIÓN: EL TEJIDO VIVO (3D INTERACTIVO) -->
+         <!-- 3. ESFERA DE HILOS (INTERACTIVO 3D) -->
         <section class="h-[80vh] w-full flex flex-col items-center justify-center relative bg-[#050200] overflow-hidden z-20">
-            
-            <!-- Texto flotante -->
-            <div class="absolute top-10 left-0 w-full text-center z-20 pointer-events-none mix-blend-difference">
+            <div class="absolute top-10 w-full text-center z-20 pointer-events-none mix-blend-difference">
                 <span class="text-[#FF3B3B] text-xs font-mono tracking-[0.4em] uppercase">Interacción</span>
-                <h3 class="text-3xl md:text-5xl font-display text-white mt-2">El Hilo de la Vida</h3>
-                <p class="text-xs text-gray-500 mt-2 font-mono">( Toca el tejido )</p>
+                <h3 class="text-3xl font-display text-white mt-2">El Hilo de la Vida</h3>
             </div>
-        
-            <!-- Contenedor 3D -->
             <div id="weaving-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
-        
         </section>
-
-        <!-- 3. ECOSISTEMA SONORO (AUDIO) -->
+      
+         <!-- 4. AUDIO (CON EFECTO TILT) -->
         <section class="py-32 px-6 md:px-24 relative z-10">
             <div class="max-w-7xl mx-auto">
                 <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-4">02 — WAYUUNAIKI</p>
                 <h2 class="text-4xl md:text-6xl font-display text-white mb-16">Voces del <span class="italic text-gray-500">Viento</span></h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Audio Card 1 -->
-                    <div class="glass-panel p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio1">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-5xl font-display text-white">Anasü</h3>
-                            <div class="w-2 h-2 bg-[#C89F65] rounded-full animate-pulse"></div>
+                    <!-- Audio 1 -->
+                    <!-- Nota: He cambiado el src a un archivo de ejemplo confiable. Para producción usa tus archivos locales -->
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio1">
+                        <div class="tilt-inner">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-5xl font-display text-white">Anasü</h3>
+                                <div class="w-3 h-3 bg-[#C89F65] rounded-full animate-pulse shadow-[0_0_15px_#C89F65]"></div>
+                            </div>
+                            <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien"</p>
                         </div>
-                        <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien / Es bueno"</p>
-                        <audio id="audio1" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+                        <!-- Audio de prueba (carrillon de viento) -->
+                        <audio id="audio1" src="https://cdn.freesound.org/previews/396/396502_5674468-lq.mp3"></audio>
                     </div>
 
-                    <!-- Audio Card 2 -->
-                    <div class="glass-panel p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio2">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-5xl font-display text-white">Mma</h3>
-                            <div class="w-2 h-2 bg-[#00C4CC] rounded-full animate-pulse"></div>
+                    <!-- Audio 2 -->
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger" data-audio="audio2">
+                        <div class="tilt-inner">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-5xl font-display text-white">Mma</h3>
+                                <div class="w-3 h-3 bg-[#00C4CC] rounded-full animate-pulse shadow-[0_0_15px_#00C4CC]"></div>
+                            </div>
+                            <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
                         </div>
-                        <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
-                        <audio id="audio2" src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3"></audio>
+                        <audio id="audio2" src="https://cdn.freesound.org/previews/530/530663_6352932-lq.mp3"></audio>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. LAPÜ (SUEÑOS) - SHADER LÍQUIDO -->
+        <!-- 5. LAPÜ (SUEÑOS) - SHADER LÍQUIDO -->
         <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
             <!-- Canvas del Shader -->
             <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
@@ -239,7 +239,7 @@
             </div>
         </section>
 
-        <!-- 5. YONNA (VIDEO) -->
+        <!-- 6. YONNA (VIDEO) -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
             <div class="absolute inset-0 z-10 bg-black/40"></div>
             <!-- Video Placeholder -->
@@ -257,7 +257,7 @@
             </div>
         </section>
 
-        <!-- 6. JEPIRA (COSMOS) -->
+        <!-- 7. JEPIRA (COSMOS) -->
         <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
             <div class="cosmos-bg" id="cosmos-overlay"></div>
             
@@ -316,563 +316,298 @@
             }, 50);
 
             // --- 1. GESTOR DEL CURSOR ---
-            const cursor = document.getElementById('cursor');
+              const cursor = document.getElementById('cursor');
             const cursorText = document.getElementById('cursor-text');
-
-            const moveCursor = (e) => {
+            window.addEventListener('mousemove', (e) => {
                 gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-            };
-            window.addEventListener('mousemove', moveCursor);
-
-            // Hover Genérico
-            document.querySelectorAll('.hover-trigger').forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
             });
 
-            // Audio Hover
+            // Handlers Cursor
+            const addHover = (cls, txt = "") => {
+                cursor.classList.add(cls);
+                cursorText.innerText = txt;
+            };
+            const removeHover = (cls) => {
+                cursor.classList.remove(cls);
+                cursorText.innerText = "";
+            };
+
+            document.querySelectorAll('.hover-trigger').forEach(el => {
+                el.addEventListener('mouseenter', () => addHover('hovered'));
+                el.addEventListener('mouseleave', () => removeHover('hovered'));
+            });
+
+            document.getElementById('lapu-section')?.addEventListener('mouseenter', () => addHover('dream-mode'));
+            document.getElementById('lapu-section')?.addEventListener('mouseleave', () => removeHover('dream-mode'));
+            
+            document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => addHover('video-mode', 'VER'));
+            document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => removeHover('video-mode'));
+
+            // --- AUDIO + TILT ---
+            // Inicializar Tilt en las tarjetas
+            VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
+                max: 15, speed: 400, glare: true, "max-glare": 0.2, scale: 1.05
+            });
+
             document.querySelectorAll('.audio-trigger').forEach(el => {
-                el.addEventListener('mouseenter', () => {
-                    cursor.classList.add('audio-mode');
-                    cursorText.innerText = "OÍR";
-                });
-                el.addEventListener('mouseleave', () => {
-                    cursor.classList.remove('audio-mode');
-                    cursorText.innerText = "";
-                });
-                // Click play functionality
+                el.addEventListener('mouseenter', () => addHover('audio-mode', 'OÍR'));
+                el.addEventListener('mouseleave', () => removeHover('audio-mode'));
                 el.addEventListener('click', () => {
                     const audioId = el.getAttribute('data-audio');
                     const audio = document.getElementById(audioId);
+                    
+                    // Pausar otros
+                    document.querySelectorAll('audio').forEach(a => { if(a !== audio) a.pause(); });
+                    
                     if(audio.paused) {
-                        audio.play();
-                        gsap.fromTo(el, {scale: 0.95}, {scale: 1, duration: 0.3});
+                        audio.volume = 0.5;
+                        audio.play().catch(e => console.log("Error de audio:", e));
                     } else {
                         audio.pause();
                     }
                 });
             });
 
-            // Video Hover
-            const videoArea = document.querySelector('.video-cursor-area');
-            if(videoArea) {
-                videoArea.addEventListener('mouseenter', () => {
-                    cursor.classList.add('video-mode');
-                    cursorText.innerText = "VER";
-                });
-                videoArea.addEventListener('mouseleave', () => {
-                    cursor.classList.remove('video-mode');
-                    cursorText.innerText = "";
-                });
-            }
 
-            // Dreams Hover
-            const dreamArea = document.getElementById('lapu-section');
-            if(dreamArea) {
-                dreamArea.addEventListener('mouseenter', () => cursor.classList.add('dream-mode'));
-                dreamArea.addEventListener('mouseleave', () => cursor.classList.remove('dream-mode'));
-            }
-
-
-            // --- 2. THREE.JS GLOBAL (PARTÍCULAS FONDO) ---
+            // --- THREE.JS GLOBAL (FONDO) ---
             const initGlobalThree = () => {
                 const canvas = document.getElementById('global-canvas');
                 if(!canvas) return;
-
                 const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
                 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-                
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-                // Geometría Partículas
                 const count = 2500;
                 const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(count * 3);
-                const originalPos = new Float32Array(count * 3);
-                const colors = new Float32Array(count * 3);
-
-                const colorSand = new THREE.Color('#C89F65');
-                const colorStar = new THREE.Color('#A5D8FF');
+                const pos = new Float32Array(count*3);
+                const original = new Float32Array(count*3);
+                const colors = new Float32Array(count*3);
+                const cSand = new THREE.Color('#C89F65');
+                const cStar = new THREE.Color('#A5D8FF');
 
                 for(let i=0; i<count*3; i+=3) {
-                    positions[i] = (Math.random() - 0.5) * 30;
-                    positions[i+1] = (Math.random() - 0.5) * 40;
-                    positions[i+2] = (Math.random() - 0.5) * 20;
-                    originalPos[i] = positions[i];
-                    originalPos[i+1] = positions[i+1];
-                    
-                    // Color inicial Arena
-                    colors[i] = colorSand.r;
-                    colors[i+1] = colorSand.g;
-                    colors[i+2] = colorSand.b;
+                    pos[i] = (Math.random()-0.5)*35; pos[i+1] = (Math.random()-0.5)*40; pos[i+2] = (Math.random()-0.5)*20;
+                    original[i] = pos[i]; original[i+1] = pos[i+1];
+                    colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
                 }
-
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
                 geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-                const material = new THREE.PointsMaterial({
-                    size: 0.04,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.8,
-                    blending: THREE.AdditiveBlending
-                });
-
+                const material = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
                 const particles = new THREE.Points(geometry, material);
                 scene.add(particles);
                 camera.position.z = 5;
 
-                // Animación Viento/Ruido
                 const simplex = new SimplexNoise();
                 const clock = new THREE.Clock();
 
-                const animateGlobal = () => {
-                    const time = clock.getElapsedTime();
-                    particles.rotation.y = time * 0.02;
-
-                    // Modificar posiciones suavemente (Efecto Viento)
-                    const pos = geometry.attributes.position.array;
+                const animate = () => {
+                    const t = clock.getElapsedTime();
+                    particles.rotation.y = t * 0.02;
+                    const p = geometry.attributes.position.array;
                     for(let i=0; i<count; i++) {
                         const i3 = i*3;
-                        const noise = simplex.noise2D(originalPos[i3] * 0.1, time * 0.2) * 0.2;
-                        pos[i3+1] = originalPos[i3+1] + noise;
+                        p[i3+1] = original[i3+1] + simplex.noise2D(original[i3]*0.1, t*0.2)*0.3;
                     }
                     geometry.attributes.position.needsUpdate = true;
-
                     renderer.render(scene, camera);
-                    requestAnimationFrame(animateGlobal);
+                    requestAnimationFrame(animate);
                 };
-                animateGlobal();
-                
-                // TRANSICIÓN JEPIRA (Arena -> Estrellas)
+                animate();
+
+                // Transición Jepira
                 ScrollTrigger.create({
-                    trigger: "#jepira-section",
-                    start: "top center",
+                    trigger: "#jepira-section", start: "top center",
                     onEnter: () => {
-                        // Cambiar color a estrellas
-                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2}); // Fondo azulado
-                        const cols = geometry.attributes.color.array;
-                        const tempObj = { t: 0 };
-                        gsap.to(tempObj, {
-                            t: 1,
-                            duration: 2,
-                            onUpdate: () => {
-                                for(let i=0; i<count*3; i+=3) {
-                                    cols[i] = THREE.MathUtils.lerp(colorSand.r, colorStar.r, tempObj.t);
-                                    cols[i+1] = THREE.MathUtils.lerp(colorSand.g, colorStar.g, tempObj.t);
-                                    cols[i+2] = THREE.MathUtils.lerp(colorSand.b, colorStar.b, tempObj.t);
-                                }
-                                geometry.attributes.color.needsUpdate = true;
+                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
+                        const c = geometry.attributes.color.array;
+                        const obj = {t:0};
+                        gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                            for(let i=0; i<count*3; i+=3) {
+                                c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
+                                c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
+                                c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
                             }
-                        });
+                            geometry.attributes.color.needsUpdate = true;
+                        }});
                     },
                     onLeaveBack: () => {
-                        // Volver a Arena
-                        gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                        const cols = geometry.attributes.color.array;
-                        const tempObj = { t: 0 };
-                        gsap.to(tempObj, {
-                            t: 1,
-                            duration: 2,
-                            onUpdate: () => {
-                                for(let i=0; i<count*3; i+=3) {
-                                    cols[i] = THREE.MathUtils.lerp(colorStar.r, colorSand.r, tempObj.t);
-                                    cols[i+1] = THREE.MathUtils.lerp(colorStar.g, colorSand.g, tempObj.t);
-                                    cols[i+2] = THREE.MathUtils.lerp(colorStar.b, colorSand.b, tempObj.t);
-                                }
-                                geometry.attributes.color.needsUpdate = true;
+                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                         const c = geometry.attributes.color.array;
+                         const obj = {t:0};
+                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                            for(let i=0; i<count*3; i+=3) {
+                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
+                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
+                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
                             }
-                        });
+                            geometry.attributes.color.needsUpdate = true;
+                         }});
                     }
-                });
-
-                window.addEventListener('resize', () => {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
                 });
             };
             initGlobalThree();
 
 
-            // --- 3. THREE.JS LOCAL (SHADER SUEÑOS/LAPÜ) ---
+            // --- THREE.JS HILOS (WEAVING) ---
+            (function() {
+                const container = document.getElementById('weaving-container');
+                if(!container) return;
+                const scene = new THREE.Scene();
+                scene.fog = new THREE.FogExp2(0x050200, 0.002);
+                const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+                camera.position.z = 15;
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                container.appendChild(renderer.domElement);
+
+                const group = new THREE.Group();
+                scene.add(group);
+                const pCount = 300;
+                const pData = [];
+                const pGeo = new THREE.BufferGeometry();
+                const pPos = new Float32Array(pCount*3);
+                
+                for(let i=0; i<pCount; i++) {
+                    const theta = Math.random()*Math.PI*2;
+                    const phi = Math.acos((Math.random()*2)-1);
+                    const r = 6;
+                    pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+                    pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+                    pPos[i*3+2] = r*Math.cos(phi);
+                    pData.push({ vel: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiplyScalar(0.02), con:0 });
+                }
+                pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
+                const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
+                group.add(points);
+
+                const lGeo = new THREE.BufferGeometry();
+                const lPos = new Float32Array(pCount*pCount*3);
+                const lCol = new Float32Array(pCount*pCount*3);
+                lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3).setUsage(THREE.DynamicDrawUsage));
+                lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
+                const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
+                group.add(lines);
+
+                let mx=0, my=0;
+                container.addEventListener('mousemove', e => {
+                    const rect = container.getBoundingClientRect();
+                    mx = ((e.clientX - rect.left)/rect.width)*2 - 1;
+                    my = -((e.clientY - rect.top)/rect.height)*2 + 1;
+                });
+
+                const animate = () => {
+                    group.rotation.x += 0.002 + my*0.01;
+                    group.rotation.y += 0.002 + mx*0.01;
+                    let vPos=0, cPos=0, con=0;
+                    for(let i=0; i<pCount; i++) pData[i].con=0;
+
+                    for(let i=0; i<pCount; i++) {
+                        pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
+                        const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
+                        if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
+
+                        if(pData[i].con>=3) continue;
+                        for(let j=i+1; j<pCount; j++) {
+                            if(pData[j].con>=3) continue;
+                            const dx = pPos[i*3]-pPos[j*3], dy = pPos[i*3+1]-pPos[j*3+1], dz = pPos[i*3+2]-pPos[j*3+2];
+                            const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
+                            if(dist<2.5) {
+                                pData[i].con++; pData[j].con++;
+                                lPos[vPos++]=pPos[i*3]; lPos[vPos++]=pPos[i*3+1]; lPos[vPos++]=pPos[i*3+2];
+                                lPos[vPos++]=pPos[j*3]; lPos[vPos++]=pPos[j*3+1]; lPos[vPos++]=pPos[j*3+2];
+                                lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                                lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                                con++;
+                            }
+                        }
+                    }
+                    lines.geometry.setDrawRange(0, con*2);
+                    lines.geometry.attributes.position.needsUpdate = true;
+                    lines.geometry.attributes.color.needsUpdate = true;
+                    points.geometry.attributes.position.needsUpdate = true;
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animate);
+                };
+                animate();
+            })();
+
+
+            // --- THREE.JS SHADER (SUEÑOS) ---
             (function() {
                 const container = document.getElementById('dream-canvas-container');
                 if(!container) return;
-
                 const scene = new THREE.Scene();
                 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
                 const renderer = new THREE.WebGLRenderer({ alpha: true });
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 container.appendChild(renderer.domElement);
 
-                // Crear Textura con Canvas 2D
                 function createTextTexture() {
                     const cvs = document.createElement('canvas');
-                    cvs.width = window.innerWidth; 
-                    cvs.height = window.innerHeight;
+                    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
                     const ctx = cvs.getContext('2d');
-                    
-                    // Texto Centrado
-                    const cx = cvs.width / 2;
-                    const cy = cvs.height / 2;
-                    
-                    // Título
-                    ctx.font = "italic 700 15vw 'Playfair Display'";
-                    ctx.fillStyle = "white";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
+                    const cx = cvs.width/2, cy = cvs.height/2;
+                    ctx.font = "italic 700 15vw 'Playfair Display'"; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                     ctx.fillText("SUEÑOS", cx, cy);
-
-                    // Subtexto
-                    ctx.font = "300 1.5vw 'Manrope'";
-                    ctx.fillStyle = "#C89F65";
+                    ctx.font = "300 1.5vw 'Manrope'"; ctx.fillStyle = "#C89F65";
                     ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
-
-                    const tex = new THREE.CanvasTexture(cvs);
-                    return tex;
+                    return new THREE.CanvasTexture(cvs);
                 }
 
-                const texture = createTextTexture();
-
-                // Shader FBM
                 const material = new THREE.ShaderMaterial({
-                    uniforms: {
-                        uTime: { value: 0 },
-                        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-                        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-                        uTexture: { value: texture }
-                    },
-                    vertexShader: `
-                        varying vec2 vUv;
-                        void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-                    `,
+                    uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0.5,0.5)}, uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, uTexture: {value: createTextTexture()} },
+                    vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
                     fragmentShader: `
-                        uniform float uTime;
-                        uniform vec2 uMouse;
-                        uniform vec2 uResolution;
-                        uniform sampler2D uTexture;
-                        varying vec2 vUv;
-
-                        // Simplex Noise
-                        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-                        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-                        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
-                        float snoise(vec2 v) {
-                            const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-                            vec2 i  = floor(v + dot(v, C.yy) );
-                            vec2 x0 = v -   i + dot(i, C.xx);
-                            vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-                            vec4 x12 = x0.xyxy + C.xxzz;
-                            x12.xy -= i1;
-                            i = mod289(i);
-                            vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
-                            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-                            m = m*m ; m = m*m ;
-                            vec3 x = 2.0 * fract(p * C.www) - 1.0;
-                            vec3 h = abs(x) - 0.5;
-                            vec3 ox = floor(x + 0.5);
-                            vec3 a0 = x - ox;
-                            m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-                            vec3 g;
-                            g.x  = a0.x  * x0.x  + h.x  * x0.y;
-                            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-                            return 130.0 * dot(m, g);
-                        }
-
-                        void main() {
-                            vec2 uv = vUv;
-                            vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
-                            vec2 st = uv * ratio;
-                            vec2 mouse = uMouse * ratio;
-                            
-                            // Distancia Mouse
-                            float dist = distance(st, mouse);
-
-                            // Ruido / Niebla
-                            float n = snoise(st * 3.0 - uTime * 0.1);
-                            float n2 = snoise(st * 8.0 + uTime * 0.05);
-                            float fog = n * 0.5 + n2 * 0.2;
-
-                            // Mascara de revelado (Agujero en la niebla)
-                            float reveal = smoothstep(0.25, 0.1, dist + fog * 0.2); // Invertido: 1 cerca mouse, 0 lejos
-
-                            // Distorsión del texto (Liquido)
-                            vec2 distort = vec2(fog * 0.1 * (1.0 - reveal));
-                            vec4 texColor = texture2D(uTexture, uv + distort);
-
-                            // Color Fondo Niebla
-                            vec3 bgColor = vec3(0.0, 0.0, 0.05);
-
-                            // Mezcla: Si reveal es alto, muestra texto. Si es bajo, muestra niebla.
-                            vec3 finalColor = mix(bgColor, texColor.rgb, reveal * texColor.a);
-                            
-                            // Borde Dorado Magico
-                            float edge = smoothstep(0.0, 0.1, reveal) * (1.0 - smoothstep(0.9, 1.0, reveal));
-                            finalColor += vec3(0.8, 0.6, 0.2) * edge * 0.2;
-
-                            gl_FragColor = vec4(finalColor, 1.0);
+                        uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
+                        vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+                        float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
+                        void main(){
+                            vec2 uv = vUv; vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
+                            float dist = distance(uv*ratio, uMouse*ratio);
+                            float fog = snoise(uv*ratio*3.0 - uTime*0.1)*0.5 + snoise(uv*ratio*8.0 + uTime*0.05)*0.2;
+                            float reveal = smoothstep(0.25, 0.1, dist + fog*0.2);
+                            vec4 tex = texture2D(uTexture, uv + vec2(fog*0.1*(1.0-reveal)));
+                            vec3 col = mix(vec3(0.0,0.0,0.05), tex.rgb, reveal*tex.a);
+                            col += vec3(0.8,0.6,0.2) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.2;
+                            gl_FragColor = vec4(col, 1.0);
                         }
                     `
                 });
+                scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
 
-                const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-                scene.add(mesh);
-
-                // Animación Local
                 const clock = new THREE.Clock();
-                const mouse = new THREE.Vector2(0.5, 0.5);
+                const mouse = new THREE.Vector2(0.5,0.5);
+                window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/window.innerWidth; mouse.y=1.0-e.clientY/window.innerHeight; });
                 
-                window.addEventListener('mousemove', (e) => {
-                    mouse.x = e.clientX / window.innerWidth;
-                    mouse.y = 1.0 - (e.clientY / window.innerHeight);
-                });
-
-                function animate() {
+                const animate = () => {
                     material.uniforms.uTime.value = clock.getElapsedTime();
                     material.uniforms.uMouse.value.lerp(mouse, 0.1);
                     renderer.render(scene, camera);
                     requestAnimationFrame(animate);
-                }
+                };
                 animate();
 
-                // Resize Local
-                window.addEventListener('resize', () => {
+                window.addEventListener('resize', ()=>{
                     renderer.setSize(window.innerWidth, window.innerHeight);
                     material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
                     material.uniforms.uTexture.value = createTextTexture();
                 });
             })();
 
-
-            // --- 4. SCROLL & ANIMATIONS (GSAP) ---
+            // Parallax
             gsap.to("#parallax-img", {
-                yPercent: 20,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: "#parallax-img",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true
-                }
+                yPercent: 20, ease: "none",
+                scrollTrigger: { trigger: "#parallax-img", start: "top bottom", end: "bottom top", scrub: true }
             });
 
-            // Lenis Smooth Scroll
+            // Smooth Scroll
             const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-            function raf(time) {
-                lenis.raf(time);
-                requestAnimationFrame(raf);
-            }
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
             requestAnimationFrame(raf);
-            
-        }); 
-
-        /**
-         * ------------------------------------------------------------------
-         * EL HILO DE LA VIDA (3D WEAVING SPHERE)
-         * Efecto de red neuronal/tejido que reacciona a la rotación y mouse
-         * ------------------------------------------------------------------
-         */
-        (function() {
-            const container = document.getElementById('weaving-container');
-            if (!container) return;
-        
-            // 1. ESCENA
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050200, 0.002); // Niebla negra para profundidad
-        
-            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 15;
-        
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
-        
-            // 2. GEOMETRÍA (PARTÍCULAS + LÍNEAS)
-            const particleCount = 400;
-            const group = new THREE.Group();
-            scene.add(group);
-        
-            // Geometría para puntos (nudos del tejido)
-            const particlesData = [];
-            const geometry = new THREE.BufferGeometry();
-            const pMaterial = new THREE.PointsMaterial({
-                color: 0xFF3B3B, // Rojo Wayuu
-                size: 0.15,
-                blending: THREE.AdditiveBlending,
-                transparent: true,
-                sizeAttenuation: true
-            });
-        
-            const positions = new Float32Array(particleCount * 3);
-            
-            // Crear esfera de puntos
-            const radius = 6;
-            for (let i = 0; i < particleCount; i++) {
-                // Matemáticas para distribuir en esfera (Spherical coordinates)
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos((Math.random() * 2) - 1);
-                
-                const x = radius * Math.sin(phi) * Math.cos(theta);
-                const y = radius * Math.sin(phi) * Math.sin(theta);
-                const z = radius * Math.cos(phi);
-        
-                positions[i * 3] = x;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = z;
-        
-                // Datos de velocidad para animación
-                particlesData.push({
-                    velocity: new THREE.Vector3(
-                        -0.5 + Math.random(), 
-                        -0.5 + Math.random(), 
-                        -0.5 + Math.random()
-                    ).multiplyScalar(0.02), // Velocidad lenta
-                    numConnections: 0
-                });
-            }
-        
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
-            const pointCloud = new THREE.Points(geometry, pMaterial);
-            group.add(pointCloud);
-        
-            // Geometría para líneas (Hilos)
-            const segments = particleCount * particleCount;
-            const positionsLines = new Float32Array(segments * 3);
-            const colorsLines = new Float32Array(segments * 3);
-        
-            const lineGeometry = new THREE.BufferGeometry();
-            lineGeometry.setAttribute('position', new THREE.BufferAttribute(positionsLines, 3).setUsage(THREE.DynamicDrawUsage));
-            lineGeometry.setAttribute('color', new THREE.BufferAttribute(colorsLines, 3).setUsage(THREE.DynamicDrawUsage));
-        
-            const lineMaterial = new THREE.LineBasicMaterial({
-                vertexColors: true,
-                blending: THREE.AdditiveBlending,
-                transparent: true,
-                opacity: 0.4
-            });
-        
-            const linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
-            group.add(linesMesh);
-        
-            // 3. INTERACCIÓN MOUSE
-            let mouseX = 0;
-            let mouseY = 0;
-            let targetRotationX = 0;
-            let targetRotationY = 0;
-            
-            // Usamos el contenedor para limitar el evento
-            container.addEventListener('mousemove', (event) => {
-                const rect = container.getBoundingClientRect();
-                // Coordenadas relativas al centro del contenedor
-                mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            });
-        
-            // 4. ANIMACIÓN
-            function animate() {
-                // Rotación suave basada en el mouse
-                targetRotationX += (mouseY * 0.5 - targetRotationX) * 0.05;
-                targetRotationY += (mouseX * 0.5 - targetRotationY) * 0.05;
-        
-                group.rotation.x += 0.002 + targetRotationX * 0.1;
-                group.rotation.y += 0.002 + targetRotationY * 0.1;
-        
-                // Actualizar posiciones
-                let vertexpos = 0;
-                let colorpos = 0;
-                let numConnected = 0;
-        
-                // Resetear conexiones
-                for (let i = 0; i < particleCount; i++) particlesData[i].numConnections = 0;
-        
-                // Bucle principal de física
-                for (let i = 0; i < particleCount; i++) {
-                    const particleData = particlesData[i];
-        
-                    // Mover partícula
-                    positions[i * 3] += particleData.velocity.x;
-                    positions[i * 3 + 1] += particleData.velocity.y;
-                    positions[i * 3 + 2] += particleData.velocity.z;
-        
-                    // Rebote en los límites (Mantener forma esférica aproximada)
-                    // Si se aleja mucho del radio, invertir velocidad
-                    const x = positions[i*3];
-                    const y = positions[i*3+1];
-                    const z = positions[i*3+2];
-                    const dist = Math.sqrt(x*x + y*y + z*z);
-                    
-                    if (dist > radius + 1) {
-                        particleData.velocity.multiplyScalar(-1); // Rebotar hacia adentro
-                    } else if(dist < radius - 3) {
-                         particleData.velocity.multiplyScalar(-1); // Rebotar hacia afuera
-                    }
-        
-                    // Comprobar conexiones (Tejer)
-                    // Límite de conexiones para rendimiento
-                    if (particleData.numConnections >= 3) continue;
-        
-                    for (let j = i + 1; j < particleCount; j++) {
-                        const particleDataB = particlesData[j];
-                        if (particleDataB.numConnections >= 3) continue;
-        
-                        const dx = positions[i * 3] - positions[j * 3];
-                        const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
-                        const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
-                        const distLine = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        
-                        // Si están cerca, dibujar hilo
-                        if (distLine < 2.5) {
-                            particleData.numConnections++;
-                            particleDataB.numConnections++;
-        
-                            // Color dinámico: Rojo cerca del centro, Dorado afuera
-                            const alpha = 1.0 - distLine / 2.5;
-        
-                            positionsLines[vertexpos++] = positions[i * 3];
-                            positionsLines[vertexpos++] = positions[i * 3 + 1];
-                            positionsLines[vertexpos++] = positions[i * 3 + 2];
-        
-                            positionsLines[vertexpos++] = positions[j * 3];
-                            positionsLines[vertexpos++] = positions[j * 3 + 1];
-                            positionsLines[vertexpos++] = positions[j * 3 + 2];
-        
-                            // Gradiente de color en los hilos
-                            colorsLines[colorpos++] = 1.0; // R (Rojo)
-                            colorsLines[colorpos++] = 0.2 + (distLine * 0.2); // G (Dorado suave)
-                            colorsLines[colorpos++] = 0.2; // B
-                            
-                            colorsLines[colorpos++] = 1.0;
-                            colorsLines[colorpos++] = 0.2 + (distLine * 0.2);
-                            colorsLines[colorpos++] = 0.2;
-        
-                            numConnected++;
-                        }
-                    }
-                }
-        
-                linesMesh.geometry.setDrawRange(0, numConnected * 2);
-                linesMesh.geometry.attributes.position.needsUpdate = true;
-                linesMesh.geometry.attributes.color.needsUpdate = true;
-                pointCloud.geometry.attributes.position.needsUpdate = true;
-        
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            }
-        
-            animate();
-            
-            // Resize
-            window.addEventListener('resize', () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
-        
-        })();
+        });
         
     </script>
 </body>
