@@ -155,6 +155,16 @@
             pointer-events: none;
         }
 
+        /* EFECTO DE VIDEO MEJORADO */
+        .video-reveal-container {
+            transition: box-shadow 0.5s ease;
+        }
+        
+        /* Filtros para mejorar video de YouTube */
+        iframe {
+            filter: contrast(1.1) saturate(1.3) brightness(0.9);
+        }
+
         /* ANIMACIÓN DE RESPLANDOR (GLOW) */
         @keyframes pulse-red {
             0% {
@@ -359,47 +369,61 @@
         </section>
 
         <!-- 5. YONNA (DANZA) - SCROLL JACKING -->
-          <section id="yonna-section" class="h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0b0500]">    
-                <!-- Fondo decorativo -->
-                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                
-                <!-- Texto Fondo -->
-                <div class="z-10 text-center mix-blend-difference absolute pointer-events-none">
-                    <span class="text-white text-xs tracking-[0.5em] mb-2 block">04 — RITUAL</span>
-                    <h2 class="text-[5rem] md:text-[12rem] text-[#FF2E63] font-bold opacity-10 whitespace-nowrap">
-                        LA YONNA
-                    </h2>
-                </div>
-            
-                <!-- CÍRCULO CON VIDEO Y RESPLANDOR -->
-                <!-- Agregamos la clase 'red-glow-pulse' para el efecto mágico -->
-              <div class="dancer-container red-glow-pulse w-[80vw] md:w-[60vh] h-[60vh] md:h-[80vh] border-x-2 border-t-2 border-b-0 border-[#FF2E63]/50 relative z-20 bg-black overflow-hidden" 
-     style="border-radius: 1000px 1000px 0 0;">
+         <section id="yonna-section" class="min-h-screen w-full flex flex-col items-center justify-center relative bg-[#0b0500] py-24 overflow-hidden">
     
-                <!-- WRAPPER VIDEO -->
-              <div class="dancer-video w-full h-full relative pointer-events-none">
-                    <!-- Ajustamos el zoom (w-250% era mucho, w-200% o menos está bien para este formato) -->
-                    <!-- Top-0 para que empiece desde arriba del arco -->
-                    <iframe 
-                        class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300%] h-[150%] object-cover" 
-                        src="https://www.youtube.com/embed/yJMXzvZEZlQ?autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ&end=42&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1" 
-                        title="Danza Yonna" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                    </iframe>
-              </div>
-                    
-                   <!-- Overlay Rojo y Sombra inferior para integrar con el suelo -->
-                    <div class="absolute inset-0 bg-[#FF2E63] mix-blend-overlay opacity-20 pointer-events-none"></div>
-                    <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0b0500] to-transparent z-30"></div>
-                </div>
-            
-                <!-- Texto inferior -->
-                <div class="absolute bottom-16 text-center z-20">
-                    <p class="text-white/80 text-sm tracking-[0.3em] uppercase font-light">El baile del viento</p>
-                </div>
-         </section>
+    <!-- FONDO: Título Gigante detrás del video -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <h2 class="text-[15vw] font-bold text-[#1a1a1a] tracking-tighter opacity-50 select-none tech-font">
+            RITUAL
+        </h2>
+    </div>
+
+    <!-- CONTENEDOR DEL VIDEO (Empieza al 70% y crece al 100%) -->
+    <div class="video-reveal-container relative z-20 w-[80%] h-[60vh] md:h-[80vh] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-[#FF2E63]/30">
+        
+        <!-- EFECTO DE GRANO DE PELÍCULA (Para ocultar baja calidad de YouTube) -->
+        <div class="absolute inset-0 z-30 pointer-events-none opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+
+        <!-- WRAPPER VIDEO -->
+        <div class="w-full h-full relative">
+            <!-- Video de YouTube (Kike Calvo) ajustado para encuadre perfecto -->
+            <!-- scale-125: Zoom moderado para calidad decente -->
+            <iframe 
+               class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300%] h-[150%] object-cover" 
+                src="https://www.youtube.com/embed/yJMXzvZEZlQ?autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ&end=42&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1" 
+                title="Danza Yonna" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <!-- OVERLAY DE TEXTO (SOBRE EL VIDEO) -->
+        <div class="absolute bottom-10 left-10 z-40">
+            <span class="block text-[#FF2E63] text-xs font-mono tracking-widest mb-2">DANZA TRADICIONAL</span>
+            <h3 class="text-4xl md:text-6xl text-white font-serif italic mix-blend-difference">
+                La Yonna
+            </h3>
+        </div>
+
+        <!-- BOTÓN DE REPRODUCCIÓN FALSO (Estético) -->
+        <div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+            <div class="w-20 h-20 rounded-full border border-white/30 backdrop-blur-sm flex items-center justify-center">
+                <div class="w-2 h-2 bg-[#FF2E63] rounded-full animate-pulse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Texto descriptivo inferior -->
+    <div class="mt-12 text-center z-20 max-w-lg px-6">
+        <p class="text-gray-400 font-light text-sm leading-relaxed">
+            La búsqueda del equilibrio. La mujer, vestida de rojo (sangre y vida), abre su manta para desafiar al viento y perseguir al hombre al ritmo del tambor Kasha.
+        </p>
+    </div>
+
+</section>
+                   
+             
 
         <!-- 6. JEPIRA (EL FINAL/COSMOS) -->
         <section id="jepira-section" class="min-h-screen w-full py-20 flex flex-col items-center justify-center relative z-20">
@@ -547,29 +571,35 @@
             gsap.registerPlugin(ScrollTrigger);
 
             
-            // A. YONNA SCROLL-JACKING (MODO PINNING / CONGELADO)
-            // Creamos una línea de tiempo para controlar el "congelamiento"
-            let tlYonna = gsap.timeline({
-                scrollTrigger: {
-                    trigger: "#yonna-section",
-                    start: "center center", // Cuando el centro de la sección llega al centro de la pantalla
-                    end: "+=150%",          // La pantalla se queda quieta durante un 150% de scroll extra
-                    scrub: 1,               // La animación sigue al dedo del usuario
-                    pin: true,              // <--- ESTO ES EL SCROLL JACKING (Congela la sección)
-                    anticipatePin: 1
-                }
-            });
-            
-            // Agregamos las animaciones a esa línea de tiempo congelada
-            tlYonna.to(".dancer-video", {
-                scale: 1.5, // Zoom dramático
-                rotate: 5,  // Leve rotación para dar dinamismo
-                duration: 1
-            })
-            .to(".dancer-container", {
-                boxShadow: "0 0 150px rgba(255, 46, 99, 0.8)", // El brillo rojo aumenta
-                duration: 1
-            }, "<"); // El "<" significa que pasa al mismo tiempo que el zoom
+          // B. CINEMATIC REVEAL (Expansión de Video)
+gsap.fromTo(".video-reveal-container", 
+    { 
+        width: "70%",       // Empieza ocupando el 70% de ancho
+        borderRadius: "20px" // Bordes redondeados
+    },
+    {
+        width: "100%",      // Crece al 100% (Borde a borde)
+        borderRadius: "0px", // Los bordes se vuelven rectos al tocar los lados
+        scrollTrigger: {
+            trigger: "#yonna-section",
+            start: "top bottom", // Empieza cuando la sección entra
+            end: "center center", // Termina cuando el video está en el centro
+            scrub: 1.5 // Suavidad extrema
+        }
+    }
+);
+
+// Movimiento Parallax del Título de fondo "RITUAL"
+gsap.to("#yonna-section h2", {
+    y: 100, // El texto se mueve verticalmente
+    opacity: 0.1,
+    scrollTrigger: {
+        trigger: "#yonna-section",
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1
+    }
+});
 
             // B. TRANSICIÓN A JEPIRA (CAMBIO DE COLOR CÓSMICO)
             ScrollTrigger.create({
