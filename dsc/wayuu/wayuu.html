@@ -154,6 +154,24 @@
             z-index: 1; /* Encima del video */
             pointer-events: none;
         }
+
+        /* ANIMACIÓN DE RESPLANDOR (GLOW) */
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 40px rgba(255, 46, 99, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 100px rgba(255, 46, 99, 0.6), 0 0 20px rgba(255, 46, 99, 0.4) inset; /* Brillo externo e interno */
+            }
+            100% {
+                box-shadow: 0 0 40px rgba(255, 46, 99, 0.2);
+            }
+        }
+        
+        .red-glow-pulse {
+            animation: pulse-red 4s infinite ease-in-out; /* 4 segundos de respiración lenta */
+        }
+        
     </style>
 </head>
 <body>
@@ -341,44 +359,44 @@
         </section>
 
         <!-- 5. YONNA (DANZA) - SCROLL JACKING -->
-        <!-- 5. SECCIÓN: YONNA (DANZA) - VIDEO CIRCULAR -->
           <section id="yonna-section" class="h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#0b0500]">    
-            <!-- Fondo decorativo sutil -->
-            <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-            
-            <!-- Texto de fondo gigante -->
-            <div class="z-10 text-center mix-blend-difference absolute pointer-events-none">
-                <span class="text-white text-xs tracking-[0.5em] mb-2 block">04 — RITUAL</span>
-                <h2 class="text-[5rem] md:text-[12rem] text-[#FF2E63] font-bold opacity-10 whitespace-nowrap">
-                    LA YONNA
-                </h2>
-            </div>
-        
-            <!-- EL CÍRCULO CON VIDEO -->
-            <div class="dancer-container w-[40vh] h-[40vh] md:w-[65vh] md:h-[65vh] rounded-full overflow-hidden border-4 border-[#FF2E63] relative z-20 shadow-[0_0_80px_rgba(255,46,99,0.4)] bg-black">
+                <!-- Fondo decorativo -->
+                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 
-                <!-- WRAPPER VIDEO (Zoom extremo para ocultar interfaz de YouTube) -->
-                <div class="dancer-video w-full h-full relative pointer-events-none">
-                  <iframe 
-                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[170%] h-[170%] object-cover" 
-                    src="https://www.youtube.com/embed/k_6p355k10M?autoplay=1&mute=1&controls=0&loop=1&playlist=k_6p355k10M&start=95&end=180&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1" 
-                    title="Danza Yonna" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen>
-                 </iframe>
+                <!-- Texto Fondo -->
+                <div class="z-10 text-center mix-blend-difference absolute pointer-events-none">
+                    <span class="text-white text-xs tracking-[0.5em] mb-2 block">04 — RITUAL</span>
+                    <h2 class="text-[5rem] md:text-[12rem] text-[#FF2E63] font-bold opacity-10 whitespace-nowrap">
+                        LA YONNA
+                    </h2>
                 </div>
-        
-                <!-- Overlay rojo para unificar el color y disimular calidad de YouTube -->
-                <div class="absolute inset-0 bg-[#FF2E63] mix-blend-overlay opacity-30 pointer-events-none"></div>
-                <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
-                
-            </div>
-        
-            <!-- Texto descriptivo inferior -->
-            <div class="absolute bottom-16 text-center z-20">
-                <p class="text-white/80 text-sm tracking-[0.3em] uppercase font-light">El baile del viento</p>
-            </div>
+            
+                <!-- CÍRCULO CON VIDEO Y RESPLANDOR -->
+                <!-- Agregamos la clase 'red-glow-pulse' para el efecto mágico -->
+                <div class="dancer-container red-glow-pulse w-[40vh] h-[40vh] md:w-[65vh] md:h-[65vh] rounded-full overflow-hidden border-2 border-[#FF2E63]/50 relative z-20 bg-black">
+                    
+                    <!-- WRAPPER VIDEO -->
+                    <div class="dancer-video w-full h-full relative pointer-events-none">
+                        <!-- NUEVO ID DE VIDEO: Kike Calvo (Documental Wayuu) - Sí permite embed -->
+                        <!-- Start: 125s (Baile) -->
+                        <iframe 
+                            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[250%] h-[250%] object-cover" 
+                            src="https://www.youtube.com/embed/Br77Q-FuCGW?autoplay=1&mute=1&controls=0&loop=1&playlist=Br77Q-FuCGW&start=125&end=150&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&enablejsapi=1" 
+                            title="Danza Yonna" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+            
+                    <!-- Overlay Rojo Mágico -->
+                    <div class="absolute inset-0 bg-[#FF2E63] mix-blend-overlay opacity-30 pointer-events-none"></div>
+                </div>
+            
+                <!-- Texto inferior -->
+                <div class="absolute bottom-16 text-center z-20">
+                    <p class="text-white/80 text-sm tracking-[0.3em] uppercase font-light">El baile del viento</p>
+                </div>
          </section>
 
         <!-- 6. JEPIRA (EL FINAL/COSMOS) -->
