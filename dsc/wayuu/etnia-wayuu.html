@@ -235,6 +235,24 @@
         
         /* Texto Wayuunaiki más brillante para contrastar */
         .tilt-card h3 { text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        /* --- DEGRADADO DE BORDES (CINEMATIC FADE) --- */
+        .cinematic-fade {
+            position: absolute;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            pointer-events: none; /* Permite dar clic a través de ella */
+            z-index: 2; /* Se coloca encima de la imagen y del overlay oscuro */
+            background: linear-gradient(
+                to bottom,
+                #050200 0%,        /* Negro arriba */
+                transparent 20%,   /* Se vuelve transparente al bajar */
+                transparent 80%,   /* Se mantiene transparente */
+                #050200 100%       /* Vuelve a negro abajo */
+            );
+        }
                 
     </style>
 </head>
@@ -340,7 +358,9 @@
                      
                 <!-- 2. OVERLAY OSCURO (Para que se lean los textos) -->
                 <div class="desert-overlay"></div>
-            
+
+                <div class="cinematic-fade"></div>
+                
                 <!-- 3. CONTENIDO (Z-Index alto para estar sobre la imagen) -->
                 <div class="max-w-[1400px] mx-auto w-full relative z-10">
                     
