@@ -95,12 +95,12 @@
         /* LOADER */
         .loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c-bg); z-index: 9999;
+            background: var(--c-bg); z-index: 10000; /* Z-index alto para tapar todo */
             display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
         .loader-line {
             width: 0%; height: 2px;
-            background: linear-gradient(90deg, var(--c-weave), var(--c-sand));
+            background: linear-gradient(90deg, var(--c-accent), var(--c-sand));
             transition: width 0.2s linear;
         }
 
@@ -122,9 +122,9 @@
     <!-- CANVAS PARTICULAS GLOBALES -->
     <canvas id="global-canvas"></canvas>
 
-       <!-- LOADER -->
+    <!-- LOADER -->
     <div class="loader" id="loader">
-        <div class="tech-font text-xl tracking-[0.3em] text-[#D4A056] mb-4">WAYUU</div>
+        <div class="font-tech text-xl tracking-[0.3em] text-[#D4A056] mb-4">WAYUU</div>
         <div class="w-48 h-[1px] bg-white/10 rounded overflow-hidden">
             <div class="loader-line h-full" id="loader-bar"></div>
         </div>
@@ -138,7 +138,8 @@
         </div>
     </nav>
 
-    <main id="smooth-wrapper">
+    <!-- MAIN (Agregado style opacity:0 para que empiece invisible) -->
+    <main id="main-content" style="opacity: 0;">
         
         <!-- 1. HERO -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden">
@@ -212,7 +213,6 @@
         </section>
 
         <!-- 4. LAPÜ (SUEÑOS) - SHADER LÍQUIDO -->
-        <!-- Seccion independiente que ejecuta su propio WebGL -->
         <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
             <!-- Canvas del Shader -->
             <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
@@ -230,7 +230,7 @@
             <!-- Video Placeholder -->
             <iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
                 style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                src="https://www.youtube.com/embed/yJMXzvZEZlQ?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
+                src="https://www.youtube.com/embed/S_Jc8jOWgqg?autoplay=1&mute=1&controls=0&loop=1&playlist=S_Jc8jOWgqg" 
                 frameborder="0" allow="autoplay; encrypted-media"></iframe>
             
             <div class="relative z-20 text-center mix-blend-overlay">
@@ -259,7 +259,7 @@
 
         <footer class="py-12 bg-black border-t border-white/10 text-center relative z-20">
             <p class="font-tech text-[10px] text-gray-600 tracking-[0.3em]">CULTURA WAYUU DIGITAL © 2025- DERECHOS RESERVADOS. ULULATO</p>
-             <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo">
+             <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo mx-auto mt-4 w-24">
         </footer>        
 
     </main>
@@ -272,373 +272,386 @@
 
     <!-- LOGICA PRINCIPAL -->
     <script>
-         document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. LOADER ---
+            gsap.registerPlugin(ScrollTrigger);
+
+            // --- 0. LOADER ---
             const loader = document.getElementById('loader');
             const loaderBar = document.getElementById('loader-bar');
             let progress = 0;
+            
+            // Simulación de carga
             const interval = setInterval(() => {
                 progress += Math.random() * 8;
                 if(progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
-                    gsap.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' });
-                    gsap.to("#webgl-canvas", { opacity: 1, duration: 2 });
-                    gsap.to("#main-content", { opacity: 1, duration: 1 });
-                    gsap.from(".hero-anim", { y: 60, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out", delay: 0.5 });
+                    
+                    // Secuencia de entrada
+                    const tl = gsap.timeline();
+                    tl.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' })
+                      .to("#main-content", { opacity: 1, duration: 1.5 }, "-=0.5") // Revelar contenido
+                      .to("#global-canvas", { opacity: 1, duration: 2 }, "-=1.5") // Revelar partículas
+                      .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
+                      .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
                 }
                 loaderBar.style.width = `${progress}%`;
             }, 50);
-             
-        gsap.registerPlugin(ScrollTrigger);
 
-        // --- 1. GESTOR DEL CURSOR ---
-        const cursor = document.getElementById('cursor');
-        const cursorText = document.getElementById('cursor-text');
+            // --- 1. GESTOR DEL CURSOR ---
+            const cursor = document.getElementById('cursor');
+            const cursorText = document.getElementById('cursor-text');
 
-        const moveCursor = (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-        };
-        window.addEventListener('mousemove', moveCursor);
-
-        // Hover Genérico
-        document.querySelectorAll('.hover-trigger').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
-        });
-
-        // Audio Hover
-        document.querySelectorAll('.audio-trigger').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursor.classList.add('audio-mode');
-                cursorText.innerText = "OÍR";
-            });
-            el.addEventListener('mouseleave', () => {
-                cursor.classList.remove('audio-mode');
-                cursorText.innerText = "";
-            });
-            // Click play functionality
-            el.addEventListener('click', () => {
-                const audioId = el.getAttribute('data-audio');
-                const audio = document.getElementById(audioId);
-                audio.play();
-                gsap.fromTo(el, {scale: 0.95}, {scale: 1, duration: 0.3});
-            });
-        });
-
-        // Video Hover
-        const videoArea = document.querySelector('.video-cursor-area');
-        videoArea.addEventListener('mouseenter', () => {
-            cursor.classList.add('video-mode');
-            cursorText.innerText = "VER";
-        });
-        videoArea.addEventListener('mouseleave', () => {
-            cursor.classList.remove('video-mode');
-            cursorText.innerText = "";
-        });
-
-        // Dreams Hover
-        const dreamArea = document.getElementById('lapu-section');
-        dreamArea.addEventListener('mouseenter', () => cursor.classList.add('dream-mode'));
-        dreamArea.addEventListener('mouseleave', () => cursor.classList.remove('dream-mode'));
-
-
-        // --- 2. THREE.JS GLOBAL (PARTÍCULAS FONDO) ---
-        const initGlobalThree = () => {
-            const canvas = document.getElementById('global-canvas');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            // Geometría Partículas
-            const count = 2500;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(count * 3);
-            const originalPos = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3);
-
-            const colorSand = new THREE.Color('#C89F65');
-            const colorStar = new THREE.Color('#A5D8FF');
-
-            for(let i=0; i<count*3; i+=3) {
-                positions[i] = (Math.random() - 0.5) * 30;
-                positions[i+1] = (Math.random() - 0.5) * 40;
-                positions[i+2] = (Math.random() - 0.5) * 20;
-                originalPos[i] = positions[i];
-                originalPos[i+1] = positions[i+1];
-                
-                // Color inicial Arena
-                colors[i] = colorSand.r;
-                colors[i+1] = colorSand.g;
-                colors[i+2] = colorSand.b;
-            }
-
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 0.04,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-            camera.position.z = 5;
-
-            // Animación Viento/Ruido
-            const simplex = new SimplexNoise();
-            const clock = new THREE.Clock();
-
-            const animateGlobal = () => {
-                const time = clock.getElapsedTime();
-                particles.rotation.y = time * 0.02;
-
-                // Modificar posiciones suavemente (Efecto Viento)
-                const pos = geometry.attributes.position.array;
-                for(let i=0; i<count; i++) {
-                    const i3 = i*3;
-                    const noise = simplex.noise2D(originalPos[i3] * 0.1, time * 0.2) * 0.2;
-                    pos[i3+1] = originalPos[i3+1] + noise;
-                }
-                geometry.attributes.position.needsUpdate = true;
-
-                renderer.render(scene, camera);
-                requestAnimationFrame(animateGlobal);
+            const moveCursor = (e) => {
+                gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
             };
-            animateGlobal();
-            
-            // Fade In Inicial
-            gsap.to("#global-canvas", {opacity: 1, duration: 2, delay: 0.5});
+            window.addEventListener('mousemove', moveCursor);
 
-            // TRANSICIÓN JEPIRA (Arena -> Estrellas)
-            ScrollTrigger.create({
-                trigger: "#jepira-section",
-                start: "top center",
-                onEnter: () => {
-                    // Cambiar color a estrellas
-                    gsap.to("#cosmos-overlay", {opacity: 1, duration: 2}); // Fondo azulado
-                    const cols = geometry.attributes.color.array;
-                    // Tween manual de colores (Simulado)
-                    const tempObj = { t: 0 };
-                    gsap.to(tempObj, {
-                        t: 1,
-                        duration: 2,
-                        onUpdate: () => {
-                            for(let i=0; i<count*3; i+=3) {
-                                cols[i] = THREE.MathUtils.lerp(colorSand.r, colorStar.r, tempObj.t);
-                                cols[i+1] = THREE.MathUtils.lerp(colorSand.g, colorStar.g, tempObj.t);
-                                cols[i+2] = THREE.MathUtils.lerp(colorSand.b, colorStar.b, tempObj.t);
+            // Hover Genérico
+            document.querySelectorAll('.hover-trigger').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
+
+            // Audio Hover
+            document.querySelectorAll('.audio-trigger').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('audio-mode');
+                    cursorText.innerText = "OÍR";
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('audio-mode');
+                    cursorText.innerText = "";
+                });
+                // Click play functionality
+                el.addEventListener('click', () => {
+                    const audioId = el.getAttribute('data-audio');
+                    const audio = document.getElementById(audioId);
+                    if(audio.paused) {
+                        audio.play();
+                        gsap.fromTo(el, {scale: 0.95}, {scale: 1, duration: 0.3});
+                    } else {
+                        audio.pause();
+                    }
+                });
+            });
+
+            // Video Hover
+            const videoArea = document.querySelector('.video-cursor-area');
+            if(videoArea) {
+                videoArea.addEventListener('mouseenter', () => {
+                    cursor.classList.add('video-mode');
+                    cursorText.innerText = "VER";
+                });
+                videoArea.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('video-mode');
+                    cursorText.innerText = "";
+                });
+            }
+
+            // Dreams Hover
+            const dreamArea = document.getElementById('lapu-section');
+            if(dreamArea) {
+                dreamArea.addEventListener('mouseenter', () => cursor.classList.add('dream-mode'));
+                dreamArea.addEventListener('mouseleave', () => cursor.classList.remove('dream-mode'));
+            }
+
+
+            // --- 2. THREE.JS GLOBAL (PARTÍCULAS FONDO) ---
+            const initGlobalThree = () => {
+                const canvas = document.getElementById('global-canvas');
+                if(!canvas) return;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                // Geometría Partículas
+                const count = 2500;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(count * 3);
+                const originalPos = new Float32Array(count * 3);
+                const colors = new Float32Array(count * 3);
+
+                const colorSand = new THREE.Color('#C89F65');
+                const colorStar = new THREE.Color('#A5D8FF');
+
+                for(let i=0; i<count*3; i+=3) {
+                    positions[i] = (Math.random() - 0.5) * 30;
+                    positions[i+1] = (Math.random() - 0.5) * 40;
+                    positions[i+2] = (Math.random() - 0.5) * 20;
+                    originalPos[i] = positions[i];
+                    originalPos[i+1] = positions[i+1];
+                    
+                    // Color inicial Arena
+                    colors[i] = colorSand.r;
+                    colors[i+1] = colorSand.g;
+                    colors[i+2] = colorSand.b;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 0.04,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+                camera.position.z = 5;
+
+                // Animación Viento/Ruido
+                const simplex = new SimplexNoise();
+                const clock = new THREE.Clock();
+
+                const animateGlobal = () => {
+                    const time = clock.getElapsedTime();
+                    particles.rotation.y = time * 0.02;
+
+                    // Modificar posiciones suavemente (Efecto Viento)
+                    const pos = geometry.attributes.position.array;
+                    for(let i=0; i<count; i++) {
+                        const i3 = i*3;
+                        const noise = simplex.noise2D(originalPos[i3] * 0.1, time * 0.2) * 0.2;
+                        pos[i3+1] = originalPos[i3+1] + noise;
+                    }
+                    geometry.attributes.position.needsUpdate = true;
+
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animateGlobal);
+                };
+                animateGlobal();
+                
+                // TRANSICIÓN JEPIRA (Arena -> Estrellas)
+                ScrollTrigger.create({
+                    trigger: "#jepira-section",
+                    start: "top center",
+                    onEnter: () => {
+                        // Cambiar color a estrellas
+                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2}); // Fondo azulado
+                        const cols = geometry.attributes.color.array;
+                        const tempObj = { t: 0 };
+                        gsap.to(tempObj, {
+                            t: 1,
+                            duration: 2,
+                            onUpdate: () => {
+                                for(let i=0; i<count*3; i+=3) {
+                                    cols[i] = THREE.MathUtils.lerp(colorSand.r, colorStar.r, tempObj.t);
+                                    cols[i+1] = THREE.MathUtils.lerp(colorSand.g, colorStar.g, tempObj.t);
+                                    cols[i+2] = THREE.MathUtils.lerp(colorSand.b, colorStar.b, tempObj.t);
+                                }
+                                geometry.attributes.color.needsUpdate = true;
                             }
-                            geometry.attributes.color.needsUpdate = true;
-                        }
-                    });
-                },
-                onLeaveBack: () => {
-                     // Volver a Arena
-                    gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                    const cols = geometry.attributes.color.array;
-                    const tempObj = { t: 0 };
-                    gsap.to(tempObj, {
-                        t: 1,
-                        duration: 2,
-                        onUpdate: () => {
-                            for(let i=0; i<count*3; i+=3) {
-                                cols[i] = THREE.MathUtils.lerp(colorStar.r, colorSand.r, tempObj.t);
-                                cols[i+1] = THREE.MathUtils.lerp(colorStar.g, colorSand.g, tempObj.t);
-                                cols[i+2] = THREE.MathUtils.lerp(colorStar.b, colorSand.b, tempObj.t);
+                        });
+                    },
+                    onLeaveBack: () => {
+                        // Volver a Arena
+                        gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                        const cols = geometry.attributes.color.array;
+                        const tempObj = { t: 0 };
+                        gsap.to(tempObj, {
+                            t: 1,
+                            duration: 2,
+                            onUpdate: () => {
+                                for(let i=0; i<count*3; i+=3) {
+                                    cols[i] = THREE.MathUtils.lerp(colorStar.r, colorSand.r, tempObj.t);
+                                    cols[i+1] = THREE.MathUtils.lerp(colorStar.g, colorSand.g, tempObj.t);
+                                    cols[i+2] = THREE.MathUtils.lerp(colorStar.b, colorSand.b, tempObj.t);
+                                }
+                                geometry.attributes.color.needsUpdate = true;
                             }
-                            geometry.attributes.color.needsUpdate = true;
+                        });
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            };
+            initGlobalThree();
+
+
+            // --- 3. THREE.JS LOCAL (SHADER SUEÑOS/LAPÜ) ---
+            (function() {
+                const container = document.getElementById('dream-canvas-container');
+                if(!container) return;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+                const renderer = new THREE.WebGLRenderer({ alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(renderer.domElement);
+
+                // Crear Textura con Canvas 2D
+                function createTextTexture() {
+                    const cvs = document.createElement('canvas');
+                    cvs.width = window.innerWidth; 
+                    cvs.height = window.innerHeight;
+                    const ctx = cvs.getContext('2d');
+                    
+                    // Texto Centrado
+                    const cx = cvs.width / 2;
+                    const cy = cvs.height / 2;
+                    
+                    // Título
+                    ctx.font = "italic 700 15vw 'Playfair Display'";
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("SUEÑOS", cx, cy);
+
+                    // Subtexto
+                    ctx.font = "300 1.5vw 'Manrope'";
+                    ctx.fillStyle = "#C89F65";
+                    ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
+
+                    const tex = new THREE.CanvasTexture(cvs);
+                    return tex;
+                }
+
+                const texture = createTextTexture();
+
+                // Shader FBM
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTime: { value: 0 },
+                        uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+                        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                        uTexture: { value: texture }
+                    },
+                    vertexShader: `
+                        varying vec2 vUv;
+                        void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
+                    `,
+                    fragmentShader: `
+                        uniform float uTime;
+                        uniform vec2 uMouse;
+                        uniform vec2 uResolution;
+                        uniform sampler2D uTexture;
+                        varying vec2 vUv;
+
+                        // Simplex Noise
+                        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                        float snoise(vec2 v) {
+                            const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                            vec2 i  = floor(v + dot(v, C.yy) );
+                            vec2 x0 = v -   i + dot(i, C.xx);
+                            vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                            vec4 x12 = x0.xyxy + C.xxzz;
+                            x12.xy -= i1;
+                            i = mod289(i);
+                            vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                            m = m*m ; m = m*m ;
+                            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                            vec3 h = abs(x) - 0.5;
+                            vec3 ox = floor(x + 0.5);
+                            vec3 a0 = x - ox;
+                            m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                            vec3 g;
+                            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                            return 130.0 * dot(m, g);
                         }
-                    });
+
+                        void main() {
+                            vec2 uv = vUv;
+                            vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
+                            vec2 st = uv * ratio;
+                            vec2 mouse = uMouse * ratio;
+                            
+                            // Distancia Mouse
+                            float dist = distance(st, mouse);
+
+                            // Ruido / Niebla
+                            float n = snoise(st * 3.0 - uTime * 0.1);
+                            float n2 = snoise(st * 8.0 + uTime * 0.05);
+                            float fog = n * 0.5 + n2 * 0.2;
+
+                            // Mascara de revelado (Agujero en la niebla)
+                            float reveal = smoothstep(0.25, 0.1, dist + fog * 0.2); // Invertido: 1 cerca mouse, 0 lejos
+
+                            // Distorsión del texto (Liquido)
+                            vec2 distort = vec2(fog * 0.1 * (1.0 - reveal));
+                            vec4 texColor = texture2D(uTexture, uv + distort);
+
+                            // Color Fondo Niebla
+                            vec3 bgColor = vec3(0.0, 0.0, 0.05);
+
+                            // Mezcla: Si reveal es alto, muestra texto. Si es bajo, muestra niebla.
+                            vec3 finalColor = mix(bgColor, texColor.rgb, reveal * texColor.a);
+                            
+                            // Borde Dorado Magico
+                            float edge = smoothstep(0.0, 0.1, reveal) * (1.0 - smoothstep(0.9, 1.0, reveal));
+                            finalColor += vec3(0.8, 0.6, 0.2) * edge * 0.2;
+
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `
+                });
+
+                const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+                scene.add(mesh);
+
+                // Animación Local
+                const clock = new THREE.Clock();
+                const mouse = new THREE.Vector2(0.5, 0.5);
+                
+                window.addEventListener('mousemove', (e) => {
+                    mouse.x = e.clientX / window.innerWidth;
+                    mouse.y = 1.0 - (e.clientY / window.innerHeight);
+                });
+
+                function animate() {
+                    material.uniforms.uTime.value = clock.getElapsedTime();
+                    material.uniforms.uMouse.value.lerp(mouse, 0.1);
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animate);
+                }
+                animate();
+
+                // Resize Local
+                window.addEventListener('resize', () => {
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+                    material.uniforms.uTexture.value = createTextTexture();
+                });
+            })();
+
+
+            // --- 4. SCROLL & ANIMATIONS (GSAP) ---
+            gsap.to("#parallax-img", {
+                yPercent: 20,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#parallax-img",
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
                 }
             });
-        };
-        initGlobalThree();
 
-
-        // --- 3. THREE.JS LOCAL (SHADER SUEÑOS/LAPÜ) ---
-        // Usamos una IIFE para aislar variables y no romper el Three.js global
-        (function() {
-            const container = document.getElementById('dream-canvas-container');
-            const scene = new THREE.Scene();
-            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-
-            // Crear Textura con Canvas 2D
-            function createTextTexture() {
-                const cvs = document.createElement('canvas');
-                cvs.width = window.innerWidth; 
-                cvs.height = window.innerHeight;
-                const ctx = cvs.getContext('2d');
-                
-                // Texto Centrado
-                const cx = cvs.width / 2;
-                const cy = cvs.height / 2;
-                
-                // Título
-                ctx.font = "italic 700 15vw 'Playfair Display'";
-                ctx.fillStyle = "white";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("SUEÑOS", cx, cy);
-
-                // Subtexto
-                ctx.font = "300 1.5vw 'Manrope'";
-                ctx.fillStyle = "#C89F65";
-                ctx.fillText("Busca la luz en la oscuridad", cx, cy + (cvs.width * 0.12));
-
-                const tex = new THREE.CanvasTexture(cvs);
-                return tex;
+            // Lenis Smooth Scroll
+            const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
             }
-
-            const texture = createTextTexture();
-
-            // Shader FBM
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0 },
-                    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-                    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-                    uTexture: { value: texture }
-                },
-                vertexShader: `
-                    varying vec2 vUv;
-                    void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-                `,
-                fragmentShader: `
-                    uniform float uTime;
-                    uniform vec2 uMouse;
-                    uniform vec2 uResolution;
-                    uniform sampler2D uTexture;
-                    varying vec2 vUv;
-
-                    // Simplex Noise
-                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-                    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-                    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
-                    float snoise(vec2 v) {
-                        const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-                        vec2 i  = floor(v + dot(v, C.yy) );
-                        vec2 x0 = v -   i + dot(i, C.xx);
-                        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-                        vec4 x12 = x0.xyxy + C.xxzz;
-                        x12.xy -= i1;
-                        i = mod289(i);
-                        vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
-                        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-                        m = m*m ; m = m*m ;
-                        vec3 x = 2.0 * fract(p * C.www) - 1.0;
-                        vec3 h = abs(x) - 0.5;
-                        vec3 ox = floor(x + 0.5);
-                        vec3 a0 = x - ox;
-                        m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-                        vec3 g;
-                        g.x  = a0.x  * x0.x  + h.x  * x0.y;
-                        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-                        return 130.0 * dot(m, g);
-                    }
-
-                    void main() {
-                        vec2 uv = vUv;
-                        vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
-                        vec2 st = uv * ratio;
-                        vec2 mouse = uMouse * ratio;
-                        
-                        // Distancia Mouse
-                        float dist = distance(st, mouse);
-
-                        // Ruido / Niebla
-                        float n = snoise(st * 3.0 - uTime * 0.1);
-                        float n2 = snoise(st * 8.0 + uTime * 0.05);
-                        float fog = n * 0.5 + n2 * 0.2;
-
-                        // Mascara de revelado (Agujero en la niebla)
-                        float reveal = smoothstep(0.25, 0.1, dist + fog * 0.2); // Invertido: 1 cerca mouse, 0 lejos
-
-                        // Distorsión del texto (Liquido)
-                        vec2 distort = vec2(fog * 0.1 * (1.0 - reveal));
-                        vec4 texColor = texture2D(uTexture, uv + distort);
-
-                        // Color Fondo Niebla
-                        vec3 bgColor = vec3(0.0, 0.0, 0.05);
-
-                        // Mezcla: Si reveal es alto, muestra texto. Si es bajo, muestra niebla.
-                        vec3 finalColor = mix(bgColor, texColor.rgb, reveal * texColor.a);
-                        
-                        // Borde Dorado Magico
-                        float edge = smoothstep(0.0, 0.1, reveal) * (1.0 - smoothstep(0.9, 1.0, reveal));
-                        finalColor += vec3(0.8, 0.6, 0.2) * edge * 0.2;
-
-                        gl_FragColor = vec4(finalColor, 1.0);
-                    }
-                `
-            });
-
-            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-            scene.add(mesh);
-
-            // Animación Local
-            const clock = new THREE.Clock();
-            const mouse = new THREE.Vector2(0.5, 0.5);
-            
-            // Listener específico para el container para coordenadas relativas correctas (opcional)
-            // Usamos window global para suavidad continua
-            window.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX / window.innerWidth;
-                mouse.y = 1.0 - (e.clientY / window.innerHeight);
-            });
-
-            function animate() {
-                material.uniforms.uTime.value = clock.getElapsedTime();
-                // Interpolación básica para suavidad
-                material.uniforms.uMouse.value.lerp(mouse, 0.1);
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            }
-            animate();
-
-            // Resize Local
-            window.addEventListener('resize', () => {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-                material.uniforms.uTexture.value = createTextTexture();
-            });
-        })();
-
-
-        // --- 4. SCROLL & ANIMATIONS (GSAP) ---
-        const tl = gsap.timeline();
-        tl.from(".reveal-title", { y: 150, opacity: 0, duration: 1.5, ease: "power4.out", delay: 0.5 })
-          .from(".reveal-text", { y: 50, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
-
-        gsap.to("#parallax-img", {
-            yPercent: 20,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#parallax-img",
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-
-        // Lenis Smooth Scroll
-        const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-        function raf(time) {
-            lenis.raf(time);
             requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
-
+            
+        }); // CIERRE CORRECTO DEL DOMContentLoaded
     </script>
 </body>
 </html>
