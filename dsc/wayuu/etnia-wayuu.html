@@ -69,17 +69,16 @@
 
         /* TILT CARDS */
         .tilt-card {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transform-style: preserve-3d;
             transform: perspective(1000px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
         }
-        .tilt-card:hover { border-color: var(--c-sand); }
-        .tilt-inner { transform: translateZ(30px); }
-
+        .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }
+        .tilt-inner { transform: translateZ(20px); }        
+        
         /* LOADER */
         .loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -102,11 +101,14 @@
             opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
         }
         
+         /* PLAY BUTTON */
         .play-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; align-items: center; justify-content: center; transition: all 0.3s;
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
         }
-        .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; }
+        .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
 
         ::-webkit-scrollbar { width: 0px; }
     </style>
@@ -183,6 +185,15 @@
         </section>
 
         <!-- 4. AUDIO (WEB AUDIO API - GENERATIVO) -->
+         <section class="h-[80vh] w-full flex flex-col items-center justify-center relative bg-[#050200] overflow-hidden z-20">
+            <div class="absolute top-10 w-full text-center z-20 pointer-events-none mix-blend-difference">
+                <span class="text-[#FF3B3B] text-xs font-mono tracking-[0.4em] uppercase">Interacción</span>
+                <h3 class="text-3xl font-display text-white mt-2">El Hilo de la Vida</h3>
+            </div>
+            <div id="weaving-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+        </section>
+
+        <!-- 4. AUDIO (ARCHIVOS REALES) -->
         <section class="py-32 px-6 md:px-24 relative z-10">
             <div class="max-w-7xl mx-auto">
                 <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-4">02 — WAYUUNAIKI</p>
@@ -190,29 +201,31 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Audio 1 -->
-                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playMysticalSound('low')">
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playRealAudio('audio1')">
                         <div class="tilt-inner flex justify-between items-start">
                             <div>
-                                <h3 class="text-5xl font-display text-white group-hover:text-[#C89F65] transition-colors">Anasü</h3>
-                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-na-sü/ — "Está bien"</p>
+                                <h3 class="text-5xl font-display text-white group-hover:text-[#C89F65] transition-colors">Achonnii</h3>
+                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/a-cho-nnii/ — "Hijo"</p>
                             </div>
                             <div class="play-btn">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                             </div>
-                        </div>
+                        </div>                     
+                        <audio id="audio1" src="../../vocabulario/wayuu/achonnii.mp3"></audio>
                     </div>
 
                     <!-- Audio 2 -->
-                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playMysticalSound('high')">
+                    <div class="tilt-card p-12 rounded-2xl cursor-none audio-trigger group" onclick="playRealAudio('audio2')">
                         <div class="tilt-inner flex justify-between items-start">
                             <div>
-                                <h3 class="text-5xl font-display text-white group-hover:text-[#00C4CC] transition-colors">Mma</h3>
-                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/m-ma/ — "Tierra Madre"</p>
+                                <h3 class="text-5xl font-display text-white group-hover:text-[#00C4CC] transition-colors">eyüü</h3>
+                                <p class="mt-4 text-gray-400 font-mono text-sm uppercase tracking-widest">/e-yüü/ — "Madre"</p>
                             </div>
                             <div class="play-btn">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                             </div>
-                        </div>
+                        </div>                       
+                        <audio id="audio2" src="../../vocabulario/wayuu/eyuu.mp3"></audio>
                     </div>
                 </div>
             </div>
