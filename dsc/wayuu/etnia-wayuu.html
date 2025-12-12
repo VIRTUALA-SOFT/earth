@@ -638,18 +638,27 @@
             </div>
         </section>
 
-   <!-- 6. VIDEO -->
-<section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
-    <div class="absolute inset-0 z-10 bg-black/40"></div>
+ <!-- 6. VIDEO -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
     
-    <!-- CONTENEDOR PARA LA API DE YOUTUBE -->
-    <!-- Las clases de Tailwind se aplican aquí para posicionamiento y estilo -->
-    <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+    <!-- 1. CONTENEDOR VIDEO (YouTube API) -->
+    <!-- Z-Index 0 para que esté al fondo -->
+    <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"></div>
 
-    <div class="relative z-20 text-center mix-blend-overlay">
+    <!-- 2. OVERLAY OSCURO (Opcional, para unificar tonos) -->
+    <div class="absolute inset-0 z-10 bg-black/20 pointer-events-none"></div>
+
+    <!-- 3. DEGRADADO DE CONTINUIDAD (AQUÍ ESTÁ LA SOLUCIÓN) -->
+    <!-- Z-Index 20 para estar ENCIMA del video -->
+    <div class="cinematic-fade" style="z-index: 20;"></div>
+
+    <!-- 4. CONTENIDO TEXTO -->
+    <!-- Z-Index 30 para estar encima de todo -->
+    <div class="relative z-30 text-center mix-blend-overlay px-4 pointer-events-none">
         <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
         <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
     </div>
+
 </section>
 
         
