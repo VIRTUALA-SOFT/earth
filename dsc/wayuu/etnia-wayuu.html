@@ -893,22 +893,36 @@
                 scene.add(particles);
                 camera.position.z = 5;
 
-                const simplex = new SimplexNoise();
-                const clock = new THREE.Clock();
-
-                const animate = () => {
-                    const t = clock.getElapsedTime();
-                    particles.rotation.y = t * 0.02;
-                    const p = geometry.attributes.position.array;
-                    for(let i=0; i<count; i++) {
-                        const i3 = i*3;
-                        p[i3+1] = original[i3+1] + simplex.noise2D(original[i3]*0.1, t*0.2)*0.3;
+                 // Animación Jepira (Aceleración)
+                let speedMultiplier = 1;
+                ScrollTrigger.create({
+                    trigger: "#jepira-section",
+                    start: "top bottom",
+                    onEnter: () => {
+                        gsap.to(mat.color, {r: 0.6, g: 0.8, b: 1, duration: 2}); // Azul
+                        gsap.to({v:1}, {v:20, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }}); // Warp Speed
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(mat.color, {r: 0.78, g: 0.62, b: 0.4, duration: 2}); // Dorado
+                        gsap.to({v:20}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
                     }
-                    geometry.attributes.position.needsUpdate = true;
+                });
+
+                function animate() {
+                    const p = geo.attributes.position.array;
+                    for(let i=0; i<count; i++) {
+                        p[i*3+2] += vel[i] * speedMultiplier; // Mover en Z
+                        if(p[i*3+2] > 10) p[i*3+2] = -20; // Reset
+                    }
+                    geo.attributes.position.needsUpdate = true;
+                    stars.rotation.z += 0.001 * speedMultiplier;
                     renderer.render(scene, camera);
                     requestAnimationFrame(animate);
-                };
+                }
                 animate();
+            };
+            initThree();
+
 
                 if(typeof gsap !== 'undefined') {
                     ScrollTrigger.create({
@@ -1101,37 +1115,7 @@
                 function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
                 requestAnimationFrame(raf);
             }
-        });
-
-         // Animación Jepira (Aceleración)
-                let speedMultiplier = 1;
-                ScrollTrigger.create({
-                    trigger: "#jepira-section",
-                    start: "top bottom",
-                    onEnter: () => {
-                        gsap.to(mat.color, {r: 0.6, g: 0.8, b: 1, duration: 2}); // Azul
-                        gsap.to({v:1}, {v:20, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }}); // Warp Speed
-                    },
-                    onLeaveBack: () => {
-                        gsap.to(mat.color, {r: 0.78, g: 0.62, b: 0.4, duration: 2}); // Dorado
-                        gsap.to({v:20}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                    }
-                });
-
-                function animate() {
-                    const p = geo.attributes.position.array;
-                    for(let i=0; i<count; i++) {
-                        p[i*3+2] += vel[i] * speedMultiplier; // Mover en Z
-                        if(p[i*3+2] > 10) p[i*3+2] = -20; // Reset
-                    }
-                    geo.attributes.position.needsUpdate = true;
-                    stars.rotation.z += 0.001 * speedMultiplier;
-                    renderer.render(scene, camera);
-                    requestAnimationFrame(animate);
-                }
-                animate();
-            };
-            initThree();
+        });        
         
     </script>
 </body>
