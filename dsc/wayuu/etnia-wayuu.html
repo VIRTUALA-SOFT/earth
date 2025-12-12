@@ -638,38 +638,19 @@
             </div>
         </section>
 
-     <!-- 6. VIDEO (RITUAL) - CON BORDES FUNDIDOS -->
-<section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
+   <!-- 6. VIDEO -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
+    <div class="absolute inset-0 z-10 bg-black/40"></div>
     
-    <!-- 1. CAPA DE VIDEO (FONDO) -->
-    <div class="absolute inset-0 z-0">
-            <!--<iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
-                style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&start=0&end=42" 
-                frameborder="0" allow="autoplay; encrypted-media">
-               </iframe>-->
-            
-            <iframe class="w-full h-full object-cover opacity-60 pointer-events-none scale-125"
-                src="https://www.youtube.com/embed/yJMXzvZEZlQ?autoplay=1&mute=1&controls=0&start=0&end=42&loop=1&playlist=yJMXzvZEZlQ"
-                title="YouTube video player" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-            </iframe>
-    </div>
-            <!-- Z-Index 10 para estar ENCIMA del video pero DEBAJO del texto -->
-    <div class="cinematic-fade" style="z-index: 10;"></div>
+    <!-- CONTENEDOR PARA LA API DE YOUTUBE -->
+    <!-- Las clases de Tailwind se aplican aquí para posicionamiento y estilo -->
+    <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
 
-    <!-- 3. CONTENIDO / TEXTO -->
-    <div class="relative z-20 text-center mix-blend-overlay px-4">
-        <h2 class="text-[15vw] md:text-[12vw] font-display text-white leading-none tracking-tighter select-none">
-            RITUAL
-        </h2>
-        <p class="text-white/80 text-xl font-light italic mt-4 font-display tracking-widest">
-            La Yonna
-        </p>
+    <div class="relative z-20 text-center mix-blend-overlay">
+        <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
+        <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
     </div>
-
-</section>   
+</section>
 
         
      <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
@@ -1164,6 +1145,57 @@
             requestAnimationFrame(raf);
         }
     });
+
+      // --- YOUTUBE API LOOP CONTROL (Segmento 0s - 42s) ---
+    
+    // 1. Cargar la API de Iframe de YouTube de forma asíncrona
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 2. Esta función se ejecuta automáticamente cuando la API está lista
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yonna-player', {
+            videoId: 'yJMXzvZEZlQ', // ID de tu video
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'mute': 1,        // Obligatorio para autoplay
+                'rel': 0,         // Sin videos relacionados
+                'showinfo': 0,
+                'modestbranding': 1,
+                'disablekb': 1,
+                'fs': 0,
+                'playsinline': 1,
+                'loop': 1,
+                'playlist': 'yJMXzvZEZlQ' // Respaldo de loop nativo
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    // 3. Cuando el video está listo, iniciar y activar el monitor de tiempo
+    function onPlayerReady(event) {
+        event.target.playVideo();
+        checkVideoTime();
+    }
+
+    // 4. Bucle de monitoreo preciso (Loop manual en seg 42)
+    function checkVideoTime() {
+        if (player && player.getCurrentTime) {
+            var currentTime = player.getCurrentTime();
+            // Si pasa del segundo 42, rebobinar a 0
+            if (currentTime >= 42) {
+                player.seekTo(0);
+            }
+        }
+        // Ejecutar esta revisión en cada frame de animación para máxima precisión
+        requestAnimationFrame(checkVideoTime);
+    }
 </script>
     
 </body>
