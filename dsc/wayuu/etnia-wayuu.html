@@ -464,15 +464,15 @@ pointer-events: none;
         <section class="py-32 px-6 md:px-12 relative overflow-hidden h-auto min-h-screen flex flex-col justify-center">
             <img src="../../img/wayuu_desierto.jpeg" alt="Desierto" class="desert-bg">
             <div class="desert-overlay"></div>
-            <div class="cinematic-fade"></div>
+           <div class="cinematic-fade" style="z-index: 20;"></div>
             
             <div class="max-w-[1400px] mx-auto w-full relative cards-container">
-                <div class="mb-16 border-l-2 border-[#C89F65] pl-6">
+                <div class="mb-16 border-l-2 border-[#C89F65] pl-6 relative z-30">
                     <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2 shadow-black drop-shadow-md">03 — WAYUUNAIKI</p>
-                    <h2 class="text-4xl md:text-6xl font-display text-white drop-shadow-lg">El Idioma del <span class="italic text-[#C89F65]">Desierto</span></h2>
+                    <h2 class="text-4xl md:text-6xl font-display text-white drop-shadow-2x1">El Idioma del <span class="italic text-[#C89F65] brightness-125">Desierto</span></h2>
                 </div>
         
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-30">
                     <!-- Tarjeta 1 -->
                     <div id="card-audio1" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio1')">
                         <div class="relative z-10">
