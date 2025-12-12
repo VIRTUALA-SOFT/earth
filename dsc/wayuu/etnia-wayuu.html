@@ -14,83 +14,316 @@
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
     
     <style>
-        :root { --c-bg: #050200; --c-sand: #C89F65; --c-accent: #FF3B3B; --c-star: #A5D8FF; }
-        body { background-color: var(--c-bg); color: #f3f3f3; font-family: 'Manrope', sans-serif; overflow-x: hidden; cursor: none; margin: 0; }
-        
-        .font-display { font-family: 'Playfair Display', serif; }
-        .font-tech { font-family: 'Syncopate', sans-serif; }
+         :root {
+        --c-bg: #050200;
+        --c-sand: #C89F65;
+        --c-accent: #FF3B3B;
+        --c-star: #A5D8FF;
+    }
 
-        /* --- CURSOR (ESTILOS FORZADOS) --- */
-        #cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            background: #ffffff; border-radius: 50%; pointer-events: none;
-            z-index: 99999; /* Capa Máxima */
-            transform: translate(-50%, -50%);
-            transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.2s;
-            mix-blend-mode: difference; display: flex; justify-content: center; align-items: center;
-        }
-        #cursor span { 
-            opacity: 0; font-size: 10px; font-weight: 800; color: white; 
-            font-family: 'Syncopate', sans-serif; letter-spacing: 1px; pointer-events: none;
-        }
+    body { 
+        background-color: var(--c-bg); 
+        color: #f3f3f3; 
+        font-family: 'Manrope', sans-serif; 
+        overflow-x: hidden; 
+        cursor: none; 
+        margin: 0;
+    }
 
-        /* CURSOR ROJO (AUDIO) - IMPORTANTE */
-        #cursor.audio-mode { 
-            width: 90px !important; 
-            height: 90px !important; 
-            background: #FF3B3B !important; 
-            mix-blend-mode: normal !important;
-            border: none !important;
-            box-shadow: 0 4px 30px rgba(255, 59, 59, 0.5);
-        }
-        #cursor.audio-mode span { opacity: 1 !important; color: white !important; }
+    .font-display { font-family: 'Playfair Display', serif; }
+    .font-decor { font-family: 'Cinzel Decorative', serif; }
+    .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
-        #cursor.video-mode { width: 100px; height: 100px; background: white; mix-blend-mode: difference; }
-        #cursor.video-mode span { opacity: 1; color: black; }
-        #cursor.dream-mode { width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); mix-blend-mode: overlay; }
+    /* CURSOR */
+ #cursor {
+        position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+        background: #ffffff; 
+        border-radius: 50%;
+        pointer-events: none; 
+        z-index: 99999; /* Máxima prioridad */
+        transform: translate(-50%, -50%); 
+        transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                    height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                    background-color 0.2s;
+        mix-blend-mode: difference; /* Inversión por defecto */
+        display: flex; justify-content: center; align-items: center;
+    }
+    
+    #cursor span { 
+        opacity: 0; 
+        font-size: 10px; font-weight: 800; color: white; 
+        font-family: 'Syncopate', sans-serif; letter-spacing: 1px;
+        pointer-events: none;
+    }
 
-        /* --- FONDOS Y CAPAS --- */
-        .desert-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; animation: slowZoom 60s infinite alternate; pointer-events: none; }
-        @keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.15); } }
-        
-        .desert-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%); z-index: 1; pointer-events: none; }
-        .cinematic-fade { position: absolute; inset: 0; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 20%, transparent 80%, #050200 100%); pointer-events: none; }
+    /* ESTADO: AUDIO (EL ROJO IMPORTANTE) */
+    #cursor.audio-mode { 
+        width: 90px !important; 
+        height: 90px !important; 
+        background: #FF3B3B !important; /* Rojo Forzado */
+        border: none !important;
+        mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */            
+        opacity: 1 !important;
+        box-shadow: 0 4 30px rgba(255, 59, 59, 0.5) !important;            
+    }
+    
+   #cursor.audio-mode span {         
+    opacity: 1 !important; 
+    color: white !important;
+    font-weight: 800;
+    font-size: 12px;
+  }
+/* ESTADO: HOVER SIMPLE */
+#cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
 
-        /* --- TARJETAS --- */
-        .cards-container { position: relative; z-index: 10; }
-        .tilt-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
-        .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }
-        .play-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: white; }
-        .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
+/* ESTADO: SUEÑOS */
+    #cursor.dream-mode { width: 150px; height: 150px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); mix-blend-mode: normal; }
 
-        /* --- IDENTIDAD SCROLL --- */
-        .horizontal-container { width: 400%; height: 100vh; display: flex; flex-wrap: nowrap; }
-        .panel { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 4rem; border-right: 1px solid rgba(255,255,255,0.05); }
-        .cinematic-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; filter: contrast(1.1) saturate(1.2); }
-        .text-protection { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: 1; }
-        .panel-fade { position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 15%, transparent 85%, #050200 100%); }
 
-        /* --- JEPIRA --- */
-        #jepira-section { position: relative; background-color: transparent !important; z-index: 20; overflow: hidden; }
-        #cosmos-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%); opacity: 0; transition: opacity 1s ease; z-index: -1; pointer-events: none; }
+  /* ESTADO: VIDEO */
+    #cursor.video-mode { 
+        width: 100px; 
+        height: 100px; 
+        background: white; 
+        mix-blend-mode: difference; 
+    }
+    #cursor.video-mode span { 
+        opacity: 1; 
+        color: black; /* Texto negro sobre fondo blanco */
+    }
+ 
 
-        /* --- ECUALIZADOR --- */
-        @keyframes equalize { 0% { height: 3px; } 50% { height: 100%; } 100% { height: 3px; } }
-        .bar { width: 3px; background-color: currentColor; border-radius: 9999px; animation: equalize 1s infinite ease-in-out; }
-        .bar:nth-child(1) { animation-delay: -0.4s; height: 60%; }
-        .bar:nth-child(2) { animation-delay: -0.2s; height: 100%; }
-        .bar:nth-child(3) { animation-delay: -0.6s; height: 40%; }
-        .bar:nth-child(4) { animation-delay: -0.8s; height: 80%; }
-        .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
+    /* UTILIDADES VISUALES */
+    #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+    
+    .giant-text {
+        font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
+    }
+    .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
 
-        /* UTILS */
-        .hero-video-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5; filter: contrast(1.1) brightness(0.8); mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--c-bg); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s ease, visibility 0.5s ease; }
-        .loader-line { width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear; }
-        #main-content { opacity: 0; transition: opacity 1.5s ease; }
-        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
-        ::-webkit-scrollbar { width: 0px; }
+    .hero-video-bg {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        opacity: 0.5; filter: contrast(1.1) brightness(0.8);
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    }
+
+    /* TILT CARDS */
+ /*   .tilt-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform-style: preserve-3d;
+        transform: perspective(1000px);
+        transition: all 0.3s ease;
+    }*/
+   /* .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }*/
+    .tilt-inner { transform: translateZ(20px); }        
+    
+    /* LOADER */
+    .loader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--c-bg); z-index: 10000;
+        display: flex; justify-content: center; align-items: center; flex-direction: column;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .loader-line {
+        width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear;
+    }
+    
+    /* Estado inicial del contenido principal */
+    #main-content {
+        opacity: 0;
+        transition: opacity 1.5s ease;
+    }
+
+    .cosmos-bg {
+        position: absolute; inset: 0; background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
+        opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
+    }
+    
+     /* PLAY BUTTON */
+    .play-btn {
+        width: 48px; height: 48px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.3);
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.3s;
+    }
+    .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
+
+    ::-webkit-scrollbar { width: 0px; }
+
+    /* --- ECUALIZADOR ANIMADO --- */
+    @keyframes equalize {
+        0% { height: 3px; }
+        50% { height: 100%; }
+        100% { height: 3px; }
+    }
+    
+    .bar {
+        width: 3px;
+        background-color: currentColor; /* Hereda el color del texto */
+        border-radius: 9999px;
+        animation: equalize 1s infinite ease-in-out;
+    }
+    
+    /* Retrasos para que parezca aleatorio */
+    .bar:nth-child(1) { animation-delay: -0.4s; height: 60%; }
+    .bar:nth-child(2) { animation-delay: -0.2s; height: 100%; }
+    .bar:nth-child(3) { animation-delay: -0.6s; height: 40%; }
+    .bar:nth-child(4) { animation-delay: -0.8s; height: 80%; }
+    
+    /* Estado Pausado (opcional, si quieres que se detengan al pausar) */
+    .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
+
+    /* --- FONDO CINEMÁTICO --- */
+    .desert-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        /* Efecto de Zoom lento constante para dar vida */
+        animation: slowZoom 60s infinite alternate;
+    }
+    
+    @keyframes slowZoom {
+        from { transform: scale(1); }
+        to { transform: scale(1.15); }
+    }
+    
+    /* Capa oscura para garantizar lectura */
+    .desert-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+            /* --- TARJETAS CRISTAL (MIRAGE EFFECT) --- */
+    .tilt-card {
+        /* Fondo semi-transparente oscuro */
+        background: rgba(0, 0, 0, 0.4); 
+        /* Desenfoque fuerte para suavizar el fondo */
+        backdrop-filter: blur(20px); 
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+        z-index: 10; /* Encima del fondo */
+    }
+    
+    /* AL HACER HOVER O REPRODUCIR */
+    .tilt-card:hover, .tilt-card.playing {
+        /* Se vuelve más transparente para ver el desierto detrás */
+        background: rgba(255, 255, 255, 0.05); 
+        backdrop-filter: blur(5px); /* Menos desenfoque = Más nitidez del fondo */
+        border-color: var(--c-sand);
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    
+    /* Texto Wayuunaiki más brillante para contrastar */
+    .tilt-card h3 { text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+    /* --- DEGRADADO DE BORDES (CINEMATIC FADE) --- */
+    .cinematic-fade {
+        position: absolute;
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        pointer-events: none; /* Permite dar clic a través de ella */
+        z-index: 2; /* Se coloca encima de la imagen y del overlay oscuro */
+        background: linear-gradient(
+            to bottom,
+            #050200 0%,        /* Negro arriba */
+            transparent 20%,   /* Se vuelve transparente al bajar */
+            transparent 80%,   /* Se mantiene transparente */
+            #050200 100%       /* Vuelve a negro abajo */
+        );
+    }
+
+     /* HORIZONTAL SCROLL (IDENTITY) */
+    .horizontal-container {
+        width: 400%; /* 4 Paneles */
+        height: 100vh;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    .panel {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 4rem;
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+    .panel-bg {
+        position: absolute; inset: 0; z-index: 0;
+        filter: brightness(0.4) grayscale(0.5);
+        transition: transform 0.5s;
+    }
+    .panel:hover .panel-bg { transform: scale(1.02); filter: brightness(0.5) grayscale(0.2); }
+
+     /* JEPIRA (COSMOS) */
+    .warp-speed-effect {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at center, transparent 0%, #000 90%);
+        z-index: 1;
+    }
+
+    /* --- MEJORA DE VIDEO (MÁS LUZ Y COLOR) --- */
+.cinematic-video {
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0.9; /* Subimos de 0.6 a 0.9 (Mucho más visible) /
+filter: contrast(1.1) saturate(1.2); / Realza los colores del desierto */
+transition: opacity 0.5s ease;
+}
+
+/* --- CONTINUIDAD (BORDES FUNDIDOS) --- */
+/* Esto crea el degradado negro arriba y abajo para que no se note el corte /
+.panel-fade {
+position: absolute;
+inset: 0;
+pointer-events: none; / Permite dar clic a través /
+z-index: 2;
+background: linear-gradient(
+to bottom,
+#050200 0%,         / Negro arriba (fusión con sección anterior) /
+transparent 15%,    / Transparente rápido para ver el video /
+transparent 85%,    / Se mantiene transparente /
+#050200 100%        / Negro abajo (fusión con footer/siguiente) */
+);
+}
+/* --- SOMBRA SOLO DETRÁS DEL TEXTO --- /
+/ En lugar de oscurecer todo el video, oscurecemos solo donde va el texto */
+.text-protection {
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+z-index: 1;
+}
+/* JEPIRA: Fondo transparente para ver el Canvas /
+#jepira-section {
+position: relative;
+background-color: transparent !important; / Forzar transparencia /
+z-index: 20;
+overflow: hidden; / Evita scrollbars si las estrellas se salen */
+}
+/* El degradado azul cósmico (Sutil) /
+#cosmos-overlay {
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%);
+opacity: 0;
+transition: opacity 1s ease;
+z-index: -1; / Detrás del texto */
+pointer-events: none;
+}
     </style>
 </head>
 <body>
