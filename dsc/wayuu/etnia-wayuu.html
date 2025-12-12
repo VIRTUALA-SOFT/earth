@@ -345,24 +345,53 @@ pointer-events: none;
     </audio>
 
     <!-- NAV BAR -->
-    <nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
-        <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">NACIÓN WAYUU</div>
-        <div class="flex items-center gap-6">
-            <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
-                <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
-                <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                    <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                    <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                </div>
-            </button>
-            <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
-                <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
-                <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
-                    <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
-                    <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
-                </div>
-            </button>
+  <!-- NAV BAR (Fija) -->
+<nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
+    
+    <!-- GRUPO IZQUIERDA: Logo + Volver -->
+    <div class="flex items-center gap-6 md:gap-8">
+        
+        <!-- Logo -->
+        <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">
+            NACIÓN WAYUU
         </div>
+
+        <!-- Separador Vertical (Sutil) -->
+        <div class="h-4 w-[1px] bg-white/20 hidden md:block"></div>
+
+        <!-- BOTÓN VOLVER (Premium) -->
+        <!-- hover-trigger: Para que el cursor reaccione -->
+        <a href="javascript:history.back()" class="hover-trigger group flex items-center gap-3 text-[10px] font-mono tracking-widest text-white/60 hover:text-[#C89F65] transition-colors duration-300">
+            <!-- Flecha animada -->
+            <span class="transform group-hover:-translate-x-1 transition-transform duration-300 text-lg leading-none pb-1">←</span>
+            <span class="uppercase">Volver al Globo</span>
+        </a>
+
+    </div>
+
+    <!-- GRUPO DERECHA: Sonido + Menú -->
+    <div class="flex items-center gap-6">
+        
+        <!-- BOTÓN SONIDO -->
+        <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+            <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
+            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </div>
+        </button>
+
+        <!-- BOTÓN MENÚ -->
+        <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+            <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
+            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
+                <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
+                <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+            </div>
+        </button>
+
+    </div>
+</nav>
     </nav>
 
     <!-- OVERLAY MENÚ -->
