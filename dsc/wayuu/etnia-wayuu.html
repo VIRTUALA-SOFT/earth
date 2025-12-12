@@ -285,18 +285,18 @@ transition: opacity 0.5s ease;
 }
 
 /* --- CONTINUIDAD (BORDES FUNDIDOS) --- */
-/* Esto crea el degradado negro arriba y abajo para que no se note el corte /
+/* Esto crea el degradado negro arriba y abajo para que no se note el corte */
 .panel-fade {
 position: absolute;
 inset: 0;
-pointer-events: none; / Permite dar clic a través /
+pointer-events: none; /* Permite dar clic a través */
 z-index: 2;
 background: linear-gradient(
 to bottom,
-#050200 0%,         / Negro arriba (fusión con sección anterior) /
-transparent 15%,    / Transparente rápido para ver el video /
-transparent 85%,    / Se mantiene transparente /
-#050200 100%        / Negro abajo (fusión con footer/siguiente) */
+#050200 0%,         /* Negro arriba (fusión con sección anterior) */
+transparent 15%,    /* Transparente rápido para ver el video */
+transparent 85%,    /* Se mantiene transparente */
+#050200 100%        /* Negro abajo (fusión con footer/siguiente) */
 );
 }
 /* --- SOMBRA SOLO DETRÁS DEL TEXTO --- /
@@ -307,14 +307,14 @@ inset: 0;
 background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
 z-index: 1;
 }
-/* JEPIRA: Fondo transparente para ver el Canvas /
+/* JEPIRA: Fondo transparente para ver el Canvas */
 #jepira-section {
 position: relative;
 background-color: transparent !important; / Forzar transparencia /
 z-index: 20;
 overflow: hidden; / Evita scrollbars si las estrellas se salen */
 }
-/* El degradado azul cósmico (Sutil) /
+/* El degradado azul cósmico (Sutil) */
 #cosmos-overlay {
 position: absolute;
 inset: 0;
@@ -324,7 +324,7 @@ transition: opacity 1s ease;
 z-index: -1; / Detrás del texto */
 pointer-events: none;
 }
-    </style>
+</style>
 </head>
 <body>
 
