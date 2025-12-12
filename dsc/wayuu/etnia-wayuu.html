@@ -326,41 +326,38 @@
         </div>
     </div>
     
-   <!-- AUDIO DE FONDO (Loop) -->
-<!-- Usamos un sonido de viento/atmósfera del desierto -->
+<!-- AUDIO DE FONDO -->
 <audio id="bg-music" loop>
     <source src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Ambience_Wind_Blowing_Through_Grass.ogg" type="audio/ogg">
 </audio>
 
-<!-- NAV BAR (Fija) -->
-<nav class="fixed top-8 left-8 right-8 z-50 flex justify-between items-center mix-blend-difference text-white">
+<!-- NAV BAR -->
+<nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
     
-    <!-- LOGO / NOMBRE -->
-    <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+    <!-- LOGO -->
+    <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">
         NACIÓN WAYUU
     </div>
 
-    <!-- CONTROLES DERECHA (Sonido + Menú) -->
+    <!-- CONTROLES -->
     <div class="flex items-center gap-6">
         
         <!-- BOTÓN SONIDO -->
-        <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest">
+        <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
             <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
             <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                <!-- Icono Speaker Off (Inicial) -->
+                <!-- Icono Mute (Visible al inicio) -->
                 <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                <!-- Icono Speaker On (Oculto) -->
+                <!-- Icono Sound (Oculto) -->
                 <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
             </div>
         </button>
 
-        <!-- BOTÓN MENÚ (Hamburguesa) -->
-        <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest">
+        <!-- BOTÓN MENÚ -->
+        <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
             <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
             <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
-                <!-- Línea Menú -->
                 <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
-                <!-- X de cerrar (Absoluta) -->
                 <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </div>
@@ -370,25 +367,20 @@
     </div>
 </nav>
 
-<!-- OVERLAY MENÚ DE NAVEGACIÓN (Pantalla completa) -->
+<!-- OVERLAY MENÚ (Corregido el corte de letras) -->
 <div id="menu-overlay" class="fixed inset-0 bg-[#050200] z-[90] hidden flex flex-col justify-center items-center opacity-0 transition-opacity duration-500">
-    <ul class="text-center space-y-8">
-        <li class="overflow-hidden">
-            <a href="#" onclick="closeMenu(); lenis.scrollTo('#main-content')" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-full">Origen</a>
-        </li>
-        <li class="overflow-hidden">
-            <a href="#" onclick="closeMenu(); lenis.scrollTo('#identity-section')" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-full">Identidad</a>
-        </li>
-        <li class="overflow-hidden">
-            <a href="#" onclick="closeMenu(); lenis.scrollTo('#weaving-container')" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-full">El Tejido</a>
-        </li>
-        <li class="overflow-hidden">
-            <a href="#" onclick="closeMenu(); lenis.scrollTo('.desert-bg')" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-full">Wayuunaiki</a>
-        </li>
-        <li class="overflow-hidden">
-            <a href="#" onclick="closeMenu(); lenis.scrollTo('#jepira-section')" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-full">Jepira</a>
-        </li>
+    <ul class="text-center space-y-4 md:space-y-8">
+        <!-- Quitada la clase overflow-hidden para que se vean las letras completas -->
+        <li><a href="#main-content" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Origen</a></li>
+        <li><a href="#identity-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Identidad</a></li>
+        <li><a href="#weaving-container" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">El Tejido</a></li>
+        <li><a href=".desert-bg" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Wayuunaiki</a></li>
+        <li><a href="#jepira-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Jepira</a></li>
     </ul>
+    <div class="absolute bottom-10 text-center opacity-50">
+        <p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p>
+    </div>
+</div>
     
     <div class="absolute bottom-10 text-center opacity-50">
         <p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p>
@@ -823,11 +815,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-  <script>
-    // --- 1. FUNCIONES GLOBALES ---
+<script>
+    // ==========================================
+    // 1. VARIABLES Y FUNCIONES GLOBALES
+    // ==========================================
+    let lenis; // Instancia global de scroll
     gsap.registerPlugin(ScrollTrigger);
 
-    // Sistema de Audio
+    // --- SISTEMA DE AUDIO (TARJETAS) ---
+    // Esta función debe ser global porque se llama desde el HTML (onclick)
     function playRealAudio(id) {
         const allAudios = document.querySelectorAll('audio');
         const targetAudio = document.getElementById(id);
@@ -835,11 +831,13 @@
         const targetEq = document.getElementById(`eq-${id}`);
         const targetCard = document.getElementById(`card-${id}`); 
         
+        // Iconos SVG
         const playIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
         const pauseIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     
         if (!targetAudio) return;
     
+        // A. Si ya está sonando este audio -> PAUSAR
         if (!targetAudio.paused) {
             targetAudio.pause();
             if(targetBtn) targetBtn.innerHTML = playIcon;
@@ -848,7 +846,10 @@
             return;
         }
     
+        // B. Si es otro audio -> RESETEAR TODOS (menos música de fondo)
         allAudios.forEach(audio => {
+            if(audio.id === 'bg-music') return; // Ignorar música de fondo
+            
             audio.pause();
             audio.currentTime = 0;
             const btn = document.getElementById(`btn-${audio.id}`);
@@ -860,13 +861,15 @@
             if(card) card.classList.remove('playing');
         });
     
-        targetAudio.volume = 0.6;
+        // C. REPRODUCIR EL ELEGIDO
+        targetAudio.volume = 0.8;
         targetAudio.play().then(() => {
             if(targetBtn) targetBtn.innerHTML = pauseIcon;
             if(targetEq) { targetEq.classList.remove('opacity-0'); targetEq.classList.add('opacity-100'); }
             if(targetCard) targetCard.classList.add('playing');
-        }).catch(e => console.log("Interacción requerida"));
+        }).catch(e => console.log("Interacción requerida para audio"));
     
+        // D. AL TERMINAR
         targetAudio.onended = () => {
             if(targetBtn) targetBtn.innerHTML = playIcon;
             if(targetEq) { targetEq.classList.remove('opacity-100'); targetEq.classList.add('opacity-0'); }
@@ -874,22 +877,23 @@
         };
     }
 
-    // Sistema de Carga
+    // --- SISTEMA DE CARGA (FAILSAFE) ---
     function revealSite() {
         const loader = document.getElementById('loader');
         const main = document.getElementById('main-content');
         const canvas = document.getElementById('global-canvas');
+        
         if (loader.style.opacity === '0') return; 
+
         try {
-            if (typeof gsap !== 'undefined') {
-                const tl = gsap.timeline();
-                tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
-                  .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
-                  .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
-                  .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
-                  .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
-            } else { throw new Error("GSAP no cargó"); }
+            const tl = gsap.timeline();
+            tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
+              .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
+              .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
+              .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
+              .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
         } catch (e) {
+            // Fallback si GSAP falla
             loader.style.opacity = 0;
             setTimeout(() => { loader.style.display = 'none'; }, 500);
             main.style.opacity = 1;
@@ -897,7 +901,9 @@
         }
     }
 
-    // --- 2. INICIALIZACIÓN ---
+    // ==========================================
+    // 2. INICIALIZACIÓN (DOM READY)
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
         
         // A. LOADER
@@ -908,36 +914,44 @@
             if(loaderBar) loaderBar.style.width = `${progress}%`;
             if(progress >= 100) { clearInterval(interval); revealSite(); }
         }, 50);
-        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
+        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 3500);
 
-        // B. CURSOR Y LÓGICA DE TARJETAS
-         const cursor = document.getElementById('cursor');
+        // B. LENIS (SCROLL SUAVE)
+        if (typeof Lenis !== 'undefined') {
+            lenis = new Lenis({ duration: 1.5, smoothWheel: true });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        }
+
+        // C. CURSOR (INTERACCIÓN VISUAL)
+        const cursor = document.getElementById('cursor');
         const cursorText = document.getElementById('cursor-text');
 
         window.addEventListener('mousemove', (e) => {
             gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
         });
 
-        // Función Limpia Estados
+        // Función Helper
         const resetCursor = () => {
-            cursor.className = '';
+            cursor.className = ''; 
             cursorText.innerText = "";
         };
 
-        // LISTENER DE TARJETAS (Arreglado para el ROJO)
-        const cards = document.querySelectorAll('.tilt-card');
-        cards.forEach(card => {
+        // 1. Tarjetas de Audio (CURSOR ROJO)
+        document.querySelectorAll('.tilt-card').forEach(card => {
             card.addEventListener('mouseenter', () => {
                 resetCursor();
                 cursor.classList.add('audio-mode');
                 cursorText.innerText = "OÍR";
             });
-            card.addEventListener('mouseleave', () => {
-                resetCursor();
-            });
+            card.addEventListener('mouseleave', () => resetCursor());
+            
+            // Efecto click
+            card.addEventListener('mousedown', () => gsap.to(cursor, { scale: 0.9, duration: 0.1 }));
+            card.addEventListener('mouseup', () => gsap.to(cursor, { scale: 1, duration: 0.1 }));
         });
 
-        // Otros Listeners
+        // 2. General
         document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
             el.addEventListener('mouseenter', (e) => {
                 if(!e.target.closest('.tilt-card')) { // Evitar conflicto
@@ -948,17 +962,84 @@
             el.addEventListener('mouseleave', () => resetCursor());
         });
 
-
-        // Video
-        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText="VER"; });
+        // 3. Zonas Específicas
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText = "VER"; });
         document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => resetCursor());
-
-        // Lapu
+        
         document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
         document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
 
+        // D. MENÚ Y SONIDO DE FONDO (Nav Bar)
+        const soundBtn = document.getElementById('sound-btn');
+        const bgMusic = document.getElementById('bg-music');
+        const iconMute = document.getElementById('icon-mute');
+        const iconSound = document.getElementById('icon-sound');
+        const soundText = document.getElementById('sound-text');
+        
+        // Lógica Sonido Fondo
+        let isBgPlaying = false;
+        if(soundBtn && bgMusic) {
+            bgMusic.volume = 0.2;
+            soundBtn.addEventListener('click', () => {
+                if(!isBgPlaying) {
+                    bgMusic.play().then(() => {
+                        isBgPlaying = true;
+                        iconMute.classList.add('hidden');
+                        iconSound.classList.remove('hidden');
+                        soundText.innerText = "ON";
+                    }).catch(e => console.log("Navegador bloqueó audio automático"));
+                } else {
+                    bgMusic.pause();
+                    isBgPlaying = false;
+                    iconMute.classList.remove('hidden');
+                    iconSound.classList.add('hidden');
+                    soundText.innerText = "OFF";
+                }
+            });
+        }
 
-        // C. SCROLL HORIZONTAL
+        // Lógica Menú Desplegable
+        const menuBtn = document.getElementById('menu-btn');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const hamLine = document.getElementById('hamburger-line');
+        const closeX = document.getElementById('close-x');
+        const menuLinks = document.querySelectorAll('.menu-link');
+        let isMenuOpen = false;
+
+        function toggleMenu() {
+            if(!isMenuOpen) {
+                menuOverlay.classList.remove('hidden');
+                gsap.to(menuOverlay, {opacity: 1, duration: 0.5});
+                gsap.to(menuLinks, {y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out"});
+                hamLine.classList.add('opacity-0');
+                closeX.classList.remove('opacity-0', 'scale-50');
+            } else {
+                gsap.to(menuLinks, {y: 50, opacity: 0, duration: 0.3});
+                gsap.to(menuOverlay, {opacity: 0, duration: 0.5, delay: 0.1, onComplete: () => menuOverlay.classList.add('hidden')});
+                hamLine.classList.remove('opacity-0');
+                closeX.classList.add('opacity-0', 'scale-50');
+            }
+            isMenuOpen = !isMenuOpen;
+        }
+
+        if(menuBtn) menuBtn.addEventListener('click', toggleMenu);
+
+        // Navegación interna desde Menú
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                toggleMenu(); // Cerrar menú
+                // Usar Lenis para scroll suave
+                if(href === '.desert-bg') { // Caso especial para Wayuunaiki
+                     lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
+                } else {
+                     lenis.scrollTo(href);
+                }
+            });
+        });
+
+        // E. SCROLL HORIZONTAL (IDENTIDAD)
         const panels = gsap.utils.toArray(".panel");
         const container = document.getElementById("horizontal-wrapper");
         if(panels.length > 0 && container) {
@@ -966,11 +1047,14 @@
                 xPercent: -100 * (panels.length - 1),
                 ease: "none",
                 scrollTrigger: {
-                    trigger: "#identity-section", pin: true, scrub: 1,
-                    snap: 1 / (panels.length - 1), end: () => "+=" + container.offsetWidth
+                    trigger: "#identity-section",
+                    pin: true,
+                    scrub: 1,
+                    snap: 1 / (panels.length - 1),
+                    end: () => "+=" + container.offsetWidth
                 }
             });
-            // Cursor Drag para Identidad
+            // Cursor especial para Identidad
             const idSection = document.getElementById('identity-section');
             if(idSection) {
                 idSection.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('hovered'); cursorText.innerText = "DESLIZA"; });
@@ -978,12 +1062,12 @@
             }
         }
 
-        // D. TILT
+        // F. TILT EFECTO
         if (typeof VanillaTilt !== 'undefined') {
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-        // E. THREE.JS GLOBAL
+        // G. THREE.JS GLOBAL + JEPIRA
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
@@ -1035,8 +1119,8 @@
             };
             animate();
 
-            // Jepira
-            if(typeof gsap !== 'undefined' && document.getElementById('cosmos-overlay')) {
+            // Animación Jepira
+            if(document.getElementById('cosmos-overlay')) {
                 ScrollTrigger.create({
                     trigger: "#jepira-section", start: "top center",
                     onEnter: () => {
@@ -1055,302 +1139,5 @@
                     },
                     onLeaveBack: () => {
                          gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                         gsap.to({v:10}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                         const c = geometry.attributes.color.array;
-                         const obj = {t:0};
-                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
-                            for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
-                            }
-                            geometry.attributes.color.needsUpdate = true;
-                         }});
-                    }
-                });
-            }
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
-        initGlobalThree();
-
-        // F. THREE.JS WEAVING
-        (function() {
-            const container = document.getElementById('weaving-container');
-            if(!container) return;
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050200, 0.002);
-            const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
-            camera.position.z = 15;
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
-            const group = new THREE.Group();
-            scene.add(group);
-            const pCount = 300;
-            const pData = [];
-            const pGeo = new THREE.BufferGeometry();
-            const pPos = new Float32Array(pCount*3);
-            for(let i=0; i<pCount; i++) {
-                const theta = Math.random()*Math.PI*2;
-                const phi = Math.acos((Math.random()*2)-1);
-                const r = 6;
-                pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
-                pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
-                pPos[i*3+2] = r*Math.cos(phi);
-                pData.push({ vel: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiplyScalar(0.02), con:0 });
-            }
-            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
-            const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
-            group.add(points);
-            const lGeo = new THREE.BufferGeometry();
-            const lPos = new Float32Array(pCount*pCount*3);
-            const lCol = new Float32Array(pCount*pCount*3);
-            lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3).setUsage(THREE.DynamicDrawUsage));
-            lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
-            const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
-            group.add(lines);
-            let mx=0, my=0;
-            container.addEventListener('mousemove', e => {
-                mx = ((e.clientX - container.getBoundingClientRect().left)/container.clientWidth)*2-1;
-                my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
-            });
-            const animate = () => {
-                group.rotation.x += 0.002 + my*0.01;
-                group.rotation.y += 0.002 + mx*0.01;
-                let vPos=0, cPos=0, con=0;
-                for(let i=0; i<pCount; i++) pData[i].con=0;
-                for(let i=0; i<pCount; i++) {
-                    pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
-                    const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
-                    if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
-                    if(pData[i].con>=3) continue;
-                    for(let j=i+1; j<pCount; j++) {
-                        if(pData[j].con>=3) continue;
-                        const dx = pPos[i*3]-pPos[j*3], dy = pPos[i*3+1]-pPos[j*3+1], dz = pPos[i*3+2]-pPos[j*3+2];
-                        const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
-                        if(dist<2.5) {
-                            pData[i].con++; pData[j].con++;
-                            lPos[vPos++]=pPos[i*3]; lPos[vPos++]=pPos[i*3+1]; lPos[vPos++]=pPos[i*3+2];
-                            lPos[vPos++]=pPos[j*3]; lPos[vPos++]=pPos[j*3+1]; lPos[vPos++]=pPos[j*3+2];
-                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
-                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
-                            con++;
-                        }
-                    }
-                }
-                lines.geometry.setDrawRange(0, con*2);
-                lines.geometry.attributes.position.needsUpdate = true;
-                lines.geometry.attributes.color.needsUpdate = true;
-                points.geometry.attributes.position.needsUpdate = true;
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            };
-            animate();
-        })();
-
-        // G. THREE.JS SHADER (SUEÑOS)
-        (function() {
-            const container = document.getElementById('dream-canvas-container');
-            if(!container) return;
-            const scene = new THREE.Scene();
-            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            const renderer = new THREE.WebGLRenderer({ alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-            function createTextTexture() {
-                const cvs = document.createElement('canvas');
-                cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-                const ctx = cvs.getContext('2d');
-                const cx = cvs.width/2, cy = cvs.height/2;
-                ctx.font = "italic 700 18vw 'Playfair Display'"; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText("LAPÜ", cx, cy);
-                ctx.font = "300 1.5vw 'Manrope'"; ctx.fillStyle = "#C89F65";
-                ctx.fillText("Los ancestros hablan cuando cierras los ojos", cx, cy + (cvs.width * 0.15));
-                return new THREE.CanvasTexture(cvs);
-            }
-            const material = new THREE.ShaderMaterial({
-                uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0.5,0.5)}, uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, uTexture: {value: createTextTexture()} },
-                vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
-                fragmentShader: `
-                    uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
-                    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
-                    float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
-                    void main(){
-                        vec2 uv = vUv; vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
-                        float dist = distance(uv*ratio, uMouse*ratio);
-                        float fog = snoise(uv*ratio*3.0 - uTime*0.1)*0.5 + snoise(uv*ratio*8.0 + uTime*0.05)*0.2;
-                        float reveal = smoothstep(0.25, 0.1, dist + fog*0.2);
-                        vec4 tex = texture2D(uTexture, uv + vec2(fog*0.1*(1.0-reveal)));
-                        vec3 col = mix(vec3(0.0,0.0,0.05), tex.rgb, reveal*tex.a);
-                        col += vec3(0.8,0.6,0.2) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.2;
-                        gl_FragColor = vec4(col, 1.0);
-                    }
-                `
-            });
-            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
-            const clock = new THREE.Clock();
-            const mouse = new THREE.Vector2(0.5,0.5);
-            window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/window.innerWidth; mouse.y=1.0-e.clientY/window.innerHeight; });
-            const animate = () => {
-                material.uniforms.uTime.value = clock.getElapsedTime();
-                material.uniforms.uMouse.value.lerp(mouse, 0.1);
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            };
-            animate();
-            window.addEventListener('resize', ()=>{
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-                material.uniforms.uTexture.value = createTextTexture();
-            });
-        })();
-
-        // I. SMOOTH SCROLL (LENIS)
-        if (typeof Lenis !== 'undefined') {
-            const lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-            requestAnimationFrame(raf);
-        }
-    });
-
-      // --- YOUTUBE API LOOP CONTROL (Segmento 0s - 42s) ---
-    
-    // 1. Cargar la API de Iframe de YouTube de forma asíncrona
-    var tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    // 2. Esta función se ejecuta automáticamente cuando la API está lista
-    var player;
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('yonna-player', {
-            videoId: 'yJMXzvZEZlQ', // ID de tu video
-            playerVars: {
-                'autoplay': 1,
-                'controls': 0,
-                'mute': 1,        // Obligatorio para autoplay
-                'rel': 0,         // Sin videos relacionados
-                'showinfo': 0,
-                'modestbranding': 1,
-                'disablekb': 1,
-                'fs': 0,
-                'playsinline': 1,
-                'loop': 1,
-                'playlist': 'yJMXzvZEZlQ' // Respaldo de loop nativo
-            },
-            events: {
-                'onReady': onPlayerReady
-            }
-        });
-    }
-
-    // 3. Cuando el video está listo, iniciar y activar el monitor de tiempo
-    function onPlayerReady(event) {
-        event.target.playVideo();
-        checkVideoTime();
-    }
-
-    // 4. Bucle de monitoreo preciso (Loop manual en seg 42)
-    function checkVideoTime() {
-        if (player && player.getCurrentTime) {
-            var currentTime = player.getCurrentTime();
-            // Si pasa del segundo 42, rebobinar a 0
-            if (currentTime >= 42) {
-                player.seekTo(0);
-            }
-        }
-        // Ejecutar esta revisión en cada frame de animación para máxima precisión
-        requestAnimationFrame(checkVideoTime);
-    }
-
-
-      // --- 5. LÓGICA DE MENÚ Y SONIDO (NUEVO) ---
-
-    // A. CONTROL DE SONIDO AMBIENTAL
-    const soundBtn = document.getElementById('sound-btn');
-    const bgMusic = document.getElementById('bg-music');
-    const iconMute = document.getElementById('icon-mute');
-    const iconSound = document.getElementById('icon-sound');
-    const soundText = document.getElementById('sound-text');
-    let isPlaying = false;
-
-    if(soundBtn && bgMusic) {
-        bgMusic.volume = 0.3; // Volumen suave (30%)
-
-        soundBtn.addEventListener('click', () => {
-            if(!isPlaying) {
-                bgMusic.play().then(() => {
-                    isPlaying = true;
-                    iconMute.classList.add('hidden');
-                    iconSound.classList.remove('hidden');
-                    soundText.innerText = "Sound On";
-                }).catch(e => console.log("Audio prevent: user interaction needed"));
-            } else {
-                bgMusic.pause();
-                isPlaying = false;
-                iconMute.classList.remove('hidden');
-                iconSound.classList.add('hidden');
-                soundText.innerText = "Sound Off";
-            }
-        });
-    }
-
-    // B. CONTROL DE MENÚ (OVERLAY)
-    const menuBtn = document.getElementById('menu-btn');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const hamburgerLine = document.getElementById('hamburger-line');
-    const closeX = document.getElementById('close-x');
-    const menuLinks = document.querySelectorAll('.menu-link');
-    let isMenuOpen = false;
-
-    // Función para abrir/cerrar
-    function toggleMenu() {
-        if (!isMenuOpen) {
-            // ABRIR
-            menuOverlay.classList.remove('hidden');
-            // Animación de Fade In del fondo
-            gsap.to(menuOverlay, { opacity: 1, duration: 0.5 });
-            
-            // Animación de enlaces (Stagger: uno por uno hacia arriba)
-            gsap.to(menuLinks, { y: 0, duration: 0.8, stagger: 0.1, ease: "power4.out", delay: 0.2 });
-            
-            // Transformar icono a X
-            hamburgerLine.classList.add('opacity-0');
-            closeX.classList.remove('opacity-0', 'scale-50');
-            closeX.classList.add('scale-100');
-            
-        } else {
-            closeMenu();
-        }
-        isMenuOpen = !isMenuOpen;
-    }
-
-    // Función Global para cerrar (usada al hacer click en enlaces)
-    window.closeMenu = function() {
-        // CERRAR
-        gsap.to(menuLinks, { y: '100%', duration: 0.5, ease: "power2.in" });
-        
-        gsap.to(menuOverlay, { opacity: 0, duration: 0.5, delay: 0.2, onComplete: () => {
-            menuOverlay.classList.add('hidden');
-        }});
-
-        // Transformar icono a Línea
-        hamburgerLine.classList.remove('opacity-0');
-        closeX.classList.add('opacity-0', 'scale-50');
-        closeX.classList.remove('scale-100');
-        isMenuOpen = false;
-    };
-
-    if(menuBtn) {
-        menuBtn.addEventListener('click', toggleMenu);
-    }
-      
-</script>
-    
 </body>
 </html>
