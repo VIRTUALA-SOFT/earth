@@ -61,11 +61,21 @@
             width: 90px !important; 
             height: 90px !important; 
             background: #FF3B3B !important; /* Rojo Forzado */
+            border: none !important;
             mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 10px 30px rgba(255, 59, 59, 0.4);
+            mix-blend-mode: normal !important; /* CRUCIAL: Para que no se invierta el color */
+            opacity: 1 !important;
+            box-shadow: 0 0 30px rgba(255, 59, 59, 0.6) !important;
+            transform: translate(-50%, -50%) scale(1.1) !important;
         }
-        #cursor.audio-mode span { opacity: 1; }
+        
+       #cursor.audio-mode span { 
+        display: block !important;
+        opacity: 1 !important; 
+        color: white !important;
+        font-weight: 800;
+        font-size: 12px;
+      }
         
    /* ESTADO: HOVER SIMPLE */
         #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
@@ -761,10 +771,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-    <script>
+  <script>
     // --- 1. FUNCIONES GLOBALES (Accesibles desde HTML) ---
     
-    // Sistema de Audio
+    gsap.registerPlugin(ScrollTrigger);
+
     function playRealAudio(id) {
         const allAudios = document.querySelectorAll('audio');
         const targetAudio = document.getElementById(id);
@@ -844,10 +855,9 @@
         }
     }
 
-    // --- 2. INICIALIZACIÓN (Cuando el DOM está listo) ---
+    // --- 2. INICIALIZACIÓN DOM ---
     document.addEventListener('DOMContentLoaded', () => {
-        if(typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
-
+        
         // A. LOADER
         const loaderBar = document.getElementById('loader-bar');
         let progress = 0;
@@ -876,21 +886,27 @@
             if(cursorText) cursorText.innerText = text;
         };
 
-        // Listeners Cursor
-        document.querySelectorAll('.audio-trigger').forEach(el => {
+        // Listeners Cursor (Tarjetas - IMPORTANTE PARA EL ROJO)
+        document.querySelectorAll('.tilt-card').forEach(el => {
             el.addEventListener('mouseenter', () => setCursor('audio-mode', 'OÍR'));
             el.addEventListener('mouseleave', () => setCursor(''));
         });
+
+        // Listeners Generales
         document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
             el.addEventListener('mouseenter', () => setCursor('hovered'));
             el.addEventListener('mouseleave', () => setCursor(''));
         });
+        
+        // Video
         document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => setCursor('video-mode', 'VER'));
         document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => setCursor(''));
+
+        // Lapu
         document.getElementById('lapu-section')?.addEventListener('mouseenter', () => setCursor('dream-mode'));
         document.getElementById('lapu-section')?.addEventListener('mouseleave', () => setCursor(''));
 
-        // C. SCROLL HORIZONTAL (IDENTIDAD) - Moviendo esto adentro para evitar error
+        // C. SCROLL HORIZONTAL (IDENTIDAD)
         const panels = gsap.utils.toArray(".panel");
         const container = document.getElementById("horizontal-wrapper");
         
@@ -907,18 +923,14 @@
                 }
             });
 
-            // Cursor Drag para Identidad
-            const idSection = document.getElementById('identity-section');
-            if(idSection) {
-                idSection.addEventListener('mouseenter', () => {
-                    cursor.classList.add('drag-mode'); // Asegúrate de tener CSS para .drag-mode si no lo tienes usa .hovered
-                    cursorText.innerText = "DESLIZA";
-                });
-                idSection.addEventListener('mouseleave', () => {
-                    cursor.classList.remove('drag-mode');
-                    cursorText.innerText = "";
-                });
-            }
+            // Cursor Drag
+            document.getElementById('identity-section').addEventListener('mouseenter', () => {
+                // Usamos hovered porque .drag-mode no estaba definido en CSS, hovered sirve igual
+                setCursor('hovered', 'DESLIZA'); 
+            });
+            document.getElementById('identity-section').addEventListener('mouseleave', () => {
+                setCursor('');
+            });
         }
 
         // D. TILT
@@ -926,7 +938,7 @@
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-        // E. THREE.JS GLOBAL
+        // E. THREE.JS GLOBAL + JEPIRA (CORREGIDO)
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
@@ -944,7 +956,9 @@
             const cStar = new THREE.Color('#A5D8FF');
 
             for(let i=0; i<count*3; i+=3) {
-                pos[i] = (Math.random()-0.5)*35; pos[i+1] = (Math.random()-0.5)*40; pos[i+2] = (Math.random()-0.5)*20;
+                pos[i] = (Math.random()-0.5)*35; 
+                pos[i+1] = (Math.random()-0.5)*40; 
+                pos[i+2] = (Math.random()-0.5)*20;
                 colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
             }
             geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -957,24 +971,19 @@
 
             const simplex = new SimplexNoise();
             const clock = new THREE.Clock();
-
-            // Variables para Jepira
             let speedMultiplier = 1;
 
             const animate = () => {
                 const t = clock.getElapsedTime();
-                // Rotación base + aceleración si estamos en Jepira
                 particles.rotation.y = t * 0.02 * speedMultiplier;
                 
                 const p = geometry.attributes.position.array;
                 for(let i=0; i<count; i++) {
                     const i3 = i*3;
-                    // Efecto Warp Speed en Z si speedMultiplier es alto
                     if(speedMultiplier > 2) {
-                        p[i3+2] += 0.1 * speedMultiplier;
+                        p[i3+2] += 0.1 * speedMultiplier; // Warp effect
                         if(p[i3+2] > 10) p[i3+2] = -20;
                     } else {
-                        // Movimiento normal de viento
                         p[i3+1] = (Math.random()-0.5)*40 + simplex.noise2D(p[i3]*0.1, t*0.2)*0.3;
                     }
                 }
@@ -984,14 +993,17 @@
             };
             animate();
 
+            // --- JEPIRA LOGIC (AHORA DENTRO DEL SCOPE CORRECTO) ---
             if(typeof gsap !== 'undefined') {
                 ScrollTrigger.create({
                     trigger: "#jepira-section", start: "top center",
                     onEnter: () => {
+                        // Fondo Azul
                         gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
-                        // Warp Speed Effect
+                        // Warp Speed
                         gsap.to({v:1}, {v:10, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
                         
+                        // Cambio de Color a Estrellas
                         const c = geometry.attributes.color.array;
                         const obj = {t:0};
                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
@@ -1104,7 +1116,7 @@
             animate();
         })();
 
-        // G. THREE.JS SHADER (SUEÑOS)
+        // G. THREE.JS SHADER (SUEÑOS/LAPÜ)
         (function() {
             const container = document.getElementById('dream-canvas-container');
             if(!container) return;
@@ -1160,12 +1172,6 @@
                 material.uniforms.uTexture.value = createTextTexture();
             });
         })();
-
-        // H. PARALLAX IMG
-        /* gsap.to("#parallax-img", {
-            yPercent: 20, ease: "none",
-            scrollTrigger: { trigger: "#parallax-img", start: "top bottom", end: "bottom top", scrub: true }
-        });*/
 
         // I. SMOOTH SCROLL (LENIS)
         if (typeof Lenis !== 'undefined') {
