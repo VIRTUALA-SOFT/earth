@@ -819,11 +819,10 @@
     // ==========================================
     // 1. VARIABLES Y FUNCIONES GLOBALES
     // ==========================================
-    let lenis; // Instancia global de scroll
-    gsap.registerPlugin(ScrollTrigger);
+    let lenis; 
+    let player; // Para YouTube
 
     // --- SISTEMA DE AUDIO (TARJETAS) ---
-    // Esta función debe ser global porque se llama desde el HTML (onclick)
     function playRealAudio(id) {
         const allAudios = document.querySelectorAll('audio');
         const targetAudio = document.getElementById(id);
@@ -831,7 +830,6 @@
         const targetEq = document.getElementById(`eq-${id}`);
         const targetCard = document.getElementById(`card-${id}`); 
         
-        // Iconos SVG
         const playIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
         const pauseIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     
@@ -848,7 +846,7 @@
     
         // B. Si es otro audio -> RESETEAR TODOS (menos música de fondo)
         allAudios.forEach(audio => {
-            if(audio.id === 'bg-music') return; // Ignorar música de fondo
+            if(audio.id === 'bg-music') return; 
             
             audio.pause();
             audio.currentTime = 0;
@@ -867,7 +865,7 @@
             if(targetBtn) targetBtn.innerHTML = pauseIcon;
             if(targetEq) { targetEq.classList.remove('opacity-0'); targetEq.classList.add('opacity-100'); }
             if(targetCard) targetCard.classList.add('playing');
-        }).catch(e => console.log("Interacción requerida para audio"));
+        }).catch(e => console.log("Interacción requerida"));
     
         // D. AL TERMINAR
         targetAudio.onended = () => {
@@ -877,23 +875,22 @@
         };
     }
 
-    // --- SISTEMA DE CARGA (FAILSAFE) ---
+    // --- SISTEMA DE CARGA ---
     function revealSite() {
         const loader = document.getElementById('loader');
         const main = document.getElementById('main-content');
         const canvas = document.getElementById('global-canvas');
-        
         if (loader.style.opacity === '0') return; 
-
         try {
-            const tl = gsap.timeline();
-            tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
-              .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
-              .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
-              .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
-              .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline();
+                tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
+                  .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
+                  .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
+                  .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
+                  .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+            } else { throw new Error("GSAP no cargó"); }
         } catch (e) {
-            // Fallback si GSAP falla
             loader.style.opacity = 0;
             setTimeout(() => { loader.style.display = 'none'; }, 500);
             main.style.opacity = 1;
@@ -901,12 +898,42 @@
         }
     }
 
+    // --- YOUTUBE API CALLBACK (Debe ser global) ---
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yonna-player', {
+            videoId: 'yJMXzvZEZlQ',
+            playerVars: {
+                'autoplay': 1, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0,
+                'modestbranding': 1, 'disablekb': 1, 'fs': 0, 'playsinline': 1,
+                'loop': 1, 'playlist': 'yJMXzvZEZlQ'
+            },
+            events: { 'onReady': onPlayerReady }
+        });
+    }
+    function onPlayerReady(event) {
+        event.target.playVideo();
+        checkVideoTime();
+    }
+    function checkVideoTime() {
+        if (player && player.getCurrentTime) {
+            if (player.getCurrentTime() >= 42) player.seekTo(0);
+        }
+        requestAnimationFrame(checkVideoTime);
+    }
+
     // ==========================================
     // 2. INICIALIZACIÓN (DOM READY)
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
-        
-        // A. LOADER
+        if(typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+
+        // A. CARGA DE API YOUTUBE
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // B. LOADER
         const loaderBar = document.getElementById('loader-bar');
         let progress = 0;
         const interval = setInterval(() => {
@@ -914,30 +941,23 @@
             if(loaderBar) loaderBar.style.width = `${progress}%`;
             if(progress >= 100) { clearInterval(interval); revealSite(); }
         }, 50);
-        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 3500);
-
-        // B. LENIS (SCROLL SUAVE)
-        if (typeof Lenis !== 'undefined') {
-            lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-            requestAnimationFrame(raf);
-        }
+        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
 
         // C. CURSOR (INTERACCIÓN VISUAL)
         const cursor = document.getElementById('cursor');
         const cursorText = document.getElementById('cursor-text');
 
         window.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+            if(typeof gsap !== 'undefined') gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+            else { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
         });
 
-        // Función Helper
         const resetCursor = () => {
             cursor.className = ''; 
             cursorText.innerText = "";
         };
 
-        // 1. Tarjetas de Audio (CURSOR ROJO)
+        // 1. Tarjetas de Audio (CURSOR ROJO) - Selector .tilt-card
         document.querySelectorAll('.tilt-card').forEach(card => {
             card.addEventListener('mouseenter', () => {
                 resetCursor();
@@ -945,8 +965,6 @@
                 cursorText.innerText = "OÍR";
             });
             card.addEventListener('mouseleave', () => resetCursor());
-            
-            // Efecto click
             card.addEventListener('mousedown', () => gsap.to(cursor, { scale: 0.9, duration: 0.1 }));
             card.addEventListener('mouseup', () => gsap.to(cursor, { scale: 1, duration: 0.1 }));
         });
@@ -954,7 +972,7 @@
         // 2. General
         document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
             el.addEventListener('mouseenter', (e) => {
-                if(!e.target.closest('.tilt-card')) { // Evitar conflicto
+                if(!e.target.closest('.tilt-card')) { 
                     resetCursor();
                     cursor.classList.add('hovered');
                 }
@@ -962,21 +980,19 @@
             el.addEventListener('mouseleave', () => resetCursor());
         });
 
-        // 3. Zonas Específicas
+        // 3. Zonas
         document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText = "VER"; });
         document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => resetCursor());
-        
         document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
         document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
 
-        // D. MENÚ Y SONIDO DE FONDO (Nav Bar)
+        // D. MENÚ Y SONIDO DE FONDO
         const soundBtn = document.getElementById('sound-btn');
         const bgMusic = document.getElementById('bg-music');
         const iconMute = document.getElementById('icon-mute');
         const iconSound = document.getElementById('icon-sound');
         const soundText = document.getElementById('sound-text');
         
-        // Lógica Sonido Fondo
         let isBgPlaying = false;
         if(soundBtn && bgMusic) {
             bgMusic.volume = 0.2;
@@ -987,7 +1003,7 @@
                         iconMute.classList.add('hidden');
                         iconSound.classList.remove('hidden');
                         soundText.innerText = "ON";
-                    }).catch(e => console.log("Navegador bloqueó audio automático"));
+                    }).catch(e => console.log("Navegador bloqueó audio"));
                 } else {
                     bgMusic.pause();
                     isBgPlaying = false;
@@ -998,7 +1014,6 @@
             });
         }
 
-        // Lógica Menú Desplegable
         const menuBtn = document.getElementById('menu-btn');
         const menuOverlay = document.getElementById('menu-overlay');
         const hamLine = document.getElementById('hamburger-line');
@@ -1024,37 +1039,37 @@
 
         if(menuBtn) menuBtn.addEventListener('click', toggleMenu);
 
-        // Navegación interna desde Menú
         menuLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const href = link.getAttribute('href');
-                toggleMenu(); // Cerrar menú
-                // Usar Lenis para scroll suave
-                if(href === '.desert-bg') { // Caso especial para Wayuunaiki
-                     lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
+                toggleMenu(); 
+                // Navegación inteligente
+                if(href === '.desert-bg') {
+                     if(lenis) lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
                 } else {
-                     lenis.scrollTo(href);
+                     if(lenis) lenis.scrollTo(href);
+                     else document.querySelector(href).scrollIntoView({behavior:'smooth'});
                 }
             });
         });
 
+        document.getElementById('logo-btn')?.addEventListener('click', () => {
+            if(lenis) lenis.scrollTo(0);
+        });
+
         // E. SCROLL HORIZONTAL (IDENTIDAD)
         const panels = gsap.utils.toArray(".panel");
-        const container = document.getElementById("horizontal-wrapper");
-        if(panels.length > 0 && container) {
+        const containerH = document.getElementById("horizontal-wrapper");
+        if(panels.length > 0 && containerH) {
             gsap.to(panels, {
                 xPercent: -100 * (panels.length - 1),
                 ease: "none",
                 scrollTrigger: {
-                    trigger: "#identity-section",
-                    pin: true,
-                    scrub: 1,
-                    snap: 1 / (panels.length - 1),
-                    end: () => "+=" + container.offsetWidth
+                    trigger: "#identity-section", pin: true, scrub: 1,
+                    snap: 1 / (panels.length - 1), end: () => "+=" + containerH.offsetWidth
                 }
             });
-            // Cursor especial para Identidad
             const idSection = document.getElementById('identity-section');
             if(idSection) {
                 idSection.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('hovered'); cursorText.innerText = "DESLIZA"; });
@@ -1062,12 +1077,12 @@
             }
         }
 
-        // F. TILT EFECTO
+        // F. TILT
         if (typeof VanillaTilt !== 'undefined') {
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-        // G. THREE.JS GLOBAL + JEPIRA
+        // G. THREE.JS GLOBAL
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
@@ -1119,7 +1134,7 @@
             };
             animate();
 
-            // Animación Jepira
+            // Jepira
             if(document.getElementById('cosmos-overlay')) {
                 ScrollTrigger.create({
                     trigger: "#jepira-section", start: "top center",
@@ -1162,7 +1177,7 @@
         };
         initGlobalThree();
 
-        // H. THREE.JS WEAVING (HILO)
+        // H. THREE.JS WEAVING
         (function() {
             const container = document.getElementById('weaving-container');
             if(!container) return;
@@ -1293,6 +1308,13 @@
                 material.uniforms.uTexture.value = createTextTexture();
             });
         })();
+
+        // J. SMOOTH SCROLL
+        if (typeof Lenis !== 'undefined') {
+            lenis = new Lenis({ duration: 1.5, smoothWheel: true });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        }
     });
 </script>
 </body>
