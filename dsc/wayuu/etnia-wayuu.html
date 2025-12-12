@@ -1139,5 +1139,161 @@
                     },
                     onLeaveBack: () => {
                          gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                         gsap.to({v:10}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
+                         const c = geometry.attributes.color.array;
+                         const obj = {t:0};
+                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                            for(let i=0; i<count*3; i+=3) {
+                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
+                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
+                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
+                            }
+                            geometry.attributes.color.needsUpdate = true;
+                         }});
+                    }
+                });
+            }
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+        initGlobalThree();
+
+        // H. THREE.JS WEAVING (HILO)
+        (function() {
+            const container = document.getElementById('weaving-container');
+            if(!container) return;
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050200, 0.002);
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+            camera.position.z = 15;
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            const group = new THREE.Group();
+            scene.add(group);
+            const pCount = 300;
+            const pData = [];
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount*3);
+            for(let i=0; i<pCount; i++) {
+                const theta = Math.random()*Math.PI*2;
+                const phi = Math.acos((Math.random()*2)-1);
+                const r = 6;
+                pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+                pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+                pPos[i*3+2] = r*Math.cos(phi);
+                pData.push({ vel: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiplyScalar(0.02), con:0 });
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
+            const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
+            group.add(points);
+            const lGeo = new THREE.BufferGeometry();
+            const lPos = new Float32Array(pCount*pCount*3);
+            const lCol = new Float32Array(pCount*pCount*3);
+            lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3).setUsage(THREE.DynamicDrawUsage));
+            lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
+            const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
+            group.add(lines);
+            let mx=0, my=0;
+            container.addEventListener('mousemove', e => {
+                mx = ((e.clientX - container.getBoundingClientRect().left)/container.clientWidth)*2-1;
+                my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
+            });
+            const animate = () => {
+                group.rotation.x += 0.002 + my*0.01;
+                group.rotation.y += 0.002 + mx*0.01;
+                let vPos=0, cPos=0, con=0;
+                for(let i=0; i<pCount; i++) pData[i].con=0;
+                for(let i=0; i<pCount; i++) {
+                    pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
+                    const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
+                    if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
+                    if(pData[i].con>=3) continue;
+                    for(let j=i+1; j<pCount; j++) {
+                        if(pData[j].con>=3) continue;
+                        const dx = pPos[i*3]-pPos[j*3], dy = pPos[i*3+1]-pPos[j*3+1], dz = pPos[i*3+2]-pPos[j*3+2];
+                        const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
+                        if(dist<2.5) {
+                            pData[i].con++; pData[j].con++;
+                            lPos[vPos++]=pPos[i*3]; lPos[vPos++]=pPos[i*3+1]; lPos[vPos++]=pPos[i*3+2];
+                            lPos[vPos++]=pPos[j*3]; lPos[vPos++]=pPos[j*3+1]; lPos[vPos++]=pPos[j*3+2];
+                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                            con++;
+                        }
+                    }
+                }
+                lines.geometry.setDrawRange(0, con*2);
+                lines.geometry.attributes.position.needsUpdate = true;
+                lines.geometry.attributes.color.needsUpdate = true;
+                points.geometry.attributes.position.needsUpdate = true;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+        })();
+
+        // I. THREE.JS SHADER (LAPÜ)
+        (function() {
+            const container = document.getElementById('dream-canvas-container');
+            if(!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            function createTextTexture() {
+                const cvs = document.createElement('canvas');
+                cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+                const ctx = cvs.getContext('2d');
+                const cx = cvs.width/2, cy = cvs.height/2;
+                ctx.font = "italic 700 18vw 'Playfair Display'"; ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillText("LAPÜ", cx, cy);
+                ctx.font = "300 1.5vw 'Manrope'"; ctx.fillStyle = "#C89F65";
+                ctx.fillText("Los ancestros hablan cuando cierras los ojos", cx, cy + (cvs.width * 0.15));
+                return new THREE.CanvasTexture(cvs);
+            }
+            const material = new THREE.ShaderMaterial({
+                uniforms: { uTime: {value:0}, uMouse: {value: new THREE.Vector2(0.5,0.5)}, uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, uTexture: {value: createTextTexture()} },
+                vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
+                fragmentShader: `
+                    uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
+                    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+                    float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
+                    void main(){
+                        vec2 uv = vUv; vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
+                        float dist = distance(uv*ratio, uMouse*ratio);
+                        float fog = snoise(uv*ratio*3.0 - uTime*0.1)*0.5 + snoise(uv*ratio*8.0 + uTime*0.05)*0.2;
+                        float reveal = smoothstep(0.25, 0.1, dist + fog*0.2);
+                        vec4 tex = texture2D(uTexture, uv + vec2(fog*0.1*(1.0-reveal)));
+                        vec3 col = mix(vec3(0.0,0.0,0.05), tex.rgb, reveal*tex.a);
+                        col += vec3(0.8,0.6,0.2) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.2;
+                        gl_FragColor = vec4(col, 1.0);
+                    }
+                `
+            });
+            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
+            const clock = new THREE.Clock();
+            const mouse = new THREE.Vector2(0.5,0.5);
+            window.addEventListener('mousemove', e=>{ mouse.x=e.clientX/window.innerWidth; mouse.y=1.0-e.clientY/window.innerHeight; });
+            const animate = () => {
+                material.uniforms.uTime.value = clock.getElapsedTime();
+                material.uniforms.uMouse.value.lerp(mouse, 0.1);
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+            window.addEventListener('resize', ()=>{
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+                material.uniforms.uTexture.value = createTextTexture();
+            });
+        })();
+    });
+</script>
 </body>
 </html>
