@@ -236,7 +236,38 @@
                 #050200 100%       /* Vuelve a negro abajo */
             );
         }
-                
+
+         /* HORIZONTAL SCROLL (IDENTITY) */
+        .horizontal-container {
+            width: 400%; /* 4 Paneles */
+            height: 100vh;
+            display: flex;
+            flex-wrap: nowrap;
+        }
+        .panel {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 4rem;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .panel-bg {
+            position: absolute; inset: 0; z-index: 0;
+            filter: brightness(0.4) grayscale(0.5);
+            transition: transform 0.5s;
+        }
+        .panel:hover .panel-bg { transform: scale(1.02); filter: brightness(0.5) grayscale(0.2); }
+
+         /* JEPIRA (COSMOS) */
+        .warp-speed-effect {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, #000 90%);
+            z-index: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -287,29 +318,68 @@
             
         </section>
 
-        <!-- 2. IDENTIDAD -->
-        <section class="min-h-screen py-32 px-6 md:px-24 relative flex items-center z-20">
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
-                <div class="space-y-12">
-                    <h2 class="text-5xl md:text-8xl font-display leading-none text-white">
-                        Sangre de <br> <span class="text-[#C89F65] italic">Cactus</span>
-                    </h2>
-                    <p class="text-xl text-gray-400 font-light leading-relaxed max-w-md hover-trigger">
-                        Un pueblo milenario que teje su historia en cada hilo. La aridez no es un vacío, es un lienzo.
-                    </p>
-                    <div class="border border-white/10 bg-white/5 p-6 inline-block rounded-xl backdrop-blur-md">
-                        <span class="block text-4xl font-bold text-white mb-1">600k+</span>
-                        <span class="text-xs tracking-widest text-gray-500 uppercase">Habitantes Binacionales</span>
-                    </div>
-                </div>
+      <!-- 2. IDENTIDAD PROFUNDA (HORIZONTAL SCROLL) -->
+        <section id="identity-section" class="overflow-hidden h-screen bg-[#050200]">
+            <div class="horizontal-container" id="horizontal-wrapper">
                 
-                <div class="relative h-[70vh] w-full">
-                    <div class="absolute inset-0 bg-[#1a1a1a] overflow-hidden rounded-sm filter brightness-90">
-                        <img src="../../img/Mujeres-wayuu.jpg" class="w-full h-full object-cover scale-110" id="parallax-img" alt="Mujer Wayuu">
+                <!-- Intro Panel -->
+                <div class="panel bg-black relative">
+                    <div class="z-10 max-w-2xl">
+                        <span class="text-[#FF3B3B] font-mono text-xs tracking-widest mb-4 block">01 — IDENTIDAD</span>
+                        <h2 class="text-6xl md:text-8xl font-display text-white mb-8">Los 4 Pilares <br><span class="italic text-[#C89F65]">Ancestrales</span></h2>
+                        <p class="text-gray-400 text-lg font-light">
+                            Más que una etnia, somos una civilización del desierto organizada por leyes invisibles pero inquebrantables.
+                            <br><br>
+                            <span class="text-xs font-mono border-b border-gray-600 pb-1">DESLIZA PARA CONOCER</span>
+                        </p>
                     </div>
                 </div>
+
+                <!-- Panel 1: Social (Matrilineal) -->
+                <div class="panel hover-trigger">
+                    <img src="https://images.unsplash.com/photo-1532561931304-45e0fb337f69?q=80&w=2000&auto=format&fit=crop" class="panel-bg object-cover">
+                    <div class="glass-card p-10 max-w-xl z-10 relative">
+                        <h3 class="text-4xl font-display text-white mb-4">La Sangre Materna</h3>
+                        <p class="text-gray-300 font-light mb-4">
+                            Somos una sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido, el clan (*Eiruku*) y la carne se heredan de la madre. La mujer es la dueña de la herencia y la guardiana de la cultura.
+                        </p>
+                        <ul class="text-xs font-mono text-gray-400 space-y-2">
+                            <li>• Eiruku: Carne / Clan</li>
+                            <li>• 30+ Clanes (Uriana, Epieyu, Pushaina...)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Político (Palabrero) -->
+                <div class="panel hover-trigger">
+                    <img src="https://live.staticflickr.com/3936/15545638421_64e320f77d_b.jpg" class="panel-bg object-cover">
+                    <div class="glass-card p-10 max-w-xl z-10 relative">
+                        <h3 class="text-4xl font-display text-white mb-4">La Palabra es Ley</h3>
+                        <p class="text-gray-300 font-light mb-4">
+                            No tenemos policía, tenemos al <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero). Patrimonio de la Humanidad. Él resuelve conflictos mediante la palabra, la compensación y la paz, evitando la guerra entre familias.
+                        </p>
+                        <div class="flex items-center gap-3 mt-4">
+                            <div class="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center">⚖️</div>
+                            <span class="text-xs uppercase tracking-widest">Justicia Restaurativa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Económico/Geográfico -->
+                <div class="panel hover-trigger">
+                    <img src="https://images.unsplash.com/photo-1629737643738-4b7b32402264?q=80&w=2000&auto=format&fit=crop" class="panel-bg object-cover">
+                    <div class="glass-card p-10 max-w-xl z-10 relative">
+                        <h3 class="text-4xl font-display text-white mb-4">Desierto y Mar</h3>
+                        <p class="text-gray-300 font-light mb-4">
+                            Vivimos en la dualidad. Pastores de chivos en la sequía y pescadores expertos en la costa. Nuestra economía mezcla el comercio ancestral, el tejido de mochilas y la resistencia ante la escasez de agua.
+                        </p>
+                        <span class="text-[#C89F65] text-4xl font-bold block mt-4">600k+ <span class="text-sm font-normal text-white">Habitantes</span></span>
+                    </div>
+                </div>
+
             </div>
         </section>
+
 
         <!-- 3. SECCIÓN: EL HILO DE LA VIDA (3D + STORYTELLING) -->
         <section class="h-screen w-full flex flex-col md:flex-row items-center justify-center relative bg-[#050200] overflow-hidden z-20">
@@ -521,13 +591,19 @@
         </section>     
 
         
-        <!-- 7. FINAL -->
-        <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
-            <div class="cosmos-bg" id="cosmos-overlay"></div>
-            <div class="relative z-10 text-center px-6 max-w-3xl">
-                <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-widest">05 — JEPIRA</span>
-                <h2 class="text-5xl md:text-7xl font-display text-white mb-8">El Camino de las Almas</h2>
-                <a href="#" class="inline-block px-10 py-4 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger">Reiniciar</a>
+       <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
+        <section id="jepira-section" class="h-screen relative flex items-center justify-center overflow-hidden">
+            <div class="warp-speed-effect"></div>
+            
+            <div class="relative z-20 text-center px-6">
+                <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-[0.5em] uppercase">05 — Jepira</span>
+                <h2 class="text-5xl md:text-8xl font-display text-white mb-8 mix-blend-screen">El Retorno a <br> las Estrellas</h2>
+                <p class="text-gray-300 text-lg font-light leading-relaxed mb-12 max-w-lg mx-auto">
+                    La muerte no existe. Es solo convertirse en lluvia para volver a la tierra, o en luz para habitar la Vía Láctea (*Spieyu*).
+                </p>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 border border-white/30 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger bg-black/50 backdrop-blur-md">
+                    Regresar a la Tierra
+                </button>
             </div>
         </section>
         
@@ -608,6 +684,9 @@
     <script>
         
             // --- 1. SISTEMA DE AUDIO (SIN PIANO, CON ICONOS) ---
+
+           gsap.registerPlugin(ScrollTrigger);
+        
            function playRealAudio(id) {
             const allAudios = document.querySelectorAll('audio');
             const targetAudio = document.getElementById(id);
@@ -661,6 +740,33 @@
             };
         }    
 
+
+         // Horizontal Scroll (Identidad)
+            const panels = gsap.utils.toArray(".panel");
+            const container = document.getElementById("horizontal-wrapper");
+            
+            gsap.to(panels, {
+                xPercent: -100 * (panels.length - 1),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: "#identity-section",
+                    pin: true,
+                    scrub: 1,
+                    snap: 1 / (panels.length - 1),
+                    end: () => "+=" + container.offsetWidth
+                }
+            });
+
+        // Cursor Drag para Identidad
+            document.getElementById('identity-section').addEventListener('mouseenter', () => {
+                cursor.classList.add('drag-mode');
+                cursorText.innerText = "EXPLORA";
+            });
+            document.getElementById('identity-section').addEventListener('mouseleave', () => {
+                cursor.classList.remove('drag-mode');
+                cursorText.innerText = "";
+            });
+        
         // --- SISTEMA DE CARGA (FAILSAFE) ---
         function revealSite() {
             const loader = document.getElementById('loader');
@@ -996,6 +1102,37 @@
                 requestAnimationFrame(raf);
             }
         });
+
+         // Animación Jepira (Aceleración)
+                let speedMultiplier = 1;
+                ScrollTrigger.create({
+                    trigger: "#jepira-section",
+                    start: "top bottom",
+                    onEnter: () => {
+                        gsap.to(mat.color, {r: 0.6, g: 0.8, b: 1, duration: 2}); // Azul
+                        gsap.to({v:1}, {v:20, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }}); // Warp Speed
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(mat.color, {r: 0.78, g: 0.62, b: 0.4, duration: 2}); // Dorado
+                        gsap.to({v:20}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
+                    }
+                });
+
+                function animate() {
+                    const p = geo.attributes.position.array;
+                    for(let i=0; i<count; i++) {
+                        p[i*3+2] += vel[i] * speedMultiplier; // Mover en Z
+                        if(p[i*3+2] > 10) p[i*3+2] = -20; // Reset
+                    }
+                    geo.attributes.position.needsUpdate = true;
+                    stars.rotation.z += 0.001 * speedMultiplier;
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            };
+            initThree();
+        
     </script>
 </body>
 </html>
