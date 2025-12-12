@@ -268,6 +268,42 @@
             z-index: 1;
         }
 
+        /* --- MEJORA DE VIDEO (MÁS LUZ Y COLOR) --- */
+.cinematic-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9; /* Subimos de 0.6 a 0.9 (Mucho más visible) */
+    filter: contrast(1.1) saturate(1.2); /* Realza los colores del desierto */
+    transition: opacity 0.5s ease;
+}
+
+        /* --- CONTINUIDAD (BORDES FUNDIDOS) --- */
+/* Esto crea el degradado negro arriba y abajo para que no se note el corte */
+.panel-fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none; /* Permite dar clic a través */
+    z-index: 2;
+    background: linear-gradient(
+        to bottom,
+        #050200 0%,         /* Negro arriba (fusión con sección anterior) */
+        transparent 15%,    /* Transparente rápido para ver el video */
+        transparent 85%,    /* Se mantiene transparente */
+        #050200 100%        /* Negro abajo (fusión con footer/siguiente) */
+    );
+}
+
+/* --- SOMBRA SOLO DETRÁS DEL TEXTO --- */
+/* En lugar de oscurecer todo el video, oscurecemos solo donde va el texto */
+.text-protection {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+    z-index: 1;
+}
+        
+
     </style>
 </head>
 <body>
@@ -318,38 +354,42 @@
             
         </section>
 
-    <!-- 2. IDENTIDAD PROFUNDA (HORIZONTAL SCROLL CON VIDEO) -->
-<section id="identity-section" class="overflow-hidden h-screen bg-[#050200]">
+        <!-- 2. IDENTIDAD (VIDEOS VIVOS + BORDES FUNDIDOS) -->
+<section id="identity-section" class="overflow-hidden h-screen bg-[#050200] relative z-20">
     <div class="horizontal-container" id="horizontal-wrapper">
         
-        <!-- Intro Panel (Texto Intro) -->
+        <!-- Intro Panel -->
         <div class="panel bg-black relative">
             <div class="z-10 max-w-2xl px-6">
                 <span class="text-[#FF3B3B] font-mono text-xs tracking-widest mb-4 block">01 — IDENTIDAD</span>
                 <h2 class="text-5xl md:text-8xl font-display text-white mb-8">Los 4 Pilares <br><span class="italic text-[#C89F65]">Ancestrales</span></h2>
                 <p class="text-gray-400 text-lg font-light">
-                    Más que una etnia, somos una civilización del desierto organizada por leyes invisibles pero inquebrantables.
+                    Más que una etnia, somos una civilización del desierto.
                     <br><br>
                     <span class="text-xs font-mono border-b border-gray-600 pb-1 animate-pulse">DESLIZA ▶</span>
                 </p>
             </div>
+            <!-- Degradado de continuidad también aquí -->
+            <div class="panel-fade"></div>
         </div>
 
-        <!-- Panel 1: Social (VIDEO: Mujer Wayuu / Viento) -->
-        <div class="panel hover-trigger group">
-            <!-- VIDEO DE FONDO -->
-            <div class="panel-bg absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-700">
-                    <!-- Ejemplo: Telas rojas al viento -->
-                    <source src="../../video/wayuu-rojas2.mp4" type="video/mp4">
+        <!-- Panel 1: Social -->
+        <div class="panel hover-trigger group relative">
+            <!-- VIDEO MEJORADO -->
+            <div class="absolute inset-0 w-full h-full">
+                <video autoplay muted loop playsinline class="cinematic-video">
+                     <source src="../../video/wayuu-rojas2.mp4" type="video/mp4">
                 </video>
-                <div class="absolute inset-0 bg-black/30"></div> <!-- Overlay para legibilidad -->
+                <!-- Protección visual suave -->
+                <div class="text-protection"></div>
+                <!-- BORDES FUNDIDOS (Tu requerimiento) -->
+                <div class="panel-fade"></div>
             </div>
 
-            <div class="glass-card p-10 max-w-xl z-10 relative backdrop-blur-md border border-white/10">
+            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
                 <h3 class="text-4xl font-display text-white mb-4">La Sangre Materna</h3>
-                <p class="text-gray-200 font-light mb-4">
-                    Somos una sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido y el clan (*Eiruku*) se heredan de la madre. La mujer es la guardiana de la cultura.
+                <p class="text-gray-200 font-light mb-4 text-lg">
+                    Sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido y el clan (*Eiruku*) se heredan de la madre. Ella es la raíz.
                 </p>
                 <ul class="text-xs font-mono text-gray-300 space-y-2 border-t border-white/20 pt-4">
                     <li>• Eiruku: Carne / Clan</li>
@@ -358,48 +398,47 @@
             </div>
         </div>
 
-        <!-- Panel 2: Político (VIDEO: Hombre/Desierto) -->
-        <div class="panel hover-trigger group">
-            <div class="panel-bg absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-700">
-                    <!-- Ejemplo: Hombre caminando o paisaje árido -->
+        <!-- Panel 2: Político -->
+        <div class="panel hover-trigger group relative">
+            <div class="absolute inset-0 w-full h-full">
+                <video autoplay muted loop playsinline class="cinematic-video">
                     <source src="../../video/wayuu_video.mp4" type="video/mp4">
                 </video>
-                <div class="absolute inset-0 bg-black/30"></div>
+                <div class="text-protection"></div>
+                <div class="panel-fade"></div>
             </div>
 
-            <div class="glass-card p-10 max-w-xl z-10 relative backdrop-blur-md border border-white/10">
+            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
                 <h3 class="text-4xl font-display text-white mb-4">La Palabra es Ley</h3>
-                <p class="text-gray-200 font-light mb-4">
-                    El <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero) es nuestro sistema de justicia. Resuelve conflictos mediante la mediación y la paz, evitando la guerra entre clanes.
+                <p class="text-gray-200 font-light mb-4 text-lg">
+                    El <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero) resuelve conflictos con el poder de la palabra, evitando la guerra y restaurando la armonía.
                 </p>
-                <div class="flex items-center gap-3 mt-4">
-                    <span class="text-xs uppercase tracking-widest text-[#C89F65]">Patrimonio de la Humanidad</span>
-                </div>
+                <span class="text-xs uppercase tracking-widest text-[#C89F65]">Patrimonio de la Humanidad</span>
             </div>
         </div>
 
-        <!-- Panel 3: Económico (VIDEO: Tejido/Artesanía) -->
-        <div class="panel hover-trigger group">
-            <div class="panel-bg absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-700">
-                    <!-- Ejemplo: Manos tejiendo o texturas -->
+        <!-- Panel 3: Económico -->
+        <div class="panel hover-trigger group relative">
+            <div class="absolute inset-0 w-full h-full">
+                <video autoplay muted loop playsinline class="cinematic-video">
                     <source src="../../video/default_video.mp4" type="video/mp4">
                 </video>
-                <div class="absolute inset-0 bg-black/30"></div>
+                <div class="text-protection"></div>
+                <div class="panel-fade"></div>
             </div>
 
-            <div class="glass-card p-10 max-w-xl z-10 relative backdrop-blur-md border border-white/10">
+            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
                 <h3 class="text-4xl font-display text-white mb-4">Sustento y Arte</h3>
-                <p class="text-gray-200 font-light mb-4">
-                    El pastoreo y el tejido no son solo economía, son espiritualidad. Cada mochila cuenta una historia geométrica (*Kanas*) que refleja el universo.
+                <p class="text-gray-200 font-light mb-4 text-lg">
+                    Pastoreo, pesca y tejido. Cada mochila (*Susu*) cuenta una historia geométrica (*Kanas*) que refleja el universo Wayuu.
                 </p>
                 <span class="text-[#C89F65] text-4xl font-bold block mt-4">Kanas <span class="text-sm font-normal text-white">Geometría Sagrada</span></span>
             </div>
         </div>
 
     </div>
-</section>
+</section>        
+    
 
         <!-- 3. SECCIÓN: EL HILO DE LA VIDA (3D + STORYTELLING) -->
         <section class="h-screen w-full flex flex-col md:flex-row items-center justify-center relative bg-[#050200] overflow-hidden z-20">
