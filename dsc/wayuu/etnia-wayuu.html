@@ -772,10 +772,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
   <script>
-    // --- 1. FUNCIONES GLOBALES (Accesibles desde HTML) ---
-    
+    // --- 1. FUNCIONES GLOBALES ---
     gsap.registerPlugin(ScrollTrigger);
 
+    // Sistema de Audio
     function playRealAudio(id) {
         const allAudios = document.querySelectorAll('audio');
         const targetAudio = document.getElementById(id);
@@ -788,7 +788,6 @@
     
         if (!targetAudio) return;
     
-        // Si ya está sonando, pausar
         if (!targetAudio.paused) {
             targetAudio.pause();
             if(targetBtn) targetBtn.innerHTML = playIcon;
@@ -797,7 +796,6 @@
             return;
         }
     
-        // Resetear otros audios
         allAudios.forEach(audio => {
             audio.pause();
             audio.currentTime = 0;
@@ -806,14 +804,10 @@
             const card = document.getElementById(`card-${audio.id}`);
             
             if(btn) btn.innerHTML = playIcon;
-            if(eq) {
-                eq.classList.remove('opacity-100');
-                eq.classList.add('opacity-0');
-            }
+            if(eq) { eq.classList.remove('opacity-100'); eq.classList.add('opacity-0'); }
             if(card) card.classList.remove('playing');
         });
     
-        // Reproducir
         targetAudio.volume = 0.6;
         targetAudio.play().then(() => {
             if(targetBtn) targetBtn.innerHTML = pauseIcon;
@@ -828,14 +822,12 @@
         };
     }
 
-    // Sistema de Carga (Failsafe)
+    // Sistema de Carga
     function revealSite() {
         const loader = document.getElementById('loader');
         const main = document.getElementById('main-content');
         const canvas = document.getElementById('global-canvas');
-        
         if (loader.style.opacity === '0') return; 
-
         try {
             if (typeof gsap !== 'undefined') {
                 const tl = gsap.timeline();
@@ -844,9 +836,7 @@
                   .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
                   .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
                   .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
-            } else {
-                throw new Error("GSAP no cargó");
-            }
+            } else { throw new Error("GSAP no cargó"); }
         } catch (e) {
             loader.style.opacity = 0;
             setTimeout(() => { loader.style.display = 'none'; }, 500);
@@ -855,7 +845,7 @@
         }
     }
 
-    // --- 2. INICIALIZACIÓN DOM ---
+    // --- 2. INICIALIZACIÓN ---
     document.addEventListener('DOMContentLoaded', () => {
         
         // A. LOADER
@@ -868,7 +858,7 @@
         }, 50);
         setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
 
-        // B. CURSOR
+        // B. CURSOR Y LÓGICA DE TARJETAS (AQUÍ ESTÁ TU CÓDIGO RESTAURADO)
         const cursor = document.getElementById('cursor');
         const cursorText = document.getElementById('cursor-text');
 
@@ -880,57 +870,74 @@
             }
         });
 
-        const setCursor = (mode, text = "") => {
+        // Función auxiliar para limpiar clases
+        const resetCursor = () => {
             cursor.className = ''; 
-            if(mode) cursor.classList.add(mode);
-            if(cursorText) cursorText.innerText = text;
+            cursorText.innerText = "";
         };
 
-        // Listeners Cursor (Tarjetas - IMPORTANTE PARA EL ROJO)
-        document.querySelectorAll('.tilt-card').forEach(el => {
-            el.addEventListener('mouseenter', () => setCursor('audio-mode', 'OÍR'));
-            el.addEventListener('mouseleave', () => setCursor(''));
+        // 1. TARJETAS DE AUDIO (Prioridad Alta - EL CÍRCULO ROJO)
+        const audioCards = document.querySelectorAll('.tilt-card'); // Selector corregido
+        
+        audioCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                resetCursor();
+                cursor.classList.add('audio-mode');
+                cursorText.innerText = "OÍR";
+            });
+
+            card.addEventListener('mouseleave', () => {
+                resetCursor();
+            });
+            
+            // Efecto click que pediste
+            card.addEventListener('mousedown', () => {
+                gsap.to(cursor, { scale: 0.9, duration: 0.1 });
+            });
+            card.addEventListener('mouseup', () => {
+                gsap.to(cursor, { scale: 1, duration: 0.1 });
+            });
         });
 
-        // Listeners Generales
-        document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
-            el.addEventListener('mouseenter', () => setCursor('hovered'));
-            el.addEventListener('mouseleave', () => setCursor(''));
+        // 2. Otros elementos (Hover simple)
+        document.querySelectorAll('a, button, .play-btn').forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                // Evita conflicto si estamos sobre la tarjeta
+                if(!e.target.closest('.tilt-card')) {
+                    resetCursor();
+                    cursor.classList.add('hovered');
+                }
+            });
+            el.addEventListener('mouseleave', () => resetCursor());
         });
-        
+
         // Video
-        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => setCursor('video-mode', 'VER'));
-        document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => setCursor(''));
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText="VER"; });
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => resetCursor());
 
         // Lapu
-        document.getElementById('lapu-section')?.addEventListener('mouseenter', () => setCursor('dream-mode'));
-        document.getElementById('lapu-section')?.addEventListener('mouseleave', () => setCursor(''));
+        document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
+        document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
 
-        // C. SCROLL HORIZONTAL (IDENTIDAD)
+
+        // C. SCROLL HORIZONTAL
         const panels = gsap.utils.toArray(".panel");
         const container = document.getElementById("horizontal-wrapper");
-        
         if(panels.length > 0 && container) {
             gsap.to(panels, {
                 xPercent: -100 * (panels.length - 1),
                 ease: "none",
                 scrollTrigger: {
-                    trigger: "#identity-section",
-                    pin: true,
-                    scrub: 1,
-                    snap: 1 / (panels.length - 1),
-                    end: () => "+=" + container.offsetWidth
+                    trigger: "#identity-section", pin: true, scrub: 1,
+                    snap: 1 / (panels.length - 1), end: () => "+=" + container.offsetWidth
                 }
             });
-
-            // Cursor Drag
-            document.getElementById('identity-section').addEventListener('mouseenter', () => {
-                // Usamos hovered porque .drag-mode no estaba definido en CSS, hovered sirve igual
-                setCursor('hovered', 'DESLIZA'); 
-            });
-            document.getElementById('identity-section').addEventListener('mouseleave', () => {
-                setCursor('');
-            });
+            // Cursor Drag para Identidad
+            const idSection = document.getElementById('identity-section');
+            if(idSection) {
+                idSection.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('hovered'); cursorText.innerText = "DESLIZA"; });
+                idSection.addEventListener('mouseleave', () => resetCursor());
+            }
         }
 
         // D. TILT
@@ -938,7 +945,7 @@
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-        // E. THREE.JS GLOBAL + JEPIRA (CORREGIDO)
+        // E. THREE.JS GLOBAL
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
@@ -956,9 +963,7 @@
             const cStar = new THREE.Color('#A5D8FF');
 
             for(let i=0; i<count*3; i+=3) {
-                pos[i] = (Math.random()-0.5)*35; 
-                pos[i+1] = (Math.random()-0.5)*40; 
-                pos[i+2] = (Math.random()-0.5)*20;
+                pos[i] = (Math.random()-0.5)*35; pos[i+1] = (Math.random()-0.5)*40; pos[i+2] = (Math.random()-0.5)*20;
                 colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
             }
             geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -976,12 +981,11 @@
             const animate = () => {
                 const t = clock.getElapsedTime();
                 particles.rotation.y = t * 0.02 * speedMultiplier;
-                
                 const p = geometry.attributes.position.array;
                 for(let i=0; i<count; i++) {
                     const i3 = i*3;
                     if(speedMultiplier > 2) {
-                        p[i3+2] += 0.1 * speedMultiplier; // Warp effect
+                        p[i3+2] += 0.1 * speedMultiplier;
                         if(p[i3+2] > 10) p[i3+2] = -20;
                     } else {
                         p[i3+1] = (Math.random()-0.5)*40 + simplex.noise2D(p[i3]*0.1, t*0.2)*0.3;
@@ -993,17 +997,13 @@
             };
             animate();
 
-            // --- JEPIRA LOGIC (AHORA DENTRO DEL SCOPE CORRECTO) ---
-            if(typeof gsap !== 'undefined') {
+            // Jepira
+            if(typeof gsap !== 'undefined' && document.getElementById('cosmos-overlay')) {
                 ScrollTrigger.create({
                     trigger: "#jepira-section", start: "top center",
                     onEnter: () => {
-                        // Fondo Azul
                         gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
-                        // Warp Speed
                         gsap.to({v:1}, {v:10, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                        
-                        // Cambio de Color a Estrellas
                         const c = geometry.attributes.color.array;
                         const obj = {t:0};
                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
@@ -1018,7 +1018,6 @@
                     onLeaveBack: () => {
                          gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
                          gsap.to({v:10}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                         
                          const c = geometry.attributes.color.array;
                          const obj = {t:0};
                          gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
@@ -1032,7 +1031,6 @@
                     }
                 });
             }
-            
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
@@ -1116,7 +1114,7 @@
             animate();
         })();
 
-        // G. THREE.JS SHADER (SUEÑOS/LAPÜ)
+        // G. THREE.JS SHADER (SUEÑOS)
         (function() {
             const container = document.getElementById('dream-canvas-container');
             if(!container) return;
