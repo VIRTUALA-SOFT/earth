@@ -62,15 +62,12 @@
             height: 90px !important; 
             background: #FF3B3B !important; /* Rojo Forzado */
             border: none !important;
-            mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */
-            mix-blend-mode: normal !important; /* CRUCIAL: Para que no se invierta el color */
+            mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */            
             opacity: 1 !important;
-            box-shadow: 0 0 30px rgba(255, 59, 59, 0.6) !important;
-            transform: translate(-50%, -50%) scale(1.1) !important;
+            box-shadow: 0 4 30px rgba(255, 59, 59, 0.5) !important;            
         }
         
-       #cursor.audio-mode span { 
-        display: block !important;
+       #cursor.audio-mode span {         
         opacity: 1 !important; 
         color: white !important;
         font-weight: 800;
@@ -858,58 +855,44 @@
         }, 50);
         setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
 
-        // B. CURSOR Y LÓGICA DE TARJETAS (AQUÍ ESTÁ TU CÓDIGO RESTAURADO)
-        const cursor = document.getElementById('cursor');
+        // B. CURSOR Y LÓGICA DE TARJETAS
+         const cursor = document.getElementById('cursor');
         const cursorText = document.getElementById('cursor-text');
 
         window.addEventListener('mousemove', (e) => {
-            if(typeof gsap !== 'undefined') {
-                gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-            } else {
-                cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
-            }
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
         });
 
-        // Función auxiliar para limpiar clases
+        // Función Limpia Estados
         const resetCursor = () => {
-            cursor.className = ''; 
+            cursor.className = '';
             cursorText.innerText = "";
         };
 
-        // 1. TARJETAS DE AUDIO (Prioridad Alta - EL CÍRCULO ROJO)
-        const audioCards = document.querySelectorAll('.tilt-card'); // Selector corregido
-        
-        audioCards.forEach(card => {
+        // LISTENER DE TARJETAS (Arreglado para el ROJO)
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 resetCursor();
                 cursor.classList.add('audio-mode');
                 cursorText.innerText = "OÍR";
             });
-
             card.addEventListener('mouseleave', () => {
                 resetCursor();
             });
-            
-            // Efecto click que pediste
-            card.addEventListener('mousedown', () => {
-                gsap.to(cursor, { scale: 0.9, duration: 0.1 });
-            });
-            card.addEventListener('mouseup', () => {
-                gsap.to(cursor, { scale: 1, duration: 0.1 });
-            });
         });
 
-        // 2. Otros elementos (Hover simple)
-        document.querySelectorAll('a, button, .play-btn').forEach(el => {
+        // Otros Listeners
+        document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
             el.addEventListener('mouseenter', (e) => {
-                // Evita conflicto si estamos sobre la tarjeta
-                if(!e.target.closest('.tilt-card')) {
+                if(!e.target.closest('.tilt-card')) { // Evitar conflicto
                     resetCursor();
                     cursor.classList.add('hovered');
                 }
             });
             el.addEventListener('mouseleave', () => resetCursor());
         });
+
 
         // Video
         document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText="VER"; });
