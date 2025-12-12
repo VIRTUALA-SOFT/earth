@@ -828,7 +828,7 @@ pointer-events: none;
         document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
         document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
 
-        // D. MENÚ Y SONIDO DE FONDO
+      // D. MENÚ Y SONIDO DE FONDO (AUTO-START)
         const soundBtn = document.getElementById('sound-btn');
         const bgMusic = document.getElementById('bg-music');
         const iconMute = document.getElementById('icon-mute');
@@ -836,24 +836,62 @@ pointer-events: none;
         const soundText = document.getElementById('sound-text');
         
         let isBgPlaying = false;
+
+        // Función para actualizar la UI (Iconos y Texto)
+        const updateSoundUI = (playing) => {
+            if (playing) {
+                iconMute.classList.add('hidden');
+                iconSound.classList.remove('hidden');
+                soundText.innerText = "ON";
+                soundBtn.classList.add('text-[#C89F65]'); // Color activo
+            } else {
+                iconMute.classList.remove('hidden');
+                iconSound.classList.add('hidden');
+                soundText.innerText = "OFF";
+                soundBtn.classList.remove('text-[#C89F65]');
+            }
+        };
+
         if(soundBtn && bgMusic) {
-            bgMusic.volume = 0.4;
-            soundBtn.addEventListener('click', () => {
+            bgMusic.volume = 0.4; // Volumen inicial
+
+            // 1. INTENTO DE AUTOPLAY INMEDIATO
+            const attemptPlay = () => {
+                bgMusic.play().then(() => {
+                    isBgPlaying = true;
+                    updateSoundUI(true);
+                    console.log("Audio iniciado automáticamente.");
+                }).catch(error => {
+                    console.log("Autoplay bloqueado por el navegador. Esperando interacción...");
+                    // 2. FALLBACK: Activar al primer clic en cualquier lado
+                    document.addEventListener('click', () => {
+                        if (!isBgPlaying) {
+                            bgMusic.play();
+                            isBgPlaying = true;
+                            updateSoundUI(true);
+                        }
+                    }, { once: true }); // Se ejecuta una sola vez
+                });
+            };
+
+            // Ejecutar intento al cargar
+            attemptPlay();
+
+            // 3. Lógica del Botón (Manual)
+            soundBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita conflicto con el listener global
                 if(!isBgPlaying) {
                     bgMusic.play().then(() => {
                         isBgPlaying = true;
-                        iconMute.classList.add('hidden');
-                        iconSound.classList.remove('hidden');
-                        soundText.innerText = "ON";
-                    }).catch(e => console.log("Navegador bloqueó audio"));
+                        updateSoundUI(true);
+                    });
                 } else {
                     bgMusic.pause();
                     isBgPlaying = false;
-                    iconMute.classList.remove('hidden');
-                    iconSound.classList.add('hidden');
-                    soundText.innerText = "OFF";
+                    updateSoundUI(false);
                 }
             });
+        }
         }
 
         const menuBtn = document.getElementById('menu-btn');
