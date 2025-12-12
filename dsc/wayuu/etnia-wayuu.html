@@ -631,23 +631,35 @@
             </div>
         </section>
 
-        <!-- 6. VIDEO -->
-        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-black video-cursor-area">
-            <div class="absolute inset-0 z-10 bg-black/40"></div>
+     <!-- 6. VIDEO (RITUAL) - CON BORDES FUNDIDOS -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
+    
+    <!-- 1. CAPA DE VIDEO (FONDO) -->
+    <div class="absolute inset-0 z-0">
             <!--<iframe class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
                 style="top:50%; left:50%; transform:translate(-50%,-50%);"
                 src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&autoplay=1&mute=1&controls=0&loop=1&playlist=yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&start=0&end=42" 
                 frameborder="0" allow="autoplay; encrypted-media">
                </iframe>-->
             <iframe
-                 class="absolute w-[150%] h-[150%] opacity-70 pointer-events-none" 
-                 style="top:50%; left:50%; transform:translate(-50%,-50%);"
-                 src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&amp;controls=0&amp;&amp;loop=1&amp;autoplay=1&amp;mute=1&amp;start=0" title="YouTube video player" frameborder="0"  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <div class="relative z-20 text-center mix-blend-overlay">
-                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
-                <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
-            </div>
-        </section>     
+                <iframe class="w-full h-full object-cover opacity-60 pointer-events-none scale-125"                  
+                 src="https://www.youtube.com/embed/yJMXzvZEZlQ?si=EVoSeu4BpinhA-iF&amp;controls=0&amp;&amp;loop=1&amp;autoplay=1&amp;mute=1&amp;start=0" title="YouTube video player" frameborder="0"  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>                
+            </iframe>
+    </div>
+            <!-- Z-Index 10 para estar ENCIMA del video pero DEBAJO del texto -->
+    <div class="cinematic-fade" style="z-index: 10;"></div>
+
+    <!-- 3. CONTENIDO / TEXTO -->
+    <div class="relative z-20 text-center mix-blend-overlay px-4">
+        <h2 class="text-[15vw] md:text-[12vw] font-display text-white leading-none tracking-tighter select-none">
+            RITUAL
+        </h2>
+        <p class="text-white/80 text-xl font-light italic mt-4 font-display tracking-widest">
+            La Yonna
+        </p>
+    </div>
+
+</section>   
 
         
      <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
