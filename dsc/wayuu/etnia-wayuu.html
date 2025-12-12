@@ -9,327 +9,88 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet">
     
-    <!-- LIBRERÍAS EXTERNAS -->
+    <!-- LIBRERÍAS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
     
     <style>
-        :root {
-            --c-bg: #050200;
-            --c-sand: #C89F65;
-            --c-accent: #FF3B3B;
-            --c-star: #A5D8FF;
-        }
-
-        body { 
-            background-color: var(--c-bg); 
-            color: #f3f3f3; 
-            font-family: 'Manrope', sans-serif; 
-            overflow-x: hidden; 
-            cursor: none; 
-            margin: 0;
-        }
-
+        :root { --c-bg: #050200; --c-sand: #C89F65; --c-accent: #FF3B3B; --c-star: #A5D8FF; }
+        body { background-color: var(--c-bg); color: #f3f3f3; font-family: 'Manrope', sans-serif; overflow-x: hidden; cursor: none; margin: 0; }
+        
         .font-display { font-family: 'Playfair Display', serif; }
-        .font-decor { font-family: 'Cinzel Decorative', serif; }
         .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        /* CURSOR */
-     #cursor {
+        /* --- CURSOR (ESTILOS FORZADOS) --- */
+        #cursor {
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            background: #ffffff; 
-            border-radius: 50%;
-            pointer-events: none; 
-            z-index: 99999; /* Máxima prioridad */
-            transform: translate(-50%, -50%); 
-            transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
-                        height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
-                        background-color 0.2s;
-            mix-blend-mode: difference; /* Inversión por defecto */
-            display: flex; justify-content: center; align-items: center;
+            background: #ffffff; border-radius: 50%; pointer-events: none;
+            z-index: 99999; /* Capa Máxima */
+            transform: translate(-50%, -50%);
+            transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), background-color 0.2s;
+            mix-blend-mode: difference; display: flex; justify-content: center; align-items: center;
         }
-        
         #cursor span { 
-            opacity: 0; 
-            font-size: 10px; font-weight: 800; color: white; 
-            font-family: 'Syncopate', sans-serif; letter-spacing: 1px;
-            pointer-events: none;
+            opacity: 0; font-size: 10px; font-weight: 800; color: white; 
+            font-family: 'Syncopate', sans-serif; letter-spacing: 1px; pointer-events: none;
         }
 
-        /* ESTADO: AUDIO (EL ROJO IMPORTANTE) */
+        /* CURSOR ROJO (AUDIO) - IMPORTANTE */
         #cursor.audio-mode { 
             width: 90px !important; 
             height: 90px !important; 
-            background: #FF3B3B !important; /* Rojo Forzado */
+            background: #FF3B3B !important; 
+            mix-blend-mode: normal !important;
             border: none !important;
-            mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */            
-            opacity: 1 !important;
-            box-shadow: 0 4 30px rgba(255, 59, 59, 0.5) !important;            
+            box-shadow: 0 4px 30px rgba(255, 59, 59, 0.5);
         }
-        
-       #cursor.audio-mode span {         
-        opacity: 1 !important; 
-        color: white !important;
-        font-weight: 800;
-        font-size: 12px;
-      }
-        
-   /* ESTADO: HOVER SIMPLE */
+        #cursor.audio-mode span { opacity: 1 !important; color: white !important; }
+
         #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
+        #cursor.video-mode { width: 100px; height: 100px; background: white; mix-blend-mode: difference; }
+        #cursor.video-mode span { opacity: 1; color: black; }
+        #cursor.dream-mode { width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 60%); mix-blend-mode: overlay; }
 
-        /* ESTADO: SUEÑOS */
-        #cursor.dream-mode { width: 150px; height: 150px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); mix-blend-mode: normal; }
-
-
-      /* ESTADO: VIDEO */
-        #cursor.video-mode { 
-            width: 100px; 
-            height: 100px; 
-            background: white; 
-            mix-blend-mode: difference; 
-        }
-        #cursor.video-mode span { 
-            opacity: 1; 
-            color: black; /* Texto negro sobre fondo blanco */
-        }
-     
-
-        /* UTILIDADES VISUALES */
-        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+        /* --- FONDOS Y CAPAS --- */
+        .desert-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; animation: slowZoom 60s infinite alternate; pointer-events: none; }
+        @keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.15); } }
         
-        .giant-text {
-            font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
-        }
-        .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
+        .desert-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%); z-index: 1; pointer-events: none; }
+        .cinematic-fade { position: absolute; inset: 0; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 20%, transparent 80%, #050200 100%); pointer-events: none; }
 
-        .hero-video-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.5; filter: contrast(1.1) brightness(0.8);
-            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-        }
-
-        /* TILT CARDS */
-     /*   .tilt-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
-            transition: all 0.3s ease;
-        }*/
-       /* .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }*/
-        .tilt-inner { transform: translateZ(20px); }        
-        
-        /* LOADER */
-        .loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c-bg); z-index: 10000;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        .loader-line {
-            width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear;
-        }
-        
-        /* Estado inicial del contenido principal */
-        #main-content {
-            opacity: 0;
-            transition: opacity 1.5s ease;
-        }
-
-        .cosmos-bg {
-            position: absolute; inset: 0; background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
-            opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
-        }
-        
-         /* PLAY BUTTON */
-        .play-btn {
-            width: 48px; height: 48px; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.3);
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s;
-        }
+        /* --- TARJETAS --- */
+        .cards-container { position: relative; z-index: 10; }
+        .tilt-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }
+        .play-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: white; }
         .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
 
-        ::-webkit-scrollbar { width: 0px; }
+        /* --- IDENTIDAD SCROLL --- */
+        .horizontal-container { width: 400%; height: 100vh; display: flex; flex-wrap: nowrap; }
+        .panel { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 4rem; border-right: 1px solid rgba(255,255,255,0.05); }
+        .cinematic-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; filter: contrast(1.1) saturate(1.2); }
+        .text-protection { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: 1; }
+        .panel-fade { position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 15%, transparent 85%, #050200 100%); }
 
-        /* --- ECUALIZADOR ANIMADO --- */
-        @keyframes equalize {
-            0% { height: 3px; }
-            50% { height: 100%; }
-            100% { height: 3px; }
-        }
-        
-        .bar {
-            width: 3px;
-            background-color: currentColor; /* Hereda el color del texto */
-            border-radius: 9999px;
-            animation: equalize 1s infinite ease-in-out;
-        }
-        
-        /* Retrasos para que parezca aleatorio */
+        /* --- JEPIRA --- */
+        #jepira-section { position: relative; background-color: transparent !important; z-index: 20; overflow: hidden; }
+        #cosmos-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%); opacity: 0; transition: opacity 1s ease; z-index: -1; pointer-events: none; }
+
+        /* --- ECUALIZADOR --- */
+        @keyframes equalize { 0% { height: 3px; } 50% { height: 100%; } 100% { height: 3px; } }
+        .bar { width: 3px; background-color: currentColor; border-radius: 9999px; animation: equalize 1s infinite ease-in-out; }
         .bar:nth-child(1) { animation-delay: -0.4s; height: 60%; }
         .bar:nth-child(2) { animation-delay: -0.2s; height: 100%; }
         .bar:nth-child(3) { animation-delay: -0.6s; height: 40%; }
         .bar:nth-child(4) { animation-delay: -0.8s; height: 80%; }
-        
-        /* Estado Pausado (opcional, si quieres que se detengan al pausar) */
         .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
 
-        /* --- FONDO CINEMÁTICO --- */
-        .desert-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover;
-            z-index: 0;
-            /* Efecto de Zoom lento constante para dar vida */
-            animation: slowZoom 60s infinite alternate;
-        }
-        
-        @keyframes slowZoom {
-            from { transform: scale(1); }
-            to { transform: scale(1.15); }
-        }
-        
-        /* Capa oscura para garantizar lectura */
-        .desert-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%);
-            z-index: 1;
-            pointer-events: none;
-        }
-        
-                /* --- TARJETAS CRISTAL (MIRAGE EFFECT) --- */
-        .tilt-card {
-            /* Fondo semi-transparente oscuro */
-            background: rgba(0, 0, 0, 0.4); 
-            /* Desenfoque fuerte para suavizar el fondo */
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
-            z-index: 10; /* Encima del fondo */
-        }
-        
-        /* AL HACER HOVER O REPRODUCIR */
-        .tilt-card:hover, .tilt-card.playing {
-            /* Se vuelve más transparente para ver el desierto detrás */
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(5px); /* Menos desenfoque = Más nitidez del fondo */
-            border-color: var(--c-sand);
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        
-        /* Texto Wayuunaiki más brillante para contrastar */
-        .tilt-card h3 { text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-
-        /* --- DEGRADADO DE BORDES (CINEMATIC FADE) --- */
-        .cinematic-fade {
-            position: absolute;
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            pointer-events: none; /* Permite dar clic a través de ella */
-            z-index: 2; /* Se coloca encima de la imagen y del overlay oscuro */
-            background: linear-gradient(
-                to bottom,
-                #050200 0%,        /* Negro arriba */
-                transparent 20%,   /* Se vuelve transparente al bajar */
-                transparent 80%,   /* Se mantiene transparente */
-                #050200 100%       /* Vuelve a negro abajo */
-            );
-        }
-
-         /* HORIZONTAL SCROLL (IDENTITY) */
-        .horizontal-container {
-            width: 400%; /* 4 Paneles */
-            height: 100vh;
-            display: flex;
-            flex-wrap: nowrap;
-        }
-        .panel {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 4rem;
-            border-right: 1px solid rgba(255,255,255,0.05);
-        }
-        .panel-bg {
-            position: absolute; inset: 0; z-index: 0;
-            filter: brightness(0.4) grayscale(0.5);
-            transition: transform 0.5s;
-        }
-        .panel:hover .panel-bg { transform: scale(1.02); filter: brightness(0.5) grayscale(0.2); }
-
-         /* JEPIRA (COSMOS) */
-        .warp-speed-effect {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, #000 90%);
-            z-index: 1;
-        }
-
-        /* --- MEJORA DE VIDEO (MÁS LUZ Y COLOR) --- */
-.cinematic-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.9; /* Subimos de 0.6 a 0.9 (Mucho más visible) */
-    filter: contrast(1.1) saturate(1.2); /* Realza los colores del desierto */
-    transition: opacity 0.5s ease;
-}
-
-        /* --- CONTINUIDAD (BORDES FUNDIDOS) --- */
-/* Esto crea el degradado negro arriba y abajo para que no se note el corte */
-.panel-fade {
-    position: absolute;
-    inset: 0;
-    pointer-events: none; /* Permite dar clic a través */
-    z-index: 2;
-    background: linear-gradient(
-        to bottom,
-        #050200 0%,         /* Negro arriba (fusión con sección anterior) */
-        transparent 15%,    /* Transparente rápido para ver el video */
-        transparent 85%,    /* Se mantiene transparente */
-        #050200 100%        /* Negro abajo (fusión con footer/siguiente) */
-    );
-}
-
-/* --- SOMBRA SOLO DETRÁS DEL TEXTO --- */
-/* En lugar de oscurecer todo el video, oscurecemos solo donde va el texto */
-.text-protection {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
-    z-index: 1;
-}
-
-
-/* JEPIRA: Fondo transparente para ver el Canvas */
-#jepira-section {
-    position: relative;
-    background-color: transparent !important; /* Forzar transparencia */
-    z-index: 20;
-    overflow: hidden; /* Evita scrollbars si las estrellas se salen */
-}
-
-/* El degradado azul cósmico (Sutil) */
-#cosmos-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%);
-    opacity: 0;
-    transition: opacity 1s ease;
-    z-index: -1; /* Detrás del texto */
-    pointer-events: none;
-}
-
+        /* UTILS */
+        .hero-video-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5; filter: contrast(1.1) brightness(0.8); mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+        .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--c-bg); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .loader-line { width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear; }
+        #main-content { opacity: 0; transition: opacity 1.5s ease; }
+        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+        ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body>
@@ -345,366 +106,222 @@
         </div>
     </div>
     
-<!-- AUDIO DE FONDO -->
-<audio id="bg-music" loop>
-    <source src="../../musica/musica_wayuu.wav" type="audio/wav">
-</audio>
+    <!-- AUDIO DE FONDO -->
+    <audio id="bg-music" loop>
+        <source src="../../musica/musica_wayuu.wav" type="audio/wav">
+    </audio>
 
-<!-- NAV BAR -->
-<nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
-    
-    <!-- LOGO -->
-    <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">
-        NACIÓN WAYUU
-    </div>
-
-    <!-- CONTROLES -->
-    <div class="flex items-center gap-6">
-        
-        <!-- BOTÓN SONIDO -->
-        <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
-            <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
-            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                <!-- Icono Mute (Visible al inicio) -->
-                <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                <!-- Icono Sound (Oculto) -->
-                <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-            </div>
-        </button>
-
-        <!-- BOTÓN MENÚ -->
-        <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
-            <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
-            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
-                <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
-                <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    <!-- NAV BAR -->
+    <nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
+        <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">NACIÓN WAYUU</div>
+        <div class="flex items-center gap-6">
+            <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+                <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
+                <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                    <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                    <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                 </div>
-            </div>
-        </button>
+            </button>
+            <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+                <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
+                <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
+                    <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
+                    <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+                </div>
+            </button>
+        </div>
+    </nav>
 
+    <!-- OVERLAY MENÚ -->
+    <div id="menu-overlay" class="fixed inset-0 bg-[#050200] z-[90] hidden flex flex-col justify-center items-center opacity-0 transition-opacity duration-500">
+        <ul class="text-center space-y-4 md:space-y-8">
+            <li><a href="#main-content" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Origen</a></li>
+            <li><a href="#identity-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Identidad</a></li>
+            <li><a href="#weaving-container" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">El Tejido</a></li>
+            <li><a href=".desert-bg" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Wayuunaiki</a></li>
+            <li><a href="#jepira-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Jepira</a></li>
+        </ul>
+        <div class="absolute bottom-10 text-center opacity-50"><p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p></div>
     </div>
-</nav>
-
-<!-- OVERLAY MENÚ (Corregido el corte de letras) -->
-<div id="menu-overlay" class="fixed inset-0 bg-[#050200] z-[90] hidden flex flex-col justify-center items-center opacity-0 transition-opacity duration-500">
-    <ul class="text-center space-y-4 md:space-y-8">
-        <!-- Quitada la clase overflow-hidden para que se vean las letras completas -->
-        <li><a href="#main-content" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Origen</a></li>
-        <li><a href="#identity-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Identidad</a></li>
-        <li><a href="#weaving-container" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">El Tejido</a></li>
-        <li><a href=".desert-bg" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Wayuunaiki</a></li>
-        <li><a href="#jepira-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Jepira</a></li>
-    </ul>
-    <div class="absolute bottom-10 text-center opacity-50">
-        <p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p>
-    </div>
-</div>
-    
-    <div class="absolute bottom-10 text-center opacity-50">
-        <p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p>
-    </div>
-</div>
 
     <!-- MAIN -->
     <main id="main-content">
         
         <!-- 1. HERO -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden">
-            <video autoplay muted loop playsinline class="hero-video-bg">
-                <source src="../../video/wayuu_desierto_ss.mp4" type="video/mp4">
-            </video>
-            
+            <video autoplay muted loop playsinline class="hero-video-bg"><source src="../../video/wayuu_desierto_ss.mp4" type="video/mp4"></video>
             <div class="text-center relative z-10 flex flex-col items-center">
                 <p class="font-tech text-xs tracking-[0.8em] text-white/60 mb-6 reveal-text">ORIGEN</p>
                 <h1 class="giant-text font-display reveal-title">WA<span>YUU</span></h1>
-                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">
-                    Hijos de la lluvia y la sequía
-                </p>
-                 <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">
-                    EL CAMINO DE LAS ALMAS
-                </p>
+                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">Hijos de la lluvia y la sequía</p>
+                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">EL CAMINO DE LAS ALMAS</p>
             </div>
-
-              <!-- FLECHA SCROLL -->
             <div class="absolute bottom-10 animate-bounce z-20 text-white/50">
                 <p class="text-[9px] tracking-[0.3em] mb-2 uppercase">Descubre su historia</p>
                 <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
             </div>
-            
         </section>
 
-        <!-- 2. IDENTIDAD (VIDEOS VIVOS + BORDES FUNDIDOS) -->
-<section id="identity-section" class="overflow-hidden h-screen bg-[#050200] relative z-20">
-    <div class="horizontal-container" id="horizontal-wrapper">
-        
-        <!-- Intro Panel -->
-        <div class="panel bg-black relative">
-            <div class="z-10 max-w-2xl px-6">
-                <span class="text-[#FF3B3B] font-mono text-xs tracking-widest mb-4 block">01 — IDENTIDAD</span>
-                <h2 class="text-5xl md:text-8xl font-display text-white mb-8">Los 4 Pilares <br><span class="italic text-[#C89F65]">Ancestrales</span></h2>
-                <p class="text-gray-400 text-lg font-light">
-                    Más que una etnia, somos una civilización del desierto.
-                    <br><br>
-                    <span class="text-xs font-mono border-b border-gray-600 pb-1 animate-pulse">DESLIZA ▶</span>
-                </p>
+        <!-- 2. IDENTIDAD (SCROLL HORIZONTAL) -->
+        <section id="identity-section" class="overflow-hidden h-screen bg-[#050200] relative z-20">
+            <div class="horizontal-container" id="horizontal-wrapper">
+                
+                <div class="panel bg-black relative">
+                    <div class="z-10 max-w-2xl px-6">
+                        <span class="text-[#FF3B3B] font-mono text-xs tracking-widest mb-4 block">01 — IDENTIDAD</span>
+                        <h2 class="text-5xl md:text-8xl font-display text-white mb-8">Los 4 Pilares <br><span class="italic text-[#C89F65]">Ancestrales</span></h2>
+                        <p class="text-gray-400 text-lg font-light">Más que una etnia, somos una civilización del desierto.<br><br><span class="text-xs font-mono border-b border-gray-600 pb-1 animate-pulse">DESLIZA ▶</span></p>
+                    </div>
+                    <div class="panel-fade"></div>
+                </div>
+
+                <div class="panel hover-trigger group relative">
+                    <div class="absolute inset-0 w-full h-full">
+                        <video autoplay muted loop playsinline class="cinematic-video"><source src="../../video/wayuu-rojas2.mp4" type="video/mp4"></video>
+                        <div class="text-protection"></div><div class="panel-fade"></div>
+                    </div>
+                    <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
+                        <h3 class="text-4xl font-display text-white mb-4">La Sangre Materna</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">Sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido y el clan (*Eiruku*) se heredan de la madre. Ella es la raíz.</p>
+                        <ul class="text-xs font-mono text-gray-300 space-y-2 border-t border-white/20 pt-4"><li>• Eiruku: Carne / Clan</li><li>• 30+ Clanes (Uriana, Epieyu...)</li></ul>
+                    </div>
+                </div>
+
+                <div class="panel hover-trigger group relative">
+                    <div class="absolute inset-0 w-full h-full">
+                        <video autoplay muted loop playsinline class="cinematic-video"><source src="../../video/wayuu_video.mp4" type="video/mp4"></video>
+                        <div class="text-protection"></div><div class="panel-fade"></div>
+                    </div>
+                    <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
+                        <h3 class="text-4xl font-display text-white mb-4">La Palabra es Ley</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">El <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero) resuelve conflictos con el poder de la palabra, evitando la guerra y restaurando la armonía.</p>
+                        <span class="text-xs uppercase tracking-widest text-[#C89F65]">Patrimonio de la Humanidad</span>
+                    </div>
+                </div>
+
+                <div class="panel hover-trigger group relative">
+                    <div class="absolute inset-0 w-full h-full">
+                        <video autoplay muted loop playsinline class="cinematic-video"><source src="../../video/default_video.mp4" type="video/mp4"></video>
+                        <div class="text-protection"></div><div class="panel-fade"></div>
+                    </div>
+                    <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
+                        <h3 class="text-4xl font-display text-white mb-4">Sustento y Arte</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">Pastoreo, pesca y tejido. Cada mochila (*Susu*) cuenta una historia geométrica (*Kanas*) que refleja el universo Wayuu.</p>
+                        <span class="text-[#C89F65] text-4xl font-bold block mt-4">Kanas <span class="text-sm font-normal text-white">Geometría Sagrada</span></span>
+                    </div>
+                </div>
             </div>
-            <!-- Degradado de continuidad también aquí -->
-            <div class="panel-fade"></div>
-        </div>
+        </section>
 
-        <!-- Panel 1: Social -->
-        <div class="panel hover-trigger group relative">
-            <!-- VIDEO MEJORADO -->
-            <div class="absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="cinematic-video">
-                     <source src="../../video/wayuu-rojas2.mp4" type="video/mp4">
-                </video>
-                <!-- Protección visual suave -->
-                <div class="text-protection"></div>
-                <!-- BORDES FUNDIDOS (Tu requerimiento) -->
-                <div class="panel-fade"></div>
-            </div>
-
-            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
-                <h3 class="text-4xl font-display text-white mb-4">La Sangre Materna</h3>
-                <p class="text-gray-200 font-light mb-4 text-lg">
-                    Sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido y el clan (*Eiruku*) se heredan de la madre. Ella es la raíz.
-                </p>
-                <ul class="text-xs font-mono text-gray-300 space-y-2 border-t border-white/20 pt-4">
-                    <li>• Eiruku: Carne / Clan</li>
-                    <li>• 30+ Clanes (Uriana, Epieyu...)</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Panel 2: Político -->
-        <div class="panel hover-trigger group relative">
-            <div class="absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="cinematic-video">
-                    <source src="../../video/wayuu_video.mp4" type="video/mp4">
-                </video>
-                <div class="text-protection"></div>
-                <div class="panel-fade"></div>
-            </div>
-
-            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
-                <h3 class="text-4xl font-display text-white mb-4">La Palabra es Ley</h3>
-                <p class="text-gray-200 font-light mb-4 text-lg">
-                    El <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero) resuelve conflictos con el poder de la palabra, evitando la guerra y restaurando la armonía.
-                </p>
-                <span class="text-xs uppercase tracking-widest text-[#C89F65]">Patrimonio de la Humanidad</span>
-            </div>
-        </div>
-
-        <!-- Panel 3: Económico -->
-        <div class="panel hover-trigger group relative">
-            <div class="absolute inset-0 w-full h-full">
-                <video autoplay muted loop playsinline class="cinematic-video">
-                    <source src="../../video/default_video.mp4" type="video/mp4">
-                </video>
-                <div class="text-protection"></div>
-                <div class="panel-fade"></div>
-            </div>
-
-            <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
-                <h3 class="text-4xl font-display text-white mb-4">Sustento y Arte</h3>
-                <p class="text-gray-200 font-light mb-4 text-lg">
-                    Pastoreo, pesca y tejido. Cada mochila (*Susu*) cuenta una historia geométrica (*Kanas*) que refleja el universo Wayuu.
-                </p>
-                <span class="text-[#C89F65] text-4xl font-bold block mt-4">Kanas <span class="text-sm font-normal text-white">Geometría Sagrada</span></span>
-            </div>
-        </div>
-
-    </div>
-</section>        
-    
-
-        <!-- 3. SECCIÓN: EL HILO DE LA VIDA (3D + STORYTELLING) -->
+        <!-- 3. EL HILO DE LA VIDA -->
         <section class="h-screen w-full flex flex-col md:flex-row items-center justify-center relative bg-[#050200] overflow-hidden z-20">
-            
-            <!-- Lado Izquierdo: Narrativa -->
             <div class="absolute md:relative z-30 w-full md:w-1/3 px-8 md:pl-24 text-center md:text-left pointer-events-none mix-blend-difference">
                 <span class="text-[#C89F65] font-mono text-xs tracking-widest uppercase mb-4 block">02 — El hilo de la vida</span>
                 <span class="text-[#FF3B3B] text-xs font-mono tracking-[0.4em] uppercase mb-4 block">Wale'kerü</span>
                 <h3 class="text-4xl md:text-6xl font-display text-white mb-6">El Tejido es <br><span class="italic text-[#C89F65]">Pensamiento</span></h3>
-                <p class="text-sm text-gray-300 font-light leading-relaxed max-w-md mx-auto md:mx-0">
-                    "La araña nos enseñó que tejer no es solo cruzar hilos. Es organizar la vida. 
-                    Cada nudo es una familia, cada línea un camino. Al mover la red, sientes la tensión de todo un pueblo 
-                    que se niega a romperse."
-                </p>
+                <p class="text-sm text-gray-300 font-light leading-relaxed max-w-md mx-auto md:mx-0">"La araña nos enseñó que tejer no es solo cruzar hilos. Es organizar la vida. Cada nudo es una familia, cada línea un camino."</p>
                 <div class="mt-8 flex items-center justify-center md:justify-start gap-4 opacity-70">
-                    <div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center animate-spin-slow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white"><path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5"/><path d="M12 8V16" stroke-width="1.5"/><path d="M8 12H16" stroke-width="1.5"/></svg>
-                    </div>
                     <span class="text-[10px] tracking-widest uppercase">Interactúa con la red</span>
                 </div>
             </div>
-        
-            <!-- Lado Derecho: Interacción 3D -->
             <div id="weaving-container" class="absolute inset-0 md:relative md:w-2/3 h-full cursor-grab active:cursor-grabbing z-20 opacity-60 md:opacity-100"></div>
-            
          </section>
 
-      
-        
-      <!-- SECCIÓN: VOCES DEL VIENTO (CON FONDO CINEMÁTICO) -->
-            <section class="py-32 px-6 md:px-12 relative overflow-hidden h-auto min-h-screen flex flex-col justify-center">
-                
-                <!-- 1. IMAGEN DE FONDO VIVA (Desierto Wayuu) -->
-                <img src="../../img/wayuu_desierto.jpeg" 
-                     alt="Desierto de la Guajira" 
-                     class="desert-bg">
-                     
-                <!-- 2. OVERLAY OSCURO (Para que se lean los textos) -->
-                <div class="desert-overlay"></div>
-
-                <div class="cinematic-fade"></div>
-                
-                <!-- 3. CONTENIDO (Z-Index alto para estar sobre la imagen) -->
-                <div class="max-w-[1400px] mx-auto w-full relative z-10">
-                    
-                    <div class="mb-16 border-l-2 border-[#C89F65] pl-6">
-                                 <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2 shadow-black drop-shadow-md">03 — WAYUUNAIKI</p>
-                        <h2 class="text-4xl md:text-6xl font-display text-white drop-shadow-lg">
-                            El Idioma del <span class="italic text-[#C89F65]">Desierto</span>
-                        </h2>
-                    </div>
+        <!-- 4. VOCES DEL VIENTO -->
+        <section class="py-32 px-6 md:px-12 relative overflow-hidden h-auto min-h-screen flex flex-col justify-center">
+            <img src="../../img/wayuu_desierto.jpeg" alt="Desierto" class="desert-bg">
+            <div class="desert-overlay"></div>
+            <div class="cinematic-fade"></div>
             
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                   <!-- TARJETA 1: Achonnii -->
-                            <div id="card-audio1" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio1')">
-                                <div class="relative z-10">
-                                    <div class="flex justify-between items-start mb-12 h-8">
-                                        <div class="flex items-end gap-2 h-full">
-                                            <span class="text-xs font-mono text-gray-300 mb-1">01</span>
-                                            <div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                                <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                            </div>
-                                        </div>
-                                        <div id="btn-audio1" class="play-btn text-white border-white/40">
-                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                        </div>
-                                    </div>
-                                    <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Achonnii</h3>
-                                    <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/a-cho-nii/ — "Hijo"</p>
-                                </div>
-                                <audio id="audio1" src="../../vocabulario/wayuu/achonnii.mp3"></audio>
+            <div class="max-w-[1400px] mx-auto w-full relative cards-container">
+                <div class="mb-16 border-l-2 border-[#C89F65] pl-6">
+                    <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2 shadow-black drop-shadow-md">03 — WAYUUNAIKI</p>
+                    <h2 class="text-4xl md:text-6xl font-display text-white drop-shadow-lg">El Idioma del <span class="italic text-[#C89F65]">Desierto</span></h2>
+                </div>
+        
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tarjeta 1 -->
+                    <div id="card-audio1" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio1')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">01</span><div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio1" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
-                
-                                    <!-- TARJETA 2 -->
-                            <div id="card-audio2" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio2')">
-                                <div class="relative z-10">
-                                    <div class="flex justify-between items-start mb-12 h-8">
-                                        <div class="flex items-end gap-2 h-full">
-                                            <span class="text-xs font-mono text-gray-300 mb-1">02</span>
-                                            <div id="eq-audio2" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                                <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                            </div>
-                                        </div>
-                                        <div id="btn-audio2" class="play-btn text-white border-white/40">
-                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                        </div>
-                                    </div>
-                                    <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Eyüü</h3>
-                                    <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/e-yüü/ — "Madre"</p>
-                                </div>
-                                <audio  id="audio2" src="../../vocabulario/wayuu/eyuu.mp3"></audio>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Achonnii</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/a-cho-nii/ — "Hijo"</p>
+                        </div>
+                        <audio id="audio1" src="../../vocabulario/wayuu/achonnii.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 2 -->
+                    <div id="card-audio2" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio2')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">02</span><div id="eq-audio2" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio2" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
-                
-                            <!-- TARJETA 3 -->
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Eyüü</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/e-yüü/ — "Madre"</p>
+                        </div>
+                        <audio id="audio2" src="../../vocabulario/wayuu/eyuu.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 3 -->
                     <div id="card-audio3" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio3')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <div class="flex items-end gap-2 h-full">
-                                    <span class="text-xs font-mono text-gray-300 mb-1">03</span>
-                                    <div id="eq-audio3" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                        <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                    </div>
-                                </div>
-                                <div id="btn-audio3" class="play-btn text-white border-white/40">
-                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">03</span><div id="eq-audio3" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio3" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Aa, anayawatsi</h3>
-                                     <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Aa-a-na-ya-wat-si/ — "Sí, gracias"</p>
-                                </div>
-                                <audio id="audio3" src="../../vocabulario/wayuu/aaanayaguatsi.mp3"></audio>
-                            </div>
-                
-                             <!-- TARJETA 4 -->
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Aa-a-na-ya-wat-si/ — "Sí, gracias"</p>
+                        </div>
+                        <audio id="audio3" src="../../vocabulario/wayuu/aaanayaguatsi.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 4 -->
                     <div id="card-audio4" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio4')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <div class="flex items-end gap-2 h-full">
-                                    <span class="text-xs font-mono text-gray-300 mb-1">04</span>
-                                    <div id="eq-audio4" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                        <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                    </div>
-                                </div>
-                                <div id="btn-audio4" class="play-btn text-white border-white/40">
-                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">04</span><div id="eq-audio4" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio4" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Anayawatsi ma'in</h3>
-                                    <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/A-na-ya-wat-si-main/ — "Muchas gracias"</p>
-                                </div>
-                                <audio id="audio4" src="../../vocabulario/wayuu/anayaquatsi.mp3"></audio>
-                            </div>
-                
-                            <!-- TARJETA 5 -->
-                     <div id="card-audio5" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio5')">
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/A-na-ya-wat-si-main/ — "Muchas gracias"</p>
+                        </div>
+                        <audio id="audio4" src="../../vocabulario/wayuu/anayaquatsi.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 5 -->
+                    <div id="card-audio5" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio5')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <div class="flex items-end gap-2 h-full">
-                                    <span class="text-xs font-mono text-gray-300 mb-1">05</span>
-                                    <div id="eq-audio5" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                        <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                    </div>
-                                </div>
-                                <div id="btn-audio5" class="play-btn text-white border-white/40">
-                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">05</span><div id="eq-audio5" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio5" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Wattama'at</h3>
-                                    <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Wa-tta-ma-at/ — "Es de mañana(Saludo estándar)"</p>
-                                </div>
-                                <audio id="audio5" src="../../vocabulario/wayuu/guattamaat.mp3"></audio>
-                            </div>
-                
-                            <!-- TARJETA 6 -->
-                     <div id="card-audio6" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio6')">
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Wa-tta-ma-at/ — "Es de mañana"</p>
+                        </div>
+                        <audio id="audio5" src="../../vocabulario/wayuu/guattamaat.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 6 -->
+                    <div id="card-audio6" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio6')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <div class="flex items-end gap-2 h-full">
-                                    <span class="text-xs font-mono text-gray-300 mb-1">06</span>
-                                    <div id="eq-audio6" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300">
-                                        <div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div>
-                                    </div>
-                                </div>
-                                <div id="btn-audio6" class="play-btn text-white border-white/40">
-                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">06</span><div id="eq-audio6" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio6" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
                             <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Paliijü taya</h3>
-                                    <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Pa-lii-jü-ta-ya/ — "Por favor"</p>
-                                </div>
-                                <audio id="audio6" src="../../vocabulario/wayuu/paliijiu.mp3"></audio>
-                            </div>
-                
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Pa-lii-jü-ta-ya/ — "Por favor"</p>
                         </div>
+                        <audio id="audio6" src="../../vocabulario/wayuu/paliijiu.mp3"></audio>
                     </div>
-                </section>
+                </div>
+            </div>
+        </section>
 
-       <!-- SECCIÓN: LAPÜ (ORÁCULO) -->
+        <!-- 5. LAPÜ -->
         <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
             <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
             <div class="relative z-10 text-center pointer-events-none mix-blend-exclusion px-4">
                 <span class="text-xs font-tech text-[#FF3B3B] tracking-[0.5em] block mb-4">04 — LAPÜ (EL ORÁCULO)</span>
-                
-                <!-- Nuevo mensaje significativo -->
                 <h2 class="text-3xl md:text-5xl font-display text-white mb-6">El Sueño es la <br>verdadera vigilia</h2>
-                
                 <div class="inline-flex flex-col items-center gap-2 mt-[30vh] opacity-60 animate-pulse">
                     <div class="w-[1px] h-12 bg-white"></div>
                     <p class="text-white text-[10px] font-mono tracking-widest uppercase">Disipa la niebla para recibir el mensaje</p>
@@ -712,134 +329,70 @@
             </div>
         </section>
 
- <!-- 6. VIDEO -->
-<section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
-    
-    <!-- 1. CONTENEDOR VIDEO (YouTube API) -->
-    <!-- Z-Index 0 para que esté al fondo -->
-    <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+        <!-- 6. VIDEO (YOUTUBE LOOP PERFECTO + FADE) -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
+            <!-- Contenedor API YouTube -->
+            <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+            <div class="cinematic-fade" style="z-index: 20;"></div>
+            <div class="relative z-30 text-center mix-blend-overlay px-4 pointer-events-none">
+                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
+                <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
+            </div>
+        </section>     
 
-    <!-- 2. OVERLAY OSCURO (Opcional, para unificar tonos) -->
-    <div class="absolute inset-0 z-10 bg-black/20 pointer-events-none"></div>
-
-    <!-- 3. DEGRADADO DE CONTINUIDAD (AQUÍ ESTÁ LA SOLUCIÓN) -->
-    <!-- Z-Index 20 para estar ENCIMA del video -->
-    <div class="cinematic-fade" style="z-index: 20;"></div>
-
-    <!-- 4. CONTENIDO TEXTO -->
-    <!-- Z-Index 30 para estar encima de todo -->
-    <div class="relative z-30 text-center mix-blend-overlay px-4 pointer-events-none">
-        <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
-        <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
-    </div>
-
-</section>
-
+        <!-- 7. JEPIRA (WARP SPEED + FONDO) -->
+        <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
+            <div id="cosmos-overlay" class="cosmos-bg"></div>
+            <div class="relative z-10 text-center px-6 max-w-3xl">
+                <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-widest">05 — JEPIRA</span>
+                <h2 class="text-5xl md:text-7xl font-display text-white mb-8">El Camino de las Almas</h2>
+                <a href="#" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="inline-block px-10 py-4 border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger">Reiniciar</a>
+            </div>
+        </section>
         
-     <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
-<section id="jepira-section" class="h-screen relative flex items-center justify-center overflow-hidden">
-    
-    <!-- FONDO CÓSMICO (ID necesario para la animación JS) -->
-    <div id="cosmos-overlay" class="cosmos-bg"></div>
-    
-    <!-- CONTENIDO -->
-    <div class="relative z-20 text-center px-6">
-        <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-[0.5em] uppercase">06 — Jepira</span>
-        
-        <h2 class="text-5xl md:text-8xl font-display text-white mb-8 mix-blend-screen">
-            El Retorno a <br> las Estrellas
-        </h2>
-        
-        <p class="text-gray-300 text-lg font-light leading-relaxed mb-12 max-w-lg mx-auto">            
-            En la cosmovisión Wayuu, la muerte no es el final. Es un viaje hacia Jepira (Cabo de la Vela), el lugar donde habitan los muertos. Allí, las almas (Yoluja) esperan para convertirse en lluvia o en estrellas de la Vía Láctea (Spieyu).
-        </p>
-        
-        <!-- Botón Reiniciar -->
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 border border-white/30 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger bg-black/20 backdrop-blur-md">
-            Regresar a la Tierra
-        </button>
-    </div>
-</section>
-        
-       <!--
-        <footer class="py-12 bg-black border-t border-white/10 text-center relative z-20">
-            <p class="font-tech text-[10px] text-gray-600 tracking-[0.3em]">CULTURA WAYUU DIGITAL © 2025</p>
-             <img src="../../img/Logo.png" alt="Logo Ululato" class="footer-logo mx-auto mt-4 w-24">
-        </footer>-->
-
-       <!-- FOOTER PREMIUM -->
-<footer class="bg-[#050200] pt-24 pb-12 px-6 border-t border-white/5 relative z-20">
-    <div class="max-w-7xl mx-auto">
-        
-        <!-- Parte Superior: Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
-            
-            <!-- Marca y Logo -->
-            <div class="md:col-span-5 flex flex-col justify-between h-full">
-                <div>
-                    <!-- LOGO AJUSTADO: w-24 (era w-32) para más elegancia -->
-                    <img src="../../img/Logo.png" alt="Logo Ululato" class="w-16 mb-8 opacity-80 hover:opacity-100 transition-opacity">
-                    <h2 class="text-3xl md:text-4xl font-display text-white leading-tight">
-                        Preservando la <br> <span class="text-[#C89F65] italic">memoria ancestral</span> <br> en el código digital.
-                    </h2>
+        <!-- FOOTER -->
+        <footer class="bg-[#050200] pt-24 pb-12 px-6 border-t border-white/5 relative z-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+                    <div class="md:col-span-5 flex flex-col justify-between h-full">
+                        <div>
+                            <img src="../../img/Logo.png" alt="Logo Ululato" class="w-16 mb-8 opacity-80 hover:opacity-100 transition-opacity">
+                            <h2 class="text-3xl md:text-4xl font-display text-white leading-tight">Preservando la <br> <span class="text-[#C89F65] italic">memoria ancestral</span> <br> en el código digital.</h2>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 md:col-start-7">
+                        <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Explorar</span>
+                        <ul class="space-y-4">
+                            <li><a href="#main-content" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Origen</a></li>
+                            <li><a href="#identity-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Identidad</a></li>
+                            <li><a href="#weaving-container" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">El Tejido</a></li>
+                            <li><a href=".desert-bg" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Wayuunaiki</a></li>
+                            <li><a href="#jepira-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Jepira</a></li>
+                        </ul>
+                    </div>
+                    <div class="md:col-span-3">
+                        <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Conectar</span>
+                        <ul class="space-y-4">
+                            <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors"><span class="text-sm">Instagram</span></a></li>
+                            <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors"><span class="text-sm">Twitter / X</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="font-tech text-[10px] text-gray-600 tracking-[0.2em]">© 2025 ULULATO STUDIO</p>
                 </div>
             </div>
-
-            <!-- Navegación -->
-            <div class="md:col-span-3 md:col-start-7">
-                <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Explorar</span>
-                <ul class="space-y-4">
-                    <!-- Enlaces conectados a los IDs de las secciones -->
-                    <li><a href="#main-content" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Origen</a></li>
-                    <li><a href="#identity-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Identidad</a></li>
-                    <li><a href="#weaving-container" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">El Tejido</a></li>
-                    <!-- Nota: Para voces usamos la clase de la imagen de fondo como ancla -->
-                    <li><a href=".desert-bg" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Wayuunaiki</a></li>
-                    <li><a href="#jepira-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Jepira</a></li>
-                </ul>
-            </div>
-
-            <!-- Social -->
-            <div class="md:col-span-3">
-                <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Conectar</span>
-                <ul class="space-y-4">
-                    <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
-                        <span class="text-sm">Instagram</span>
-                        <svg class="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2"/></svg>
-                    </a></li>
-                    <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
-                        <span class="text-sm">Twitter / X</span>
-                        <svg class="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2"/></svg>
-                    </a></li>
-                    <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
-                        <span class="text-sm">Email</span>
-                        <svg class="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-width="2"/></svg>
-                    </a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Parte Inferior: Copyright -->
-        <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="font-tech text-[10px] text-gray-600 tracking-[0.2em]">© 2025 PROYECTO ULULATO</p>
-            <div class="flex gap-6">
-                <a href="#" class="text-[10px] text-gray-600 hover:text-gray-400 uppercase tracking-widest">Privacidad</a>
-                <a href="#" class="text-[10px] text-gray-600 hover:text-gray-400 uppercase tracking-widest">Créditos</a>
-            </div>
-        </div>
-    </div>
-</footer>
-        
+        </footer>
     </main>
 
-    <!-- SCRIPTS DE DEPENDENCIAS -->
+    <!-- SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
- <script>
+    <script>
     // ==========================================
     // 1. VARIABLES Y FUNCIONES GLOBALES
     // ==========================================
@@ -1393,5 +946,3 @@
         }
     });
 </script>
-</body>
-</html>
