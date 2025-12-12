@@ -310,18 +310,20 @@
     z-index: 1;
 }
 
-        * JEPIRA: Fondo transparente para ver el Canvas */
+
+/* JEPIRA: Fondo transparente para ver el Canvas */
 #jepira-section {
     position: relative;
-    background-color: transparent; /* Importante */
-    z-index: 10;
+    background-color: transparent !important; /* Forzar transparencia */
+    z-index: 20;
+    overflow: hidden; /* Evita scrollbars si las estrellas se salen */
 }
 
-/* El degradado azul cósmico */
+/* El degradado azul cósmico (Sutil) */
 #cosmos-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, #0B1436 0%, #000000 80%);
+    background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%);
     opacity: 0;
     transition: opacity 1s ease;
     z-index: -1; /* Detrás del texto */
@@ -1104,97 +1106,88 @@
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-       // G. THREE.JS GLOBAL (EFECTO WARP SPEED)
+     // G. THREE.JS GLOBAL (WARP SPEED REAL)
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
             
             const scene = new THREE.Scene();
-            // Fog negro para que las estrellas aparezcan suavemente desde el fondo
-            scene.fog = new THREE.FogExp2(0x000000, 0.001); 
+            // Niebla negra para que las estrellas aparezcan suavemente desde el fondo
+            scene.fog = new THREE.FogExp2(0x000000, 0.0015); 
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-            camera.position.z = 1000; // Cámara lejos
+            camera.position.z = 1000; // Cámara al final del túnel
 
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // --- CREACIÓN DE PARTÍCULAS ---
-            const count = 4000; // Más partículas para más impacto
+            // --- 1. CREACIÓN DE PARTÍCULAS (TÚNEL) ---
+            const count = 6000; // Aumentamos cantidad
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
-            const sizes = new Float32Array(count); // Tamaños variables
-
-            const cSand = new THREE.Color('#C89F65');
-            const cStar = new THREE.Color('#A5D8FF');
+            
+            const cSand = new THREE.Color('#C89F65'); // Arena
+            const cStar = new THREE.Color('#FFFFFF'); // Blanco Estrella
 
             for(let i = 0; i < count; i++) {
                 const i3 = i * 3;
-                // Posición aleatoria en un túnel largo
-                positions[i3] = (Math.random() - 0.5) * 2000;     // X
-                positions[i3+1] = (Math.random() - 0.5) * 2000;   // Y
-                positions[i3+2] = (Math.random() - 0.5) * 4000;   // Z (Profundidad)
+                // X e Y dispersos, Z muy profundo (de -3000 a 1000)
+                positions[i3] = (Math.random() - 0.5) * 2500; 
+                positions[i3+1] = (Math.random() - 0.5) * 2500;
+                positions[i3+2] = (Math.random() - 0.5) * 4000; 
                 
-                // Color inicial (Arena)
+                // Empezamos con color Arena
                 colors[i3] = cSand.r;
                 colors[i3+1] = cSand.g;
                 colors[i3+2] = cSand.b;
-
-                // Tamaño aleatorio
-                sizes[i] = Math.random() * 2;
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1)); // Atributo custom si usáramos shader, aquí afecta PointsMaterial si supporteado o ignorado
 
-            // Material
             const material = new THREE.PointsMaterial({
                 size: 2,
                 vertexColors: true,
                 transparent: true,
                 opacity: 0.8,
-                sizeAttenuation: true, // Importante para profundidad
+                sizeAttenuation: true, // Efecto de profundidad
                 blending: THREE.AdditiveBlending
             });
 
             const starField = new THREE.Points(geometry, material);
             scene.add(starField);
 
-            // Variables de Animación
-            let speed = 2; // Velocidad base (brisa suave)
-            let targetSpeed = 2;
+            // --- 2. ANIMACIÓN ---
+            let speed = 0.5; // Velocidad normal (viento suave)
+            let targetSpeed = 0.5;
             const clock = new THREE.Clock();
 
-            // --- ANIMACIÓN LOOP ---
             const animate = () => {
-                const delta = clock.getDelta();
-                
-                // Interpolación suave de la velocidad (Aceleración/Frenado)
-                speed += (targetSpeed - speed) * 0.05;
+                // Suavizado de aceleración (Lerp)
+                speed += (targetSpeed - speed) * 0.03;
 
                 const positions = geometry.attributes.position.array;
                 
                 for(let i = 0; i < count; i++) {
                     const i3 = i * 3;
                     
-                    // Mover partícula hacia la cámara (Z aumenta)
+                    // MOVER HACIA LA CÁMARA (Eje Z)
                     positions[i3+2] += speed;
 
-                    // Si la partícula pasa la cámara (Z > 1000), enviarla al fondo
+                    // Si la estrella pasa la cámara, enviarla al fondo
                     if(positions[i3+2] > 1000) {
-                        positions[i3+2] = -3000; // Reset al fondo
+                        positions[i3+2] = -3000; 
                         
-                        // Opcional: Redistribuir X e Y para que no se vea repetitivo
-                        positions[i3] = (Math.random() - 0.5) * 2000;
-                        positions[i3+1] = (Math.random() - 0.5) * 2000;
+                        // Redistribuir X e Y para que no se vea patrón repetido
+                        positions[i3] = (Math.random() - 0.5) * 2500;
+                        positions[i3+1] = (Math.random() - 0.5) * 2500;
                     }
                 }
                 
-                // Rotación leve del túnel para dinamismo
-                starField.rotation.z += 0.0005 * speed * 0.2;
+                // Rotación leve para dar dinamismo
+                starField.rotation.z += 0.0002 * speed;
 
                 geometry.attributes.position.needsUpdate = true;
                 renderer.render(scene, camera);
@@ -1202,19 +1195,19 @@
             };
             animate();
 
-            // --- SCROLL TRIGGER (EL GATILLO DE JEPIRA) ---
+            // --- 3. SCROLL TRIGGER (EL GATILLO) ---
             if(typeof gsap !== 'undefined') {
                 ScrollTrigger.create({
                     trigger: "#jepira-section",
-                    start: "top center", // Cuando Jepira llega al centro
+                    start: "top center", 
                     onEnter: () => {
-                        // 1. Acelerar a Hipervelocidad
-                        targetSpeed = 50; 
+                        // Acelerar a Warp Speed
+                        targetSpeed = 40; 
                         
-                        // 2. Fondo Azul
+                        // Fondo Azul Suave
                         gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
                         
-                        // 3. Cambiar color de partículas a Blanco/Azul
+                        // Cambiar color a Blanco (Estrellas)
                         const cols = geometry.attributes.color.array;
                         const obj = {t:0};
                         gsap.to(obj, {t:1, duration: 2, onUpdate:()=>{
@@ -1227,11 +1220,12 @@
                         }});
                     },
                     onLeaveBack: () => {
-                        // Volver a velocidad normal (Arena)
-                        targetSpeed = 2;
+                        // Frenar
+                        targetSpeed = 0.5;
                         
                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
                         
+                        // Volver a Arena
                         const cols = geometry.attributes.color.array;
                         const obj = {t:0};
                         gsap.to(obj, {t:1, duration: 2, onUpdate:()=>{
@@ -1246,7 +1240,6 @@
                 });
             }
             
-            // Resize
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
