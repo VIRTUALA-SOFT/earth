@@ -309,7 +309,24 @@
     background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
     z-index: 1;
 }
-        
+
+        * JEPIRA: Fondo transparente para ver el Canvas */
+#jepira-section {
+    position: relative;
+    background-color: transparent; /* Importante */
+    z-index: 10;
+}
+
+/* El degradado azul cósmico */
+#cosmos-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, #0B1436 0%, #000000 80%);
+    opacity: 0;
+    transition: opacity 1s ease;
+    z-index: -1; /* Detrás del texto */
+    pointer-events: none;
+}
 
     </style>
 </head>
@@ -1087,93 +1104,149 @@
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-        // G. THREE.JS GLOBAL
+       // G. THREE.JS GLOBAL (EFECTO WARP SPEED)
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
+            
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            // Fog negro para que las estrellas aparezcan suavemente desde el fondo
+            scene.fog = new THREE.FogExp2(0x000000, 0.001); 
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+            camera.position.z = 1000; // Cámara lejos
+
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            const count = 2500;
+            // --- CREACIÓN DE PARTÍCULAS ---
+            const count = 4000; // Más partículas para más impacto
             const geometry = new THREE.BufferGeometry();
-            const pos = new Float32Array(count*3);
-            const colors = new Float32Array(count*3);
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const sizes = new Float32Array(count); // Tamaños variables
+
             const cSand = new THREE.Color('#C89F65');
             const cStar = new THREE.Color('#A5D8FF');
 
-            for(let i=0; i<count*3; i+=3) {
-                pos[i] = (Math.random()-0.5)*35; pos[i+1] = (Math.random()-0.5)*40; pos[i+2] = (Math.random()-0.5)*20;
-                colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
+            for(let i = 0; i < count; i++) {
+                const i3 = i * 3;
+                // Posición aleatoria en un túnel largo
+                positions[i3] = (Math.random() - 0.5) * 2000;     // X
+                positions[i3+1] = (Math.random() - 0.5) * 2000;   // Y
+                positions[i3+2] = (Math.random() - 0.5) * 4000;   // Z (Profundidad)
+                
+                // Color inicial (Arena)
+                colors[i3] = cSand.r;
+                colors[i3+1] = cSand.g;
+                colors[i3+2] = cSand.b;
+
+                // Tamaño aleatorio
+                sizes[i] = Math.random() * 2;
             }
-            geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1)); // Atributo custom si usáramos shader, aquí afecta PointsMaterial si supporteado o ignorado
 
-            const material = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
-            const particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-            camera.position.z = 5;
+            // Material
+            const material = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true, // Importante para profundidad
+                blending: THREE.AdditiveBlending
+            });
 
-            const simplex = new SimplexNoise();
+            const starField = new THREE.Points(geometry, material);
+            scene.add(starField);
+
+            // Variables de Animación
+            let speed = 2; // Velocidad base (brisa suave)
+            let targetSpeed = 2;
             const clock = new THREE.Clock();
-            let speedMultiplier = 1;
 
+            // --- ANIMACIÓN LOOP ---
             const animate = () => {
-                const t = clock.getElapsedTime();
-                particles.rotation.y = t * 0.02 * speedMultiplier;
-                const p = geometry.attributes.position.array;
-                for(let i=0; i<count; i++) {
-                    const i3 = i*3;
-                    if(speedMultiplier > 2) {
-                        p[i3+2] += 0.1 * speedMultiplier;
-                        if(p[i3+2] > 10) p[i3+2] = -20;
-                    } else {
-                        p[i3+1] = (Math.random()-0.5)*40 + simplex.noise2D(p[i3]*0.1, t*0.2)*0.3;
+                const delta = clock.getDelta();
+                
+                // Interpolación suave de la velocidad (Aceleración/Frenado)
+                speed += (targetSpeed - speed) * 0.05;
+
+                const positions = geometry.attributes.position.array;
+                
+                for(let i = 0; i < count; i++) {
+                    const i3 = i * 3;
+                    
+                    // Mover partícula hacia la cámara (Z aumenta)
+                    positions[i3+2] += speed;
+
+                    // Si la partícula pasa la cámara (Z > 1000), enviarla al fondo
+                    if(positions[i3+2] > 1000) {
+                        positions[i3+2] = -3000; // Reset al fondo
+                        
+                        // Opcional: Redistribuir X e Y para que no se vea repetitivo
+                        positions[i3] = (Math.random() - 0.5) * 2000;
+                        positions[i3+1] = (Math.random() - 0.5) * 2000;
                     }
                 }
+                
+                // Rotación leve del túnel para dinamismo
+                starField.rotation.z += 0.0005 * speed * 0.2;
+
                 geometry.attributes.position.needsUpdate = true;
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
             animate();
 
-            // Jepira
-            if(document.getElementById('cosmos-overlay')) {
+            // --- SCROLL TRIGGER (EL GATILLO DE JEPIRA) ---
+            if(typeof gsap !== 'undefined') {
                 ScrollTrigger.create({
-                    trigger: "#jepira-section", start: "top center",
+                    trigger: "#jepira-section",
+                    start: "top center", // Cuando Jepira llega al centro
                     onEnter: () => {
+                        // 1. Acelerar a Hipervelocidad
+                        targetSpeed = 50; 
+                        
+                        // 2. Fondo Azul
                         gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
-                        gsap.to({v:1}, {v:10, duration: 3, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                        const c = geometry.attributes.color.array;
+                        
+                        // 3. Cambiar color de partículas a Blanco/Azul
+                        const cols = geometry.attributes.color.array;
                         const obj = {t:0};
-                        gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                        gsap.to(obj, {t:1, duration: 2, onUpdate:()=>{
                             for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
+                                cols[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
+                                cols[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
+                                cols[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
                             }
                             geometry.attributes.color.needsUpdate = true;
                         }});
                     },
                     onLeaveBack: () => {
-                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                         gsap.to({v:10}, {v:1, duration: 2, onUpdate: function(){ speedMultiplier = this.targets()[0].v }});
-                         const c = geometry.attributes.color.array;
-                         const obj = {t:0};
-                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                        // Volver a velocidad normal (Arena)
+                        targetSpeed = 2;
+                        
+                        gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                        
+                        const cols = geometry.attributes.color.array;
+                        const obj = {t:0};
+                        gsap.to(obj, {t:1, duration: 2, onUpdate:()=>{
                             for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
+                                cols[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
+                                cols[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
+                                cols[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
                             }
                             geometry.attributes.color.needsUpdate = true;
-                         }});
+                        }});
                     }
                 });
             }
             
+            // Resize
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
@@ -1181,7 +1254,7 @@
             });
         };
         initGlobalThree();
-
+        
         // H. THREE.JS WEAVING
         (function() {
             const container = document.getElementById('weaving-container');
