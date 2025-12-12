@@ -650,21 +650,30 @@
         </section>     
 
         
-       <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
-        <section id="jepira-section" class="h-screen relative flex items-center justify-center overflow-hidden">
-            <div class="warp-speed-effect"></div>
-            
-            <div class="relative z-20 text-center px-6">
-                <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-[0.5em] uppercase">05 — Jepira</span>
-                <h2 class="text-5xl md:text-8xl font-display text-white mb-8 mix-blend-screen">El Retorno a <br> las Estrellas</h2>
-                <p class="text-gray-300 text-lg font-light leading-relaxed mb-12 max-w-lg mx-auto">
-                    La muerte no existe. Es solo convertirse en lluvia para volver a la tierra, o en luz para habitar la Vía Láctea (*Spieyu*).
-                </p>
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 border border-white/30 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger bg-black/50 backdrop-blur-md">
-                    Regresar a la Tierra
-                </button>
-            </div>
-        </section>
+     <!-- 7. JEPIRA (EL COSMOS - IMPACTO VISUAL) -->
+<section id="jepira-section" class="h-screen relative flex items-center justify-center overflow-hidden">
+    
+    <!-- FONDO CÓSMICO (ID necesario para la animación JS) -->
+    <div id="cosmos-overlay" class="cosmos-bg"></div>
+    
+    <!-- CONTENIDO -->
+    <div class="relative z-20 text-center px-6">
+        <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-[0.5em] uppercase">05 — Jepira</span>
+        
+        <h2 class="text-5xl md:text-8xl font-display text-white mb-8 mix-blend-screen">
+            El Retorno a <br> las Estrellas
+        </h2>
+        
+        <p class="text-gray-300 text-lg font-light leading-relaxed mb-12 max-w-lg mx-auto">
+            La muerte no existe. Es solo convertirse en lluvia para volver a la tierra, o en luz para habitar la Vía Láctea (*Spieyu*).
+        </p>
+        
+        <!-- Botón Reiniciar -->
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 border border-white/30 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger bg-black/20 backdrop-blur-md">
+            Regresar a la Tierra
+        </button>
+    </div>
+</section>
         
        <!--
         <footer class="py-12 bg-black border-t border-white/10 text-center relative z-20">
@@ -1141,10 +1150,10 @@
         })();
 
         // H. PARALLAX IMG
-        gsap.to("#parallax-img", {
+        /* gsap.to("#parallax-img", {
             yPercent: 20, ease: "none",
             scrollTrigger: { trigger: "#parallax-img", start: "top bottom", end: "bottom top", scrub: true }
-        });
+        });*/
 
         // I. SMOOTH SCROLL (LENIS)
         if (typeof Lenis !== 'undefined') {
