@@ -171,6 +171,21 @@
       h1 { font-size: 1rem; }
       .search-icon { top: 62%; }
     }
+    .nav-left { 
+            display: flex; align-items: center; gap: 15px; padding-left: 20px; 
+            height: 100%; border-right: 1px solid transparent; 
+        }
+     .back-link {
+            text-decoration: none; color: var(--text-sec);
+            font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+            display: flex; align-items: center; gap: 5px;
+            padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.3s; cursor: pointer; white-space: nowrap;
+        }
+     .back-link:hover { border-color: var(--gold); color: var(--gold); }
+     @media (max-width: 900px) {             
+            .back-link { display: none; } 
+        }
   </style>
 </head>
 <body>
@@ -179,6 +194,14 @@
 <div id="tooltip"></div>
 
 <div id="app">
+  <div class="nav-left">
+            <img src="https://pub-8275440e24554b96ad7dd640df0866b9.r2.dev/imagenes/Logo.png" class="logo-img">
+            <div class="back-link" onclick="goToHome()">
+                <span class="material-symbols-rounded">arrow_back</span>
+                VOLVIENDO AL ORIGEN
+            </div>
+        </div>
+  
   <!-- BUSCADOR -->
   <div id="ui-controls" class="glass-panel">
     <div>
