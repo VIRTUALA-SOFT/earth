@@ -7,7 +7,7 @@ const etniasBase = [
     name: "Arhuaco", 
     region: "Colombia (Sierra Nevada)", 
     lat: 10.70, lon: -73.65, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Conocidos como los 'Guardianes de la Sierra', los Arhuacos habitan los valles altos de la Sierra Nevada de Santa Marta. Su misión espiritual es mantener el equilibrio de la naturaleza a través de pagamentos y meditación. Son famosos por sus mochilas de lana virgen y su vestimenta blanca impecable que representa la pureza de la nieve." 
   },
   { 
@@ -15,7 +15,7 @@ const etniasBase = [
     name: "Wayuu", 
     region: "La Guajira (Col/Ven)", 
     lat: 11.95, lon: -71.80, 
-    video: "video/wayuu_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_video.mp4",
     desc: "El pueblo del sol, la arena y el viento. Los Wayuu poseen una estructura social matrilineal compleja organizada en clanes. Son maestros tejedores; sus coloridas mochilas narran historias de su cosmogonía. Su sistema de justicia, guiado por el 'Pütchipü'ü' (palabrero), es reconocido como Patrimonio Inmaterial de la Humanidad." ,
     url: "dsc/wayuu/etnia-wayuu.html"
   },
@@ -24,7 +24,7 @@ const etniasBase = [
     name: "Emberá", 
     region: "Chocó / Pacífico", 
     lat: 5.80, lon: -76.80, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes de las selvas húmedas y riberas del Pacífico, se dividen en gente de río (Dobidá) y de montaña (Eyábida). Su conexión con los espíritus de la selva ('Jai') es profunda, manifestándose a través del chamanismo y la pintura corporal con jagua, usada como protección espiritual y lenguaje estético." 
   },
   { 
@@ -32,7 +32,7 @@ const etniasBase = [
     name: "Yanomami", 
     region: "Brasil/Venezuela (Amazonas)", 
     lat: 2.0, lon: -64.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Uno de los pueblos más grandes y relativamente aislados de América del Sur. Viven en grandes estructuras comunales circulares llamadas 'Shabono'. Su cosmovisión chamánica es intensa, utilizando el yopo para comunicarse con los espíritus 'xapiripë' y defender la selva de amenazas externas." 
   },
   { 
@@ -40,7 +40,7 @@ const etniasBase = [
     name: "Shuar", 
     region: "Ecuador (Amazonía)", 
     lat: -2.5, lon: -78.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Históricamente conocidos como guerreros indomables que jamás fueron conquistados por el Imperio Inca ni por los españoles. Son famosos por la antigua práctica de la 'tzantza' (reducción de cabezas), un ritual cargado de significado espiritual para capturar el poder del alma." 
   },
   { 
@@ -48,7 +48,7 @@ const etniasBase = [
     name: "Aymara", 
     region: "Bolivia/Perú (Andes)", 
     lat: -16.5, lon: -68.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Milenarios habitantes del Altiplano y las orillas del Lago Titicaca. Su cultura se basa en el principio de reciprocidad ('Ayni') y una fuerte conexión con la Pachamama. Son expertos en la agricultura de altura, textiles y han preservado su lengua y tradiciones a pesar de siglos de colonización." 
   },
   { 
@@ -56,7 +56,7 @@ const etniasBase = [
     name: "Guaraní", 
     region: "Paraguay/Brasil", 
     lat: -24.0, lon: -56.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Una gran nación espiritual que busca constantemente la 'Tierra sin Mal' (Yvy Marã e'ỹ), un lugar de inmortalidad y abundancia. Su idioma es oficial en Paraguay y hablado por millones. Poseen un vasto conocimiento de la botánica medicinal y la selva atlántica." 
   },
   { 
@@ -64,7 +64,7 @@ const etniasBase = [
     name: "Mapuche", 
     region: "Chile/Argentina", 
     lat: -38.0, lon: -72.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La 'Gente de la Tierra'. Resistieron ferozmente la expansión Inca y la colonización española durante siglos. Su espiritualidad está ligada a los ancestros y las fuerzas de la naturaleza (Ngen), con el árbol sagrado del Canelo y la Araucaria como pilares de su identidad." 
   },
   { 
@@ -72,7 +72,7 @@ const etniasBase = [
     name: "Kayapó", 
     region: "Brasil (Xingu)", 
     lat: -8.0, lon: -52.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guerreros modernos y guardianes del Amazonas. Son reconocidos internacionalmente por su activismo ambiental contra la deforestación y las represas. Su estética corporal es impactante, utilizando pinturas negras complejas y grandes tocados de plumas amarillas y azules." 
   },
   { 
@@ -80,7 +80,7 @@ const etniasBase = [
     name: "Shipibo-Conibo", 
     region: "Perú (Ucayali)", 
     lat: -8.5, lon: -74.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Maestros del arte visionario. Su cultura gira en torno al uso de plantas sagradas como la Ayahuasca. Son mundialmente famosos por sus diseños geométricos 'Kené', que representan las líneas de energía del universo y las canciones curativas (Icaros) que ven durante el trance." 
   },
   { 
@@ -88,7 +88,7 @@ const etniasBase = [
     name: "Uros", 
     region: "Perú (Titicaca)", 
     lat: -15.9, lon: -69.9, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El pueblo del lago. Viven en islas flotantes artificiales construidas por ellos mismos usando la planta de totora, sobre las aguas del lago navegable más alto del mundo. Se consideran a sí mismos dueños del lago y el agua, con un estilo de vida anfibio único." 
   },
   { 
@@ -96,7 +96,7 @@ const etniasBase = [
     name: "Selk'nam (Onas)", 
     region: "Tierra del Fuego", 
     lat: -54.0, lon: -68.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Cazadores nómadas del fin del mundo. Aunque sufrieron un genocidio trágico a principios del siglo XX, su legado visual perdura. Eran conocidos por su gran estatura y la ceremonia del 'Hain', donde los hombres pintaban sus cuerpos con diseños abstractos y usaban máscaras cónicas para representar espíritus." 
   },
 
@@ -106,7 +106,7 @@ const etniasBase = [
     name: "Haida", 
     region: "Canadá (Haida Gwaii)", 
     lat: 53.0, lon: -132.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Maestros del cedro y el mar. Habitan el archipiélago de Haida Gwaii y son reconocidos por su arte monumental: tótems gigantes y canoas de guerra talladas. Su sociedad se basa en el 'Potlatch', una ceremonia compleja de intercambio de regalos y afirmación de estatus social." 
   },
   { 
@@ -114,7 +114,7 @@ const etniasBase = [
     name: "Cree", 
     region: "Canadá (Boreal)", 
     lat: 54.0, lon: -98.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Uno de los grupos de Primeras Naciones más grandes de Norteamérica. Cazadores expertos de los vastos bosques boreales. Su concepto de salud y vida gira en torno a la 'Miyupimaatisiiun' (vivir bien), manteniendo una relación respetuosa y recíproca con los animales que cazan." 
   },
   { 
@@ -122,7 +122,7 @@ const etniasBase = [
     name: "Blackfoot (Siksika)", 
     region: "USA/Canadá (Llanuras)", 
     lat: 49.0, lon: -112.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Antiguos señores de las Grandes Llanuras. Su cultura estaba intrínsecamente ligada al bisonte, del cual obtenían todo lo necesario para vivir. Son conocidos por sus tipis pintados y la sagrada Danza del Sol, un ritual de renovación espiritual y sacrificio personal." 
   },
   { 
@@ -130,7 +130,7 @@ const etniasBase = [
     name: "Haudenosaunee", 
     region: "USA (Noreste)", 
     lat: 43.0, lon: -75.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La 'Gente de la Casa Larga'. Formaron una de las democracias participativas más antiguas del mundo, la Confederación Iroquesa, que inspiró en parte la constitución de los EE.UU. Su sociedad es matrilineal, donde las mujeres tienen un poder político y espiritual central." 
   },
   { 
@@ -138,7 +138,7 @@ const etniasBase = [
     name: "Hopi", 
     region: "USA (Arizona)", 
     lat: 35.8, lon: -110.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El 'Pueblo Pacífico'. Viven en algunas de las aldeas habitadas más antiguas de Norteamérica. Son agricultores del desierto y poseen una cosmología profunda centrada en los Kachinas, espíritus mensajeros que traen la lluvia y mantienen la armonía del mundo." 
   },
   { 
@@ -146,7 +146,7 @@ const etniasBase = [
     name: "Tlingit", 
     region: "Alaska", 
     lat: 58.0, lon: -134.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Cultura rica de la costa noroeste. Famosos por su arte heráldico, mantas Chilkat y tótems que cuentan la historia de sus clanes (Cuervo y Águila). Poseen una tradición oral compleja y un sistema legal sofisticado basado en la compensación y el honor." 
   },
   { 
@@ -154,7 +154,7 @@ const etniasBase = [
     name: "Rarámuri", 
     region: "México (Chihuahua)", 
     lat: 27.5, lon: -107.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los de los 'pies ligeros'. Habitantes de las profundas Barrancas del Cobre, son corredores de resistencia legendarios. Para ellos, correr no es un deporte, sino una forma de oración y conexión espiritual. Viven en comunidades dispersas, manteniendo celosamente sus tradiciones ancestrales." 
   },
   { 
@@ -162,7 +162,7 @@ const etniasBase = [
     name: "Zapoteco", 
     region: "México (Oaxaca)", 
     lat: 17.0, lon: -96.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La 'Gente de las Nubes' (Be'ena' Za'a). Constructores de la magnífica ciudad de Monte Albán. Desarrollaron uno de los primeros sistemas de escritura y calendarios de Mesoamérica. Hoy en día, son famosos por sus coloridos festivales como la Guelaguetza y su exquisita artesanía textil." 
   },
   { 
@@ -170,7 +170,7 @@ const etniasBase = [
     name: "Mixteco", 
     region: "México (Oaxaca)", 
     lat: 17.2, lon: -97.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El 'Pueblo de la Lluvia'. Fueron los orfebres más hábiles del México antiguo, creando joyas de oro y turquesa incomparables. También son conocidos por sus códices pictográficos, libros de piel de venado que narran la historia genealógica y mítica de sus reyes y dioses." 
   },
   { 
@@ -178,7 +178,7 @@ const etniasBase = [
     name: "Wixárika", 
     region: "México (Sierra Madre)", 
     lat: 22.0, lon: -104.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Uno de los pocos pueblos que ha mantenido su cosmogonía casi intacta. Son famosos por sus peregrinaciones al desierto sagrado de Wirikuta para recolectar el peyote (Hikuri), que consideran un venado azul sagrado. Su arte con chaquira y estambre es una representación visual de sus visiones." 
   },
 
@@ -188,7 +188,7 @@ const etniasBase = [
     name: "Guna Yala", 
     region: "Panamá", 
     lat: 9.5, lon: -79.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes del archipiélago de San Blas. Lograron una autonomía política única tras una revolución en 1925. Las mujeres son famosas por las 'Molas', textiles intrincados de capas de tela inversa. Creen en la igualdad de género y en la protección absoluta de 'Nabgwana' (la Madre Tierra)." 
   },
   { 
@@ -196,7 +196,7 @@ const etniasBase = [
     name: "Taíno", 
     region: "Caribe (Antillas)", 
     lat: 19.0, lon: -70.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El pueblo originario principal del Caribe, primeros en encontrar a Colón. Inventores de la hamaca, la barbacoa y cultivadores expertos de yuca. Aunque sufrieron un colapso demográfico, su legado genético y cultural vive en los habitantes actuales del Caribe." 
   },
   { 
@@ -204,7 +204,7 @@ const etniasBase = [
     name: "Garífuna", 
     region: "Honduras/Belice", 
     lat: 15.8, lon: -87.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Una cultura única nacida del mestizaje entre indígenas Arawak/Caribes y africanos. Su lengua, danza (Punta) y música son Patrimonio de la Humanidad. Viven en la costa caribeña, dedicados a la pesca y la agricultura, manteniendo una fuerte conexión con sus ancestros a través del ritual Dugu." 
   },
   { 
@@ -212,7 +212,7 @@ const etniasBase = [
     name: "Bribri", 
     region: "Costa Rica", 
     lat: 9.5, lon: -83.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes de las montañas de Talamanca. Su estructura social es matrilineal y clánica. Consideran el cacao como una planta sagrada entregada por Sibö (Dios) y lo utilizan en ceremonias de purificación y curación. Viven en casas cónicas tradicionales que representan el universo." 
   },
   { 
@@ -220,7 +220,7 @@ const etniasBase = [
     name: "Q'eqchi'", 
     region: "Guatemala", 
     lat: 15.5, lon: -90.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Uno de los grupos mayas más grandes y dispersos. Son guardianes de las montañas y las cuevas, a las que consideran entradas al inframundo sagrado. Han logrado preservar su idioma y rituales agrícolas a pesar de siglos de desplazamiento y conflicto." 
   },
 
@@ -230,7 +230,7 @@ const etniasBase = [
     name: "Sámi", 
     region: "Laponia (Norte Europa)", 
     lat: 68.0, lon: 22.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El único pueblo indígena reconocido de la Unión Europea. Pastores de renos nómadas que habitan la región de Sápmi. Su cultura se distingue por el 'Joik', uno de los estilos de canto más antiguos de Europa, y su colorida vestimenta tradicional (Gákti) que indica el origen familiar." 
   },
   { 
@@ -238,7 +238,7 @@ const etniasBase = [
     name: "Vasco (Euskaldunak)", 
     region: "España/Francia", 
     lat: 43.0, lon: -2.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Poseedores de una de las lenguas más antiguas y misteriosas de Europa (Euskera), sin relación con ninguna otra familia lingüística. Históricamente balleneros y navegantes, tienen una profunda conexión con sus caseríos rurales y tradiciones mitológicas pre-cristianas." 
   },
   { 
@@ -246,7 +246,7 @@ const etniasBase = [
     name: "Nenets", 
     region: "Rusia (Siberia)", 
     lat: 69.0, lon: 70.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guardianes del Ártico siberiano. Realizan migraciones épicas de miles de kilómetros cada año con sus enormes manadas de renos a través de la tundra congelada. Viven en tiendas cónicas llamadas 'Chum' y han sobrevivido a temperaturas extremas durante milenios." 
   },
 
@@ -256,7 +256,7 @@ const etniasBase = [
     name: "San (Bosquimanos)", 
     region: "Kalahari", 
     lat: -22.0, lon: 22.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Poseen el linaje genético más antiguo de la humanidad moderna. Famosos por su lenguaje de chasquidos y su increíble habilidad para el rastreo. Son autores de miles de pinturas rupestres y poseen una cosmovisión igualitaria basada en compartir recursos y la danza curativa." 
   },
   { 
@@ -264,7 +264,7 @@ const etniasBase = [
     name: "Tuareg", 
     region: "Sahara", 
     lat: 22.0, lon: 8.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Hombres Azules' del desierto, llamados así por el tinte índigo de sus velos (Tagelmust). Nómadas comerciantes que han cruzado el Sahara durante siglos. Su sociedad es tradicionalmente matrilineal y poseen su propio alfabeto antiguo, el Tifinagh." 
   },
   { 
@@ -272,7 +272,7 @@ const etniasBase = [
     name: "Dogon", 
     region: "Malí", 
     lat: 14.5, lon: -3.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Viven en los impresionantes acantilados de Bandiagara. Son famosos mundialmente por su compleja cosmogonía y conocimientos astronómicos, especialmente sobre la estrella Sirio, que describieron antes de la astronomía moderna. Sus máscaras rituales son obras maestras del arte africano." 
   },
   { 
@@ -280,7 +280,7 @@ const etniasBase = [
     name: "Maasai", 
     region: "Kenia/Tanzania", 
     lat: -2.0, lon: 36.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guerreros y pastores icónicos de la sabana africana. Para ellos, el ganado es sagrado y regalo directo de Dios (Enkai). Son conocidos por sus mantas rojas (Shuka), sus joyas de cuentas intrincadas y la danza 'Adumu', donde los guerreros saltan verticalmente para demostrar fuerza." 
   },
   { 
@@ -288,7 +288,7 @@ const etniasBase = [
     name: "Himba", 
     region: "Namibia", 
     lat: -18.0, lon: 13.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Pueblo seminómada famoso porque sus mujeres cubren su piel y cabello con 'otjize', una pasta de manteca y ocre rojo. Esto las protege del sol y simboliza la esencia de la tierra y la sangre. Mantienen el fuego sagrado de los ancestros siempre encendido en el centro de la aldea." 
   },
   { 
@@ -296,7 +296,7 @@ const etniasBase = [
     name: "Yoruba", 
     region: "Nigeria", 
     lat: 7.5, lon: 4.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Una de las etnias más grandes y urbanizadas históricamente en África. Creadores de las famosas cabezas de bronce de Ife. Su religión, centrada en los Orishas, ha influido profundamente en las culturas de América (Santería, Candomblé) debido a la diáspora." 
   },
   { 
@@ -304,7 +304,7 @@ const etniasBase = [
     name: "Zulú", 
     region: "Sudáfrica", 
     lat: -29.0, lon: 31.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El 'Pueblo del Cielo'. Forjaron un poderoso imperio militar en el siglo XIX bajo el rey Shaka. Son conocidos por su intrincado trabajo con cuentas, que sirve como lenguaje visual, y su filosofía de 'Ubuntu' (yo soy porque nosotros somos)." 
   },
   { 
@@ -312,7 +312,7 @@ const etniasBase = [
     name: "Oromo", 
     region: "Etiopía", 
     lat: 8.0, lon: 39.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El grupo étnico más grande del Cuerno de África. Desarrollaron el 'Gadaa', un sistema democrático de gobierno sociopolítico complejo organizado en generaciones, inscrito por la UNESCO como patrimonio de la humanidad. Tienen una rica tradición de poesía oral." 
   },
   { 
@@ -320,7 +320,7 @@ const etniasBase = [
     name: "Amazigh", 
     region: "Norte de África", 
     lat: 32.0, lon: -5.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Hombres Libres'. Habitantes indígenas del norte de África desde antes de los romanos. Abarcan desde las montañas del Atlas hasta los oasis del desierto. Son famosos por sus alfombras tejidas con símbolos protectores y su arquitectura de adobe (Kasbahs)." 
   },
 
@@ -330,7 +330,7 @@ const etniasBase = [
     name: "Ainu", 
     region: "Japón (Hokkaido)", 
     lat: 43.5, lon: 142.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Pueblo indígena del norte de Japón y Rusia. Su cultura animista venera a los 'Kamuy' (espíritus), siendo el oso el más sagrado. Tienen características físicas distintas y un idioma aislado. Las mujeres tradicionalmente se tatuaban los labios al llegar a la adultez." 
   },
   { 
@@ -338,7 +338,7 @@ const etniasBase = [
     name: "Mongol", 
     region: "Mongolia", 
     lat: 47.0, lon: 104.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Nómadas de las estepas eternas. Su cultura gira en torno al caballo y la vida en el 'Ger' (yurta). Son herederos del imperio terrestre más grande de la historia. Famosos por su canto de garganta (Khoomei) y su hospitalidad inquebrantable en climas extremos." 
   },
   { 
@@ -346,7 +346,7 @@ const etniasBase = [
     name: "Tibetano", 
     region: "Tíbet", 
     lat: 30.0, lon: 90.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes del 'Techo del Mundo'. Han desarrollado una adaptación genética única para vivir a gran altitud. Su cultura está profundamente impregnada por el budismo tibetano, con sus monasterios, banderas de oración y la reverencia al Dalai Lama." 
   },
   { 
@@ -354,7 +354,7 @@ const etniasBase = [
     name: "Hmong", 
     region: "Sudeste Asiático", 
     lat: 19.5, lon: 102.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Un pueblo de las montañas con una larga historia de migración y búsqueda de independencia. Son maestros en el arte textil, especialmente el batik y los 'Story Cloths', telas bordadas que narran su historia, leyendas y la vida cotidiana." 
   },
   { 
@@ -362,7 +362,7 @@ const etniasBase = [
     name: "Beduino", 
     region: "Oriente Medio", 
     lat: 28.0, lon: 40.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los habitantes del desierto por excelencia. Históricamente pastores nómadas de camellos y cabras. Se rigen por un estricto código de honor y hospitalidad; un huésped es sagrado en su tienda. Poseen una rica tradición de poesía oral recitada bajo las estrellas." 
   },
   { 
@@ -370,7 +370,7 @@ const etniasBase = [
     name: "Bajau", 
     region: "Malasia/Filipinas", 
     lat: 5.0, lon: 120.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Gitanos del Mar'. Han vivido en casas flotantes o sobre pilotes durante siglos. Han desarrollado adaptaciones genéticas (bazos más grandes) que les permiten bucear a grandes profundidades por largos periodos para pescar, caminando literalmente bajo el agua." 
   },
   { 
@@ -378,7 +378,7 @@ const etniasBase = [
     name: "Sentineleses", 
     region: "Islas Andamán", 
     lat: 11.5, lon: 92.2, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El pueblo más aislado del planeta. Viven en la isla Sentinel del Norte y rechazan violentamente cualquier contacto con el mundo exterior. Su estilo de vida cazador-recolector se ha mantenido intacto durante miles de años, siendo un misterio fascinante para la antropología." 
   },
   { 
@@ -386,7 +386,7 @@ const etniasBase = [
     name: "Chukchi", 
     region: "Rusia (Siberia)", 
     lat: 66.0, lon: 175.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Pueblo indígena del extremo noreste de Asia, cerca de Alaska. Se dividen en pastores de renos del interior y cazadores de mamíferos marinos de la costa. Son conocidos por su resistencia legendaria al frío y por haber resistido la conquista rusa durante siglos." 
   },
   { 
@@ -394,7 +394,7 @@ const etniasBase = [
     name: "Karen", 
     region: "Tailandia/Birmania", 
     lat: 18.0, lon: 98.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Grupo étnico diverso de las colinas. Son tradicionalmente agricultores de rotación y expertos entrenadores de elefantes (mahouts). Un subgrupo, los Kayan, es famoso por sus mujeres que usan anillos de latón en el cuello como símbolo de belleza e identidad cultural." 
   },
 
@@ -404,7 +404,7 @@ const etniasBase = [
     name: "Aborigen Australiano", 
     region: "Australia", 
     lat: -25.0, lon: 133.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La cultura viva continua más antigua de la Tierra (más de 65,000 años). Su concepto del 'Dreamtime' explica la creación del mundo y la ley sagrada. Tienen una conexión espiritual inquebrantable con el territorio ('Country') y usaban 'Songlines' (mapas cantados) para navegar el continente." 
   },
   { 
@@ -412,7 +412,7 @@ const etniasBase = [
     name: "Maorí", 
     region: "Nueva Zelanda", 
     lat: -39.0, lon: 176.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Tangata Whenua, la gente de la tierra. Guerreros y navegantes polinesios que desarrollaron una cultura compleja en Aotearoa. Famosos por el 'Haka' (danza de guerra), el arte del tallado en madera y el 'Tā moko', tatuajes faciales que cuentan la historia del linaje de la persona." 
   },
   { 
@@ -420,7 +420,7 @@ const etniasBase = [
     name: "Papúes", 
     region: "Papúa Nueva Guinea", 
     lat: -6.0, lon: 145.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes de una de las regiones más diversas del planeta, con más de 800 lenguas distintas. Muchas tribus de las tierras altas no tuvieron contacto con el mundo exterior hasta 1930. Son famosos por sus elaboradas decoraciones corporales y las ceremonias 'Sing-sing'." 
   },
   { 
@@ -428,7 +428,7 @@ const etniasBase = [
     name: "Kanaka Maoli", 
     region: "Hawái", 
     lat: 20.0, lon: -156.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Descendientes de grandes navegantes que cruzaron el Pacífico guiándose por las estrellas. Su cultura se centra en el 'Aloha' (amor/espíritu) y el cuidado de la tierra ('Malama 'Aina'). El Hula no es solo danza, es un archivo histórico viviente de sus genealogías y mitos." 
   },
   { 
@@ -436,7 +436,7 @@ const etniasBase = [
     name: "Samoano", 
     region: "Samoa", 
     lat: -13.8, lon: -172.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El corazón de la Polinesia tradicional. Se rigen por el 'Fa'a Samoa' (la manera samoana), un código de conducta centrado en la familia y el respeto a los mayores. Los hombres se someten al 'Pe'a', un tatuaje tradicional doloroso que cubre desde la cintura hasta las rodillas." 
   },
   { 
@@ -444,233 +444,233 @@ const etniasBase = [
     name: "Fiyiano", 
     region: "Fiyi", 
     lat: -18.0, lon: 178.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Una cultura única que mezcla influencias melanesias y polinesias. Organizados en una fuerte jerarquía de jefes. Son famosos por su ceremonia del Kava (Yaqona), una bebida social y sagrada, y por ser constructores de las canoas de guerra más rápidas del Pacífico." 
   },
   // --- AMÉRICA DEL NORTE (ADICIONALES) ---
   { 
     id: "apache", name: "Apache (Nde)", region: "USA (Suroeste)", lat: 33.5, lon: -109.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guerreros legendarios y estrategas de las zonas áridas. Se llaman a sí mismos 'Nde' (La Gente). Su resistencia bajo líderes como Gerónimo es mítica. Poseen una espiritualidad profunda ligada a los espíritus de la montaña (Gaan) y ceremonias de pubertad femenina (Sunrise Dance) muy elaboradas." 
   },
   { 
     id: "seminole", name: "Seminola", region: "USA (Florida)", lat: 26.0, lon: -80.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El 'Pueblo Inconquistado'. Nunca firmaron un tratado de paz con los EE.UU. Se refugiaron en los pantanos de los Everglades, adaptando su vida a los 'Chickees' (casas sobre pilotes). Son famosos por sus coloridas vestimentas de patchwork y su habilidad con los caimanes." 
   },
   { 
     id: "nezperce", name: "Nez Percé (Nimiipuu)", region: "USA (Idaho)", lat: 46.0, lon: -116.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Famosos criadores de caballos, desarrollaron la raza Appaloosa. Históricamente conocidos por su dramático intento de huida hacia Canadá bajo el Jefe Joseph. Eran expertos pescadores de salmón y cazadores que vivían en armonía con los valles de las Montañas Rocosas." 
   },
   { 
     id: "purepecha", name: "Purépecha", region: "México (Michoacán)", lat: 19.6, lon: -101.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El imperio que los aztecas nunca pudieron conquistar. Maestros del cobre y el bronce en la época prehispánica. Celebran la 'Noche de Muertos' en el lago de Pátzcuaro de una forma visualmente espectacular. Su lengua es aislada, sin relación con ninguna otra en la región." 
   },
   { 
     id: "lacandon", name: "Maya Lacandón", region: "México (Chiapas)", lat: 16.8, lon: -91.2, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guardianes de la Selva Lacandona. Se consideran los descendientes directos de los antiguos mayas de Palenque y Yaxchilán. Han mantenido sus tradiciones religiosas casi intactas, peregrinando a antiguas ciudades en ruinas para quemar copal a sus dioses." 
   },
 
   // --- AMÉRICA DEL SUR (ADICIONALES) ---
   { 
     id: "muisca", name: "Muisca", region: "Colombia (Cundinamarca)", lat: 5.0, lon: -74.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La civilización del oro y la sal. Su ceremonia de investidura del cacique en la laguna de Guatavita dio origen a la leyenda de 'El Dorado'. Eran grandes comerciantes y astrónomos que seguían un calendario lunisolar complejo para sus cosechas." 
   },
   { 
     id: "kogi", name: "Kogi", region: "Colombia (Sierra Nevada)", lat: 11.0, lon: -73.9, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Hermanos de los Arhuacos, viven aún más alto en la sierra y son más reservados. Se consideran los 'Hermanos Mayores' de la humanidad y creen que su misión es sostener el mundo mentalmente a través del tejido y el pensamiento espiritual en sus templos (Nuhue)." 
   },
   { 
     id: "warao", name: "Warao", region: "Venezuela (Orinoco)", lat: 9.0, lon: -61.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "La 'Gente de la Canoa'. Habitantes del Delta del Orinoco, viven en palafitos sobre el agua. Su vida gira en torno a la palma de moriche, el 'árbol de la vida', del cual obtienen alimento, vivienda y fibras para sus hamacas. Son expertos navegantes fluviales." 
   },
   { 
     id: "piaroa", name: "Piaroa", region: "Venezuela (Amazonas)", lat: 5.5, lon: -67.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Una de las sociedades más pacíficas y anarquistas del mundo; rechazan la violencia y la acumulación de poder. Sus chamanes son muy respetados por su conocimiento de plantas psicoactivas como el Yopo, usado para viajar al mundo de los espíritus y curar." 
   },
   { 
     id: "ticuna", name: "Ticuna", region: "Amazonas (Triple Frontera)", lat: -3.8, lon: -70.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El pueblo indígena más numeroso de la Amazonía brasileña. Famosos por sus máscaras ceremoniales hechas de corteza de árbol y la fiesta de la 'Pelazón' (rito de iniciación femenina). Se consideran hijos del río y pescadores por excelencia." 
   },
   { 
     id: "tehuelche", name: "Tehuelche", region: "Argentina (Patagonia)", lat: -48.0, lon: -70.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Patagones' legendarios. Eran cazadores nómadas de gran estatura que inspiraron mitos europeos sobre gigantes. Cazaban guanacos y ñandúes a pie y luego a caballo. Su cosmogonía incluye al héroe Elal, quien organizó el mundo para ellos." 
   },
   { 
     id: "charrua", name: "Charrúa", region: "Uruguay", lat: -32.0, lon: -56.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guerreros indómitos del Río de la Plata. Aunque se les consideró extintos tras la matanza de Salsipuedes, su legado vive en la identidad uruguaya ('Garra Charrúa'). Eran nómadas cazadores conocidos por su ferocidad en la defensa de su territorio." 
   },
   { 
     id: "munduruku", name: "Munduruku", region: "Brasil (Tapajós)", lat: -6.5, lon: -57.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Cortadores de Cabezas'. Históricamente temidos guerreros que dominaron gran parte del Amazonas. Hoy son famosos por su autodemarcación de tierras y resistencia política contra represas hidroeléctricas. Se distinguen por sus tatuajes faciales complejos." 
   },
 
   // --- EUROPA Y ASIA CENTRAL ---
   { 
     id: "circassian", name: "Circasiano (Adyghe)", region: "Cáucaso", lat: 44.0, lon: 40.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Guerreros de las montañas del Cáucaso con un código de honor estricto ('Adyghe Xabze'). Famosos por su belleza física y sus trajes tradicionales (Chokha) con cartuchos en el pecho. Sufrieron un gran exilio en el siglo XIX, dispersándose por el mundo." 
   },
   { 
     id: "komi", name: "Komi", region: "Rusia (Urales)", lat: 64.0, lon: 54.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes de los bosques boreales al oeste de los Urales. Cazadores y pescadores finougrios con una rica tradición de folclore y magia forestal. Fueron intermediarios cruciales en el comercio de pieles entre Siberia y Europa durante siglos." 
   },
   { 
     id: "kalash", name: "Kalash", region: "Pakistán (Hindu Kush)", lat: 35.6, lon: 71.6, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Un pueblo único y aislado en los valles de Pakistán con rasgos europeos (ojos claros). Practican una antigua religión animista politeísta, distinta al Islam que los rodea. Son famosos por sus festivales coloridos, vino y las mujeres usan tocados de conchas y cuentas." 
   },
   { 
     id: "yazidi", name: "Yazidí", region: "Irak/Siria", lat: 36.5, lon: 42.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Seguidores de una de las religiones más antiguas de Mesopotamia. Adoran al 'Ángel Pavo Real' (Melek Taus). Han sobrevivido a numerosas persecuciones debido a malentendidos sobre su fe. Sus templos tienen cúpulas cónicas características que representan los rayos del sol." 
   },
   { 
     id: "kazakh", name: "Kazajo", region: "Kazajistán", lat: 48.0, lon: 68.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Nómadas de las estepas y descendientes de las hordas mongolas y túrquicas. Son los maestros mundiales de la caza con águila real a caballo, un arte milenario Patrimonio de la Humanidad. Viven en yurtas y su bebida nacional es la leche de yegua fermentada." 
   },
 
   // --- ÁFRICA (ADICIONALES) ---
   { 
     id: "mbuti", name: "Mbuti (Pigmeos)", region: "Congo (Ituri)", lat: 1.5, lon: 29.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes originales de la selva tropical del Congo. Famosos por su baja estatura y por ser cazadores-recolectores pacíficos. Consideran al bosque como su padre y madre; su música polifónica es única en el mundo y se usa para 'despertar' a la selva." 
   },
   { 
     id: "hadza", name: "Hadza", region: "Tanzania", lat: -3.5, lon: 35.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Uno de los últimos grupos de verdaderos cazadores-recolectores del mundo. Genéticamente muy antiguos, no practican la agricultura ni construyen casas permanentes. Su idioma usa chasquidos y tienen una relación simbiótica con un pájaro que les guía hacia la miel." 
   },
   { 
     id: "dinka", name: "Dinka", region: "Sudán del Sur", lat: 8.0, lon: 28.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Gente del Nilo, famosos por ser una de las poblaciones más altas del mundo. Su vida gira en torno al ganado; cada hombre recibe un buey de color especial al iniciarse y compone canciones para él. Se marcan la frente con cicatrices rituales como signo de identidad." 
   },
   { 
     id: "wodaabe", name: "Wodaabe", region: "Níger/Chad (Sahel)", lat: 15.0, lon: 12.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Nómadas obsesionados con la belleza. En su festival 'Gerewol', los hombres se maquillan, bailan y muestran sus dientes blancos y ojos brillantes para impresionar a las mujeres, quienes eligen a los más bellos como amantes. Se consideran a sí mismos el pueblo más hermoso." 
   },
   { 
     id: "ashanti", name: "Ashanti", region: "Ghana", lat: 6.7, lon: -1.6, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Constructores de un poderoso imperio en África Occidental. Famosos por sus tejidos 'Kente' de colores brillantes y sus joyas de oro. Creen que el alma de la nación reside en el 'Taburete de Oro', un trono sagrado que nunca debe tocar el suelo." 
   },
   { 
     id: "suri", name: "Suri / Mursi", region: "Etiopía (Omo)", lat: 5.5, lon: 36.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes del valle del Omo. Famosos porque las mujeres usan grandes platos de arcilla en sus labios inferiores como símbolo de belleza y valor. Son guerreros orgullosos que practican el 'Donga', una feroz lucha con palos para demostrar hombría." 
   },
   { 
     id: "xhosa", name: "Xhosa", region: "Sudáfrica (Cabo)", lat: -32.0, lon: 27.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El pueblo de Nelson Mandela. Su idioma se caracteriza por los sonidos de chasquidos (clicks). Tienen una fuerte tradición oral y adivinos (Sangomas). La iniciación masculina 'Ulwaluko' en las montañas es un rito de paso crucial y secreto." 
   },
   { 
     id: "igbo", name: "Igbo", region: "Nigeria (Sureste)", lat: 6.0, lon: 7.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Conocidos por su espíritu emprendedor y sistema democrático pre-colonial sin reyes. Famosos por sus máscaras, el arte del ñame (alimento básico sagrado) y sus coloridos festivales de mascaradas. Su cosmología incluye el concepto de 'Chi', el dios personal de cada individuo." 
   },
 
   // --- ASIA (ADICIONALES) ---
   { 
     id: "sherpa", name: "Sherpa", region: "Nepal (Himalaya)", lat: 27.9, lon: 86.7, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Tigres de las Nieves'. Famosos mundialmente por su habilidad en el montañismo y adaptación genética a la altura. Son budistas devotos; consideran al Monte Everest como la diosa 'Chomolungma' y realizan ofrendas antes de cualquier expedición." 
   },
   { 
     id: "naga", name: "Naga", region: "India/Myanmar", lat: 26.0, lon: 94.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Conglomerado de tribus guerreras de las colinas. Antiguamente temidos cazadores de cabezas, hoy son conocidos por sus festivales coloridos como el Hornbill. Viven en aldeas fortificadas en las cumbres y tienen textiles distintivos para cada clan." 
   },
   { 
     id: "vedda", name: "Vedda", region: "Sri Lanka", lat: 7.5, lon: 81.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los habitantes aborígenes de la isla, anteriores a la llegada de cingaleses y tamiles. Tradicionalmente cazadores con arco y recolectores de miel silvestre. Mantienen rituales de posesión espiritual para comunicarse con sus ancestros, los 'Nae Yaku'." 
   },
   { 
     id: "mentawai", name: "Mentawai", region: "Indonesia (Sumatra)", lat: -1.5, lon: 99.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los 'Hombres Flor'. Viven en la selva de la isla Siberut. Famosos por sus tatuajes de cuerpo entero y por afilarse los dientes para embellecerse. Viven en comunión con la naturaleza bajo la guía de chamanes (Sikerei) y creen que todo tiene alma." 
   },
   { 
     id: "dayak", name: "Dayak", region: "Borneo", lat: 0.5, lon: 113.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Los habitantes del interior de Borneo. Antiguamente temibles guerreros, viven en enormes casas comunales llamadas 'Longhouses' sobre pilotes. Son maestros talladores de madera y tienen tatuajes intrincados que marcan sus viajes y logros." 
   },
   { 
     id: "toraja", name: "Toraja", region: "Indonesia (Sulawesi)", lat: -3.0, lon: 120.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Famosos por sus complejos rituales funerarios. Para ellos, la muerte es un proceso gradual hacia el 'Puya' (tierra de las almas). Conservan los cuerpos de sus ancestros en casa durante años y tallan tumbas en acantilados de roca custodiadas por figuras de madera 'Tau-tau'." 
   },
   { 
     id: "korowai", name: "Korowai", region: "Papúa (Indonesia)", lat: -5.5, lon: 140.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Constructores de las casas en los árboles más altas del mundo (hasta 35 metros). Viven en lo profundo de la selva para protegerse de inundaciones, insectos y espíritus. Fueron contactados muy recientemente y mantienen un estilo de vida de caza y recolección de sagú." 
   },
   { 
     id: "jarawa", name: "Jarawa", region: "Islas Andamán", lat: 11.0, lon: 92.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Vecinos de los Sentineleses, pero con contacto limitado. Han vivido en las selvas andamanesas por 50.000 años. Son expertos cazadores de cerdos salvajes y peces con arco. Enfrentan amenazas modernas por la carretera que cruza su reserva." 
   },
   
   // --- OCEANÍA (ADICIONALES) ---
   { 
     id: "rapanui", name: "Rapa Nui", region: "Isla de Pascua", lat: -27.1, lon: -109.4, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Creadores de los Moai, las estatuas monolíticas más famosas del Pacífico. Desarrollaron una escritura única aún no descifrada (Rongo Rongo). Su culto al 'Hombre Pájaro' (Tangata Manu) era una competencia física extrema para elegir al líder anual de la isla." 
   },
   { 
     id: "tahitian", name: "Tahitiano", region: "Polinesia Francesa", lat: -17.6, lon: -149.4, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Cultura vibrante de las Islas de la Sociedad. Famosos por la danza 'Ori Tahiti' (movimiento rápido de caderas) y sus tatuajes. Eran navegantes expertos y su sociedad estaba estratificada con una realeza sagrada. El concepto de 'Mana' (poder espiritual) es central." 
   },
   { 
     id: "tongan", name: "Tongano", region: "Tonga", lat: -21.1, lon: -175.2, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "El único reino del Pacífico que nunca perdió su soberanía indígena ante una potencia colonial. Famosos por su arte de la 'Tapa' (tela de corteza) y la ceremonia del Kava. Son conocidos por su gran tamaño físico y su pasión por el rugby." 
   },
   { 
     id: "chamorro", name: "Chamorro", region: "Guam/Marianas", lat: 13.4, lon: 144.7, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Pueblo indígena de las Islas Marianas. Famosos por sus antiguas 'Piedras Latte', pilares de piedra que sostenían sus casas. A pesar de siglos de colonización española y estadounidense, mantienen su lengua y el valor de 'Inafa'maolek' (interdependencia)." 
   },
   { 
     id: "tiwi", name: "Tiwi", region: "Australia (Islas Tiwi)", lat: -11.5, lon: 130.5, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Aislados en sus islas por 7,000 años, desarrollaron una cultura distinta a la del continente. Famosos por sus 'Pukumani' (postes funerarios tallados y pintados) y su arte abstracto. Su idioma es aislado y no se relaciona con otras lenguas aborígenes." 
   },
   { 
     id: "yolngu", name: "Yolngu", region: "Australia (Arnhem)", lat: -12.5, lon: 136.0, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Maestros del Didgeridoo (Yidaki). Tienen un sistema legal y de parentesco muy complejo. Son famosos por sus pinturas de corteza con diseños de líneas cruzadas 'Rarrk'. Mantuvieron comercio con pescadores de Indonesia siglos antes de la llegada de los europeos." 
   },
   { 
     id: "asaro", name: "Hombres de Barro (Asaro)", region: "Papúa Nueva Guinea", lat: -6.0, lon: 145.4, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Legendarios guerreros de las tierras altas que se cubren de barro gris y usan máscaras de arcilla aterradoras. Según la leyenda, idearon este disfraz para parecer espíritus fantasmas y asustar a sus enemigos sin luchar. Hoy es una danza cultural icónica." 
   },
   { 
     id: "ni_vanuatu", name: "Ni-Vanuatu", region: "Vanuatu", lat: -15.3, lon: 166.9, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Famosos por la ceremonia del 'Naghol' (buceo en tierra), el precursor ancestral del puenting, donde los hombres saltan de altas torres de madera atados con lianas para asegurar una buena cosecha de ñame. Es una de las culturas más felices y resilientes del mundo." 
   },
   { 
     id: "solomon", name: "Isleños Salomón", region: "Islas Salomón", lat: -9.6, lon: 160.1, 
-    video: "video/default_video.mp4",
+    video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4",
     desc: "Habitantes de Melanesia conocidos por una característica genética única: muchos tienen piel oscura y cabello rubio natural. Son expertos talladores de concha y madera. Históricamente usaban una moneda de plumas rojas única en el mundo." 
   },
   // --- AMÉRICA DEL NORTE (COSTA OESTE Y SUROESTE) ---
