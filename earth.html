@@ -185,6 +185,10 @@
             transition: 0.3s; cursor: pointer; white-space: nowrap;
         }
      .back-link:hover { border-color: #D4AF37;; color: #D4AF37; }
+     .volver-origen { 
+        display: flex; align-items: center; gap: 15px; padding-left: 20px; 
+        border-right: 1px solid transparent; 
+    }
      @media (max-width: 900px) {             
             .back-link { display: none; } 
         }
@@ -194,12 +198,12 @@
 
 <div id="loader">CARGANDO PUEBLOS DE ORÍGEN...</div>
 <div id="tooltip"></div>
-          
+<div class="volver-origen">
     <div class="back-link" onclick="goToHome()">
         <span class="material-symbols-rounded">arrow_back</span>
         VOLVIENDO AL ORIGEN
     </div>
- 
+</div>
 <div id="app">  
   <!-- BUSCADOR -->
   <div id="ui-controls" class="glass-panel">
