@@ -534,7 +534,7 @@ function focusCamera(lat, lon) {
     document.getElementById('card-desc').textContent = data.desc;
     
     // Configurar enlace con el ID correcto
-    document.getElementById('card-link').href = `pueblo.html?id=${data.id}`;
+    document.getElementById('card-link').href = data.url; // `pueblo.html?id=${data.id}`;
     document.getElementById('card-link').target = "_self";
 
     // Media
