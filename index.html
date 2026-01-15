@@ -151,7 +151,7 @@
     /* RESPONSIVIDAD */
     @media (max-width: 900px) { .back-link { top: 20px; right: 20px; padding: 6px 12px; font-size: 0.65rem; } }
     @media (max-width: 768px) {
-      #ui-controls { top: 20px; left: 20px; right: 20px; width: auto; }
+      #ui-controls { top: 20px; left: 20px; right: 70px; width: auto; }
       
       /* Tarjeta Móvil (Bottom Sheet) */
       #info-card {
@@ -164,7 +164,7 @@
       }
        /* Aumentar área de toque sin cambiar el tamaño visual del icono */
       .control-btn {
-        padding: 12px; /* Más espacio alrededor del icono para el dedo */
+        padding: 10px; /* Más espacio alrededor del icono para el dedo */
         margin-left: 5px; /* Separarlos un poco más entre sí */
       }
       /* Asegurar que la cabecera sea fácil de tocar */
@@ -176,8 +176,33 @@
       #info-card.active { transform: translateY(0); }
       #info-card.minimized { height: auto; transform: translateY(0); }
       .card-content-scroll { max-height: 150px; }
-      h1 { font-size: 1rem; }
-      .search-icon { top: 62%; }
+      h1 { font-size: 0.9rem; }
+     .search-icon { top: 50%; transform: translateY(-50%); }
+     .search-input { padding: 10px 35px 10px 15px; font-size: 0.9rem; }
+        /* 2. AJUSTE DEL BOTÓN VOLVER (DERECHA) */
+      .volver-origen {
+        top: 20px;
+        right: 20px;
+        z-index: 30; /* Asegurar que flote sobre todo */
+      }
+
+      /* Transformar en botón circular solo ícono */
+      .back-link {
+        font-size: 0; /* Oculta el texto "VOLVER AL ORIGEN" */
+        padding: 10px; /* Hace el botón cuadrado/circular */
+        border-radius: 50%; /* Lo hace redondo */
+        background: rgba(10, 15, 25, 0.8); /* Fondo oscuro para contraste */
+        backdrop-filter: blur(10px);
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+      }
+
+      /* Asegurar que el ícono de la flecha se vea bien */
+      .back-link span {
+        font-size: 1.2rem;
+        margin: 0;
+      }
     }
   </style>
 </head>
