@@ -447,16 +447,48 @@
       selectPueblo(null);
   });
 
-  function focusCamera(lat, lon) {
+function focusCamera(lat, lon) {
     const pVec = latLonToVector3(lat, lon, 1).normalize();
     const targetDist = 4.5; 
     const endPos = pVec.clone().multiplyScalar(targetDist);
+    
     gsap.to(camera.position, { 
-        duration: 3.5, x: endPos.x, y: endPos.y, z: endPos.z, 
-        onUpdate: () => controls.update(), ease: "power3.inOut",
+        duration: 3.5, 
+        x: endPos.x, y: endPos.y, z: endPos.z, 
+        onUpdate: () => controls.update(), 
+        ease: "power3.inOut",
+        
+        // --- AQUÍ ESTÁ LA MAGIA DE UX ---
         onComplete: () => {
-            // Animación de atención cuando llega
-            gsap.fromTo("#info-card", { y: 0 }, { y: -10, duration: 0.2, yoyo: true, repeat: 3 });
+            const card = document.getElementById('info-card');
+            const header = card.querySelector('.card-header');
+
+            // 1. Animación de "Saltito" (Bounce)
+            gsap.fromTo(card, 
+                { y: 0 }, 
+                { y: -10, duration: 0.3, yoyo: true, repeat: 3, ease: "power1.inOut" }
+            );
+
+            // 2. Animación de "Resplandor" en el encabezado (Color Pulse)
+            // Usamos el color --accent (#00f3ff) pero con transparencia
+            gsap.fromTo(header,
+                { 
+                    backgroundColor: "rgba(255, 255, 255, 0)", // Transparente
+                    boxShadow: "0 0 0px rgba(0, 243, 255, 0)" 
+                }, 
+                { 
+                    backgroundColor: "rgba(0, 243, 255, 0.15)", // Cian sutil
+                    boxShadow: "0 0 20px rgba(0, 243, 255, 0.3)", // Brillo externo
+                    duration: 0.3, 
+                    yoyo: true, 
+                    repeat: 3,
+                    ease: "power1.inOut",
+                    onComplete: () => {
+                        // Limpieza final para asegurar que quede limpio
+                        gsap.to(header, { backgroundColor: "transparent", boxShadow: "none", duration: 0.5 });
+                    }
+                }
+            );
         }
     });
   }
