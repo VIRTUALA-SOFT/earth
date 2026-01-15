@@ -71,6 +71,62 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       display: block;
     }    
+    .card-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre la flecha y la X */
+}
+    .control-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.control-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+    /* Transición suave para el contenido interno */
+#card-body-content {
+  transition: opacity 0.3s, max-height 0.3s;
+  opacity: 1;
+  max-height: 500px; /* Altura arbitraria suficiente */
+  overflow: hidden;
+}
+
+/* --- ESTADO MINIMIZADO (CLASE ACTIVA) --- */
+#info-card.minimized #card-body-content {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#info-card.minimized .card-media-wrapper {
+  display: none; /* Ocultamos la foto/video al minimizar para ahorrar espacio */
+}
+
+#info-card.minimized .card-header {
+  border-bottom: none; /* Quitamos la línea al minimizar */
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Rotación de la flecha cuando está minimizado */
+#info-card.minimized #toggle-card svg {
+  transform: rotate(180deg); /* Flecha apunta arriba */
+}
+/* ANIMACIÓN SUAVE DE LA FLECHA */
+#toggle-card svg {
+  transition: transform 0.3s;
+}
+    
     .search-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
     .search-icon { position: absolute; right: 15px; top: 60%; color: #666; pointer-events: none;}
 
@@ -113,7 +169,7 @@
     
     #info-card.active { transform: translateX(0); opacity: 1; pointer-events: all; }
     
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; min-height: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .card-title { font-size: 1.4rem; margin: 0; color: var(--accent); }
     
     .card-content-scroll { overflow-y: auto; margin-bottom: 15px; padding-right: 5px; flex-grow: 1; }
@@ -161,7 +217,14 @@
         padding-bottom: max(20px, env(safe-area-inset-bottom)); /* Respeta el borde inferior del celular */
         display: flex;
         flex-direction: column;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
       }
+        /* Cuando está minimizado en móvil, baja hasta dejar solo el header */
+  #info-card.minimized {
+    transform: translateY(0) !important; /* Mantiene posición base */
+    height: auto;
+    padding-bottom: 20px; /* Espacio seguro */
+  }
       #info-card.active { transform: translateY(0); }
 
        /* Asegurar que el contenido interno tenga scroll si es muy pequeño el celular */
@@ -234,15 +297,33 @@
     </div>
      
     
-    <div class="card-header">
+    <div class="card-header" onclick="toggleCardState()" style="cursor: pointer;">>
       <h2 class="card-title" id="card-title">Título</h2>
-      <button id="close-card" style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.5rem; padding: 0 10px;">&times;</button>
+      <div class="card-controls">
+        <button id="toggle-card" class="control-btn" aria-label="Minimizar">
+           <svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 1L7 7L13 1"></path>
+           </svg>
+        <!--<button id="close-card" style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.5rem; padding: 0 10px;">&times;</button>-->
+        </button>
+
+         <!-- Botón Cerrar (X) -->
+     <!-- IMPORTANTE: El botón cerrar debe detener la propagación para no re-abrir la tarjeta al cerrar -->
+    <button id="close-card" class="control-btn" aria-label="Cerrar" onclick="event.stopPropagation(); closeCardLogic();">
+        <!-- Tu icono SVG de X -->
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="11" y2="11"></line><line x1="1" y1="11" x2="11" y2="1"></line></svg>
+    </button>
     </div>
-    <div class="card-content-scroll">
-      <p class="card-desc" id="card-desc">Descripción...</p>
-    </div>
-    <a href="#" id="card-link" class="btn-action">Visitar Pueblo de Orígen</a>
   </div>
+     
+        <!-- Contenedor colapsable (Texto y Botón) -->
+        <div id="card-body-content">
+          <div class="card-content-scroll">
+            <p class="card-desc" id="card-desc">Descripción...</p>
+          </div>
+          <a href="#" id="card-link" class="btn-action">VISITAR PUEBLO DE ORÍGEN</a>
+        </div>        
+    </div>
 
   <div id="globe"></div>
 </div>
@@ -256,7 +337,31 @@
     }
   }
 </script>
+  
+<script>
+  // --- LÓGICA DE MINIMIZAR/EXPANDIR ---
+  const toggleBtn = document.getElementById('toggle-card');
+  const infoCard = document.getElementById('info-card');
+  const closeBtn = document.getElementById('close-card');
 
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Evita clics fantasma
+    infoCard.classList.toggle('minimized');
+  });
+
+  // Modificar el botón cerrar para que también resetee el estado minimizado
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectPueblo(null); // Tu función existente para deseleccionar
+    searchInput.value = '';
+    
+    // Esperar a que se cierre para quitar la clase minimized (reset estético)
+    setTimeout(() => {
+        infoCard.classList.remove('minimized');
+    }, 300);
+  });
+</script>
+  
 <script>
    // --- 0. TRANSICIÓN A HOME ---
         function goToHome() {
@@ -266,7 +371,27 @@
             }, 800);
         }
 </script>
+  
+<script>
+  / Función para alternar estado (Expandir/Minimizar)
+window.toggleCardState = function() {
+    const card = document.getElementById('info-card');
+    card.classList.toggle('minimized');
+};
 
+// Función para cerrar (Resetear todo)
+window.closeCardLogic = function() {
+    // Llamar a tu lógica existente de deseleccionar
+    selectPueblo(null); 
+    document.getElementById('searchInput').value = '';
+    
+    // Opcional: esperar un poco y quitar la clase minimized para la próxima vez
+    setTimeout(() => {
+        document.getElementById('info-card').classList.remove('minimized');
+    }, 300);
+};
+</script>
+  
 <script type="module">
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -478,6 +603,12 @@
           }
           if(u.beam) { gsap.to(u.beam.scale, { y: 2.0, duration: 1 }); gsap.to(u.beam.material, { opacity: 0.8, duration: 0.5 }); }
           showInfoCard(u.data);
+         // Forzamos que arranque MINIMIZADA para dejar ver el viaje de la cámara
+    const card = document.getElementById('info-card');
+    card.classList.add('minimized'); 
+    
+    // 3. Añadimos la clase 'active' para que aparezca (pero minimizada)
+    card.classList.add('active');
       } else {
           u.mesh.material.color.setHex(u.isMain ? 0xffd700 : 0xffeba0);
           if(u.ring) {
@@ -503,7 +634,14 @@
     const pVec = latLonToVector3(lat, lon, 1).normalize();
     const targetDist = 4.5; 
     const endPos = pVec.clone().multiplyScalar(targetDist);
-    gsap.to(camera.position, { duration: 3.5, x: endPos.x, y: endPos.y, z: endPos.z, onUpdate: () => controls.update(), ease: "power3.inOut" });
+    gsap.to(camera.position, { duration: 3.5, x: endPos.x, y: endPos.y, z: endPos.z, onUpdate: () => controls.update(), ease: "power3.inOut",   onComplete: () => {
+          // Pequeña animación en la tarjeta para llamar la atención
+          gsap.fromTo("#info-card", 
+            { y: 0 }, 
+            { y: -10, duration: 0.2, yoyo: true, repeat: 3 } // 3 saltitos
+          );
+      }
+    });
   }
 
  function showInfoCard(data) {
