@@ -162,6 +162,17 @@
         padding-bottom: max(20px, env(safe-area-inset-bottom));
         transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
       }
+       /* Aumentar área de toque sin cambiar el tamaño visual del icono */
+      .control-btn {
+        padding: 12px; /* Más espacio alrededor del icono para el dedo */
+        margin-left: 5px; /* Separarlos un poco más entre sí */
+      }
+      /* Asegurar que la cabecera sea fácil de tocar */
+      .card-header {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        min-height: 50px; /* Cabecera más alta para facilitar el clic */
+      }
       #info-card.active { transform: translateY(0); }
       #info-card.minimized { height: auto; transform: translateY(0); }
       .card-content-scroll { max-height: 150px; }
