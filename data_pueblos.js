@@ -18,6 +18,11 @@ const etniasBase = [
     video: "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_video.mp4",
     desc: "El pueblo del sol, la arena y el viento. Los Wayuu poseen una estructura social matrilineal compleja organizada en clanes. Son maestros tejedores; sus coloridas mochilas narran historias de su cosmogonía. Su sistema de justicia, guiado por el 'Pütchipü'ü' (palabrero), es reconocido como Patrimonio Inmaterial de la Humanidad." ,
     url: "dsc/wayuu/etnia-wayuu.html"
+    icons: {
+        flora: "cactus",         // Icono de Cactus
+        fauna: "pets",           // Icono Genérico (o 'pest_control_rodent' para pequeños mamíferos)
+        sacred: "star"           // Icono de Estrella/Sagrado
+    }
   },
   { 
     id: "embera", 
