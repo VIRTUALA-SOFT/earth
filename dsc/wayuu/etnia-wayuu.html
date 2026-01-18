@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nación Wayuu | Inmersión Digital</title>
     
     <!-- FUENTES -->
@@ -15,8 +15,14 @@
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     
-    <!-- Three.js Import Map -->
+    <!-- MAPBOX -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    
+    <!-- IMPORT MAP -->
     <script type="importmap">
       {
         "imports": {
@@ -25,10 +31,6 @@
         }
       }
     </script>
-
-    <!-- Mapbox CSS/JS -->
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
     
     <style>
          :root {
@@ -36,6 +38,7 @@
             --c-sand: #C89F65;
             --c-accent: #FF3B3B;
             --c-cyan: #00f3ff;
+            --c-sacred: #ff0055; /* Color Territorio Sagrado */
         }
 
         body { 
@@ -43,15 +46,21 @@
             color: #f3f3f3; 
             font-family: 'Manrope', sans-serif; 
             overflow-x: hidden; 
-            cursor: none; 
             margin: 0;
+            cursor: none; /* Cursor personalizado */
+        }
+
+        /* En móvil reactivamos cursor nativo por si acaso, pero el div sigue ahí */
+        @media (hover: none) {
+            body { cursor: auto; }
+            #cursor { display: none !important; }
         }
 
         .font-display { font-family: 'Playfair Display', serif; }
         .font-decor { font-family: 'Cinzel Decorative', serif; }
         .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        /* CURSOR */
+        /* CURSOR PERSONALIZADO */
         #cursor {
             position: fixed; top: 0; left: 0; width: 20px; height: 20px;
             background: #ffffff; border-radius: 50%; pointer-events: none; z-index: 99999;
@@ -59,19 +68,16 @@
             transition: width 0.3s, height 0.3s, background-color 0.2s;
             display: flex; justify-content: center; align-items: center;
         }
-        #cursor span { opacity: 0; font-size: 10px; font-weight: 800; color: white; font-family: 'Syncopate', sans-serif; letter-spacing: 1px; pointer-events: none; }
-        
+        #cursor span { opacity: 0; font-size: 10px; font-weight: 800; color: white; font-family: 'Syncopate', sans-serif; pointer-events: none; }
         #cursor.hovered { width: 50px; height: 50px; }
-        #cursor.audio-mode { width: 90px !important; height: 90px !important; background: #FF3B3B !important; mix-blend-mode: normal !important; opacity: 1 !important; box-shadow: 0 4px 30px rgba(255, 59, 59, 0.5) !important; }
-        #cursor.audio-mode span { opacity: 1 !important; color: white !important; }
         #cursor.map-mode { width: 80px; height: 80px; background: var(--c-cyan); mix-blend-mode: normal; color: black; box-shadow: 0 0 20px var(--c-cyan); }
 
         /* UTILIDADES VISUALES */
-        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
         
         .giant-text {
             font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
         }
         .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
 
@@ -87,44 +93,49 @@
         }
         .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.08); }
 
-        /* --- ESTILOS DEL RADAR (Observatorio) --- */
+        /* --- RADAR OPTIMIZADO (RESPONSIVO) --- */
         .radar-container {
-            position: relative; width: 400px; height: 400px;
+            position: relative; 
+            width: 400px; height: 400px;
+            /* Ajuste móvil */
+            max-width: 90vw; max-height: 90vw;
             display: flex; justify-content: center; align-items: center;
         }
         .radar-ring {
             position: absolute; border-radius: 50%; border: 1px solid var(--c-cyan);
-            opacity: 0.3; box-shadow: 0 0 15px var(--c-cyan);
+            opacity: 0.3; box-shadow: 0 0 10px var(--c-cyan);
         }
-        .ring-1 { width: 100%; height: 100%; animation: spin 30s linear infinite; border-style: dashed; opacity: 0.1; }
-        .ring-2 { width: 65%; height: 65%; animation: pulse-ring 3s infinite; border: 1px solid rgba(0, 243, 255, 0.4); }
-        /* Botón Central */
+        .ring-1 { width: 100%; height: 100%; animation: spin 40s linear infinite; border-style: dashed; opacity: 0.15; }
+        .ring-2 { width: 65%; height: 65%; animation: pulse-ring 4s infinite; border: 1px solid rgba(0, 243, 255, 0.3); }
+        
         .radar-core { 
-            width: 35%; height: 35%; border-radius: 50%;
+            width: 30%; height: 30%; border-radius: 50%;
             background: rgba(0, 243, 255, 0.05); border: 1px solid var(--c-cyan);
             backdrop-filter: blur(5px); cursor: pointer; z-index: 10;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: 0.4s;
         }
-        .radar-core:hover { background: rgba(0, 243, 255, 0.2); transform: scale(1.1); box-shadow: 0 0 40px var(--c-cyan); }
+        .radar-core:hover { background: rgba(0, 243, 255, 0.2); transform: scale(1.1); box-shadow: 0 0 30px var(--c-cyan); }
         
         /* Iconos Orbitales */
-        .orbit-track { position: absolute; width: 100%; height: 100%; animation: spin 40s linear infinite; }
+        .orbit-track { position: absolute; width: 100%; height: 100%; animation: spin 50s linear infinite; }
         .orbit-icon {
             position: absolute; width: 40px; height: 40px;
             background: #000; border: 1px solid var(--c-cyan); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan);
+            z-index: 5;
         }
-        .orbit-icon span { animation: spin-reverse 40s linear infinite; font-size: 1.2rem; } /* Contrarrestar rotación */
+        /* Rotación inversa para mantener iconos derechos */
+        .orbit-icon span { animation: spin-reverse 50s linear infinite; font-size: 1.2rem; }
         
-        .pos-1 { top: 0; left: 50%; transform: translate(-50%, -50%); } /* Norte */
-        .pos-2 { bottom: 15%; right: 15%; } /* Sureste */
-        .pos-3 { bottom: 15%; left: 15%; } /* Suroeste */
+        .pos-1 { top: 0; left: 50%; transform: translate(-50%, -50%); } /* Flora */
+        .pos-2 { bottom: 15%; right: 15%; } /* Fauna */
+        .pos-3 { bottom: 15%; left: 15%; border-color: var(--c-sacred); color: var(--c-sacred); box-shadow: 0 0 10px var(--c-sacred); } /* Sagrado */
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-        @keyframes pulse-ring { 0% { transform: scale(0.9); opacity: 0.1; } 50% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(0.9); opacity: 0.1; } }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.1; } 50% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(0.95); opacity: 0.1; } }
 
         /* MAPBOX MODAL */
         #mapbox-modal {
@@ -134,29 +145,31 @@
         }
         #mapbox-modal.open { transform: translateY(0); }
         .map-hud {
-            position: absolute; top: 120px; left: 5%; width: 300px; z-index: 10;
+            position: absolute; top: 100px; left: 5%; width: 300px; z-index: 10;
             background: rgba(10,15,20,0.9); padding: 20px; border-left: 3px solid var(--c-sand);
             backdrop-filter: blur(10px);
+            max-width: 90vw; /* Ajuste móvil */
         }
         .layer-btn {
             display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px;
             margin-top: 5px; background: rgba(255,255,255,0.05); cursor: pointer;
             border: 1px solid rgba(255,255,255,0.1); color: #fff; transition: 0.3s;
         }
-        .layer-btn:hover, .layer-btn.active { background: rgba(255,255,255,0.15); border-color: var(--c-cyan); }
+        .layer-btn:hover, .layer-btn.active { background: rgba(255,255,255,0.15); border-color: currentColor; }
+        
+        /* Colores de capas */
+        .btn-flora.active { border-color: #69f0ae; color: #69f0ae; }
+        .btn-fauna.active { border-color: #00f3ff; color: #00f3ff; }
+        .btn-sacred.active { border-color: var(--c-sacred); color: var(--c-sacred); }
+
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         .flora-dot { background: #69f0ae; box-shadow: 0 0 10px #69f0ae; }
         .fauna-dot { background: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
+        .sacred-dot { background: var(--c-sacred); box-shadow: 0 0 10px var(--c-sacred); }
 
-        /* LOADER */
-        .loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c-bg); z-index: 10000;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
-        }
-        .loader-line { width: 0%; height: 2px; background: var(--c-sand); transition: width 0.2s; }
-        
-        /* TRANSICIÓN SUAVE ENTRE SECCIONES (FADE BORDERS) */
+        .mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right { display: none; }
+
+        /* TRANSICIONES */
         .section-fade-top {
             position: absolute; top: 0; left: 0; width: 100%; height: 150px;
             background: linear-gradient(to bottom, #050200 0%, transparent 100%);
@@ -169,6 +182,17 @@
         }
 
         ::-webkit-scrollbar { width: 0px; }
+        
+        /* RESPONSIVE */
+        @media(max-width: 768px) {
+            .giant-text { font-size: 4rem; }
+            .hero h1 { font-size: 3.5rem; }
+            section { padding: 80px 20px; }
+            /* Ajuste radar en móvil */
+            .radar-container { width: 300px; height: 300px; }
+            .orbit-icon { width: 35px; height: 35px; }
+            .orbit-icon span { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -183,43 +207,37 @@
         </div>
     </div>
 
-    <!-- CANVAS THREE.JS (FONDO ORIGINAL) -->
+    <!-- CANVAS THREE.JS (FONDO - Se pausará para optimizar) -->
     <canvas id="global-canvas"></canvas>
 
     <!-- NAVEGACIÓN -->
     <nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
         <div class="flex items-center gap-6">
-            <div class="text-xs font-tech tracking-[0.3em]" id="pueblo-nav-title">NACIÓN WAYUU</div>
+            <div class="text-xs font-tech tracking-[0.3em] hidden md:block" id="pueblo-nav-title">NACIÓN WAYUU</div>
             <a href="javascript:history.back()" class="hover-trigger flex items-center gap-2 text-[10px] font-mono tracking-widest text-white/60 hover:text-[#C89F65] transition-colors">
                 <span>←</span> VOLVER AL GLOBO
             </a>
         </div>
-        <button id="sound-btn" class="hover-trigger text-[10px] tracking-widest uppercase">SONIDO OFF</button>
     </nav>
-
-    <!-- AUDIO DE FONDO -->
-    <audio id="bg-music" loop>
-        <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mp3">
-    </audio>
 
     <main id="main-content" class="opacity-0 transition-opacity duration-1000">
         
-        <!-- 1. HERO (VIDEO + TITULO) -->
+        <!-- 1. HERO (VIDEO) -->
         <section class="relative h-screen flex items-center justify-center overflow-hidden">
             <div class="absolute inset-0 z-0">
                 <video id="hero-video" autoplay muted playsinline class="hero-video-bg">
-                    <source src="" type="video/mp4"> <!-- Se llena con JS -->
+                    <source src="" type="video/mp4">
                 </video>
             </div>
             <div class="text-center relative z-10 flex flex-col items-center">
                 <p class="font-tech text-xs tracking-[0.8em] text-white/60 mb-6">PUEBLO DE ORIGEN</p>
                 <h1 class="giant-text font-display" id="pueblo-title">...</h1>
-                <p class="mt-8 text-lg font-light tracking-widest uppercase" id="pueblo-subtitle">...</p>
+                <p class="mt-8 text-lg font-light tracking-widest uppercase text-center" id="pueblo-subtitle">...</p>
             </div>
             <div class="section-fade-bottom"></div>
         </section>
 
-        <!-- 2. DATA (TILT CARDS) -->
+        <!-- 2. DATA -->
         <section class="py-24 px-6 md:px-12 bg-[#050200] relative z-20">
             <div class="section-fade-top"></div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
@@ -242,7 +260,7 @@
             </div>
         </section>
 
-        <!-- 3. WEAVING (THREE.JS TEJIDO) -->
+        <!-- 3. WEAVING (3D) -->
         <section class="h-screen w-full flex flex-col md:flex-row items-center justify-center relative bg-[#050200] overflow-hidden z-20">
             <div class="absolute md:relative z-30 w-full md:w-1/3 px-8 md:pl-24 text-center md:text-left pointer-events-none mix-blend-difference">
                 <span class="text-[#C89F65] font-mono text-xs tracking-widest uppercase mb-4 block">02 — WEAVING</span>
@@ -252,30 +270,34 @@
             <div id="weaving-container" class="absolute inset-0 md:relative md:w-2/3 h-full cursor-grab active:cursor-grabbing z-20 opacity-60 md:opacity-100"></div>
         </section>
 
-        <!-- 4. OBSERVATORIO TERRITORIAL (NUEVA SECCIÓN CON RADAR) -->
+        <!-- 4. OBSERVATORIO TERRITORIAL (RADAR OPTIMIZADO) -->
         <section id="observatory" class="h-screen w-full relative flex items-center justify-center bg-[#050200] overflow-hidden z-20">
-            <!-- Fondo sutil (mapa oscuro estático o gradiente) -->
+            <!-- Fondo sutil -->
             <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920')] bg-cover bg-center grayscale mix-blend-screen"></div>
             <div class="section-fade-top"></div>
             <div class="section-fade-bottom"></div>
 
-            <div class="relative z-30 flex flex-col items-center justify-center">
-                <span class="text-[#00f3ff] font-mono text-xs tracking-[0.3em] mb-8 animate-pulse">SISTEMA DE BIO-ESCANEO</span>
+            <div class="relative z-30 flex flex-col items-center justify-center w-full px-4">
+                <span class="text-[#00f3ff] font-mono text-xs tracking-[0.3em] mb-8 animate-pulse text-center">SISTEMA DE BIO-ESCANEO</span>
                 
-                <!-- EL RADAR -->
+                <!-- EL BIO-RADAR -->
                 <div class="radar-container hover-trigger" onclick="openMapModal()">
-                    <!-- Iconos orbitando -->
                     <div class="orbit-track">
-                        <div class="orbit-icon pos-1" title="Bosque Seco"><span class="material-symbols-rounded">forest</span></div>
-                        <div class="orbit-icon pos-2" title="Fauna"><span class="material-symbols-rounded">pets</span></div>
-                        <div class="orbit-icon pos-3" title="Clima"><span class="material-symbols-rounded">wb_sunny</span></div>
+                        <!-- ICONOS MEJORADOS (Cactus, Huella, Sagrado) -->
+                        <div class="orbit-icon pos-1" title="Flora">
+                            <span class="material-symbols-rounded">cactus</span> <!-- Cactus -->
+                        </div>
+                        <div class="orbit-icon pos-2" title="Fauna">
+                            <span class="material-symbols-rounded">pets</span> <!-- Huella -->
+                        </div>
+                        <div class="orbit-icon pos-3" title="Territorio Sagrado">
+                            <span class="material-symbols-rounded">temple_buddhist</span> <!-- Sagrado -->
+                        </div>
                     </div>
                     
-                    <!-- Anillos -->
                     <div class="radar-ring ring-1"></div>
                     <div class="radar-ring ring-2"></div>
                     
-                    <!-- Núcleo Interactivo -->
                     <div class="radar-core group">
                         <span class="material-symbols-rounded text-4xl text-[#00f3ff] group-hover:text-white transition-colors">public</span>
                         <span class="text-[10px] text-[#00f3ff] mt-2 font-mono tracking-widest group-hover:text-white">ABRIR SATÉLITE</span>
@@ -283,12 +305,12 @@
                 </div>
 
                 <p class="mt-12 text-gray-400 text-sm font-light max-w-md text-center leading-relaxed">
-                    Accede al mapa 3D de alta precisión para visualizar la topografía, flora y fauna del territorio ancestral.
+                    Visualiza la topografía, flora y zonas sagradas prohibidas del territorio ancestral.
                 </p>
             </div>
         </section>
 
-        <!-- 5. JEPIRA (COSMOS SHADER) -->
+        <!-- 5. JEPIRA (COSMOS) -->
         <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
             <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
             <div class="relative z-10 text-center pointer-events-none mix-blend-exclusion px-4">
@@ -303,7 +325,7 @@
         </footer>
     </main>
 
-    <!-- MODAL MAPBOX (FULLSCREEN OVERLAY) -->
+    <!-- MODAL MAPBOX -->
     <div id="mapbox-modal">
         <button class="absolute top-8 right-8 z-[2001] text-white hover:text-[#00f3ff] transition-colors flex items-center gap-2 bg-black/50 px-6 py-3 rounded-full backdrop-blur-md border border-white/20 hover:border-[#00f3ff]" onclick="closeMapModal()">
             <span class="text-xs font-mono tracking-widest uppercase">Cerrar Mapa</span>
@@ -312,25 +334,26 @@
         
         <div id="map-container"></div>
         
-        <!-- HUD DENTRO DEL MAPA -->
+        <!-- HUD CONTROLES -->
         <div class="map-hud">
-            <h3 class="text-[#00f3ff] font-display text-xl mb-2">Datos Biológicos</h3>
-            <p class="text-xs text-gray-400 mb-4">Capas de densidad en tiempo real.</p>
-            <button class="layer-btn active" onclick="toggleLayer('flora')">
-                <span class="dot flora-dot"></span> Flora (Cactus)
+            <h3 class="text-[#00f3ff] font-display text-xl mb-2">Datos Territoriales</h3>
+            <p class="text-xs text-gray-400 mb-4">Capas de densidad y zonas de protección.</p>
+            
+            <button class="layer-btn btn-flora active" onclick="toggleLayer('flora')">
+                <span class="dot flora-dot"></span> Flora (Cactus/Trupillo)
             </button>
-            <button class="layer-btn" onclick="toggleLayer('fauna')">
+            <button class="layer-btn btn-fauna" onclick="toggleLayer('fauna')">
                 <span class="dot fauna-dot"></span> Fauna (Flamencos)
+            </button>
+            <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
+                <span class="dot sacred-dot"></span> Territorios Sagrados
             </button>
         </div>
     </div>
 
-    <!-- SCRIPTS DE LÓGICA -->
+    <!-- SCRIPTS LÓGICA -->
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        
-        // AJUSTAR RUTA DE DATOS
         import { pueblosData } from '../../data_pueblos.js'; 
 
         // 1. CARGA DE DATOS
@@ -338,37 +361,40 @@
         const puebloId = params.get('id') || 'wayuu'; 
         const data = pueblosData.find(p => p.id === puebloId && p.type === 'main') || pueblosData[0];
 
-        // INYECTAR TEXTOS Y VIDEO
+        // INYECCIÓN DE DATOS
         document.getElementById('pueblo-nav-title').textContent = "NACIÓN " + data.name.toUpperCase();
-        document.getElementById('pueblo-title').innerHTML = data.name.substring(0, 2) + "<span>" + data.name.substring(2) + "</span>";
+        const splitName = data.name.length > 3 ? data.name.substring(0, 3) : data.name;
+        const restName = data.name.substring(3);
+        document.getElementById('pueblo-title').innerHTML = `${splitName}<span>${restName}</span>`;
         document.getElementById('pueblo-subtitle').textContent = data.region;
         document.getElementById('culture-desc').textContent = data.desc;
         
-        // Video Hero (Si hay en data, usarlo, sino fallback)
+        // VIDEO HERO
         const videoSrc = data.video || "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_desierto_ss.mp4";
         document.querySelector('#hero-video source').src = videoSrc;
         document.getElementById('hero-video').load();
 
         // ---------------------------------------------------------
-        // 2. MAPBOX (LÓGICA DEL OBSERVATORIO)
+        // 2. MAPBOX OPTIMIZADO (HEATMAPS INTENSOS + SAGRADO)
         // ---------------------------------------------------------
-        mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ'; // Token Público
+        mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ'; // Tu token
 
         let map;
 
-        // Función Global para abrir el modal
         window.openMapModal = function() {
-            const modal = document.getElementById('mapbox-modal');
-            modal.classList.add('open');
+            document.getElementById('mapbox-modal').classList.add('open');
+            // Pausar animaciones pesadas de fondo
+            toggleGlobalAnimation(false);
             
-            // Iniciar mapa solo la primera vez para ahorrar recursos
-            if(!map) {
-                setTimeout(() => initMap(), 500); // Pequeño delay para la animación CSS
+            if (!map) {
+                setTimeout(() => initMap(), 500); 
             }
         };
 
         window.closeMapModal = function() {
             document.getElementById('mapbox-modal').classList.remove('open');
+            // Reanudar fondo
+            toggleGlobalAnimation(true);
         };
 
         function initMap() {
@@ -377,7 +403,7 @@
 
             map = new mapboxgl.Map({
                 container: 'map-container',
-                style: 'mapbox://styles/mapbox/satellite-streets-v12', // Estilo Satelital Oscuro
+                style: 'mapbox://styles/mapbox/satellite-streets-v12',
                 center: [lng, lat],
                 zoom: 10, pitch: 60, bearing: -20, projection: 'globe'
             });
@@ -387,56 +413,79 @@
                 map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
                 map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-                // Datos Simulados
-                const floraData = generateRandomPoints(lng, lat, 300);
-                const faunaData = generateRandomPoints(lng, lat, 200);
+                // -- GENERACIÓN DE DATOS --
+                const floraData = generateRandomPoints(lng, lat, 400, 0.4);
+                const faunaData = generateRandomPoints(lng, lat, 300, 0.3);
+                // Zona Sagrada (Puntos concentrados en un área específica)
+                const sacredData = generateRandomPoints(lng + 0.1, lat + 0.1, 150, 0.05); 
 
-                addHeatmapLayer('flora', floraData, '#69f0ae', '#d4af37');
+                // -- CAPAS --
+                addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
                 addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
+                // Capa Sagrada (Roja/Magenta Intensa)
+                addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
+                // Estado Inicial
                 map.setLayoutProperty('flora-heat', 'visibility', 'visible');
                 map.setLayoutProperty('fauna-heat', 'visibility', 'none');
+                map.setLayoutProperty('sacred-heat', 'visibility', 'none');
                 
                 rotateCamera(0);
             });
         }
 
-        // Helpers Mapa
-        function generateRandomPoints(cx, cy, count) {
+        // Helpers de Datos
+        function generateRandomPoints(cx, cy, count, spread) {
             const points = [];
             for(let i=0; i<count; i++) {
-                points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*0.3, cy + (Math.random()-0.5)*0.3] } });
+                points.push({
+                    "type": "Feature", "properties": { "density": Math.random() },
+                    "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] }
+                });
             }
             return { "type": "FeatureCollection", "features": points };
         }
+
         function addHeatmapLayer(id, data, c1, c2) {
             map.addSource(id, { type: 'geojson', data: data });
             map.addLayer({
                 id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-                paint: { 'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 1], 'heatmap-intensity': 1, 'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2], 'heatmap-radius': 20, 'heatmap-opacity': 0.7 }
+                paint: {
+                    // Intensidad AUMENTADA para que se vea bien
+                    'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
+                    'heatmap-intensity': 2, 
+                    'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
+                    'heatmap-radius': 30, // Radio más grande para visibilidad
+                    'heatmap-opacity': 0.8
+                }
             });
         }
+
         function rotateCamera(timestamp) { if(map) map.rotateTo((timestamp / 100) % 360, { duration: 0 }); requestAnimationFrame(rotateCamera); }
 
         window.toggleLayer = function(layer) {
             if(!map) return;
+            // Reset botones
             document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-            if(layer === 'flora') {
-                map.setLayoutProperty('flora-heat', 'visibility', 'visible');
-                map.setLayoutProperty('fauna-heat', 'visibility', 'none');
-                event.currentTarget.classList.add('active');
-            } else {
-                map.setLayoutProperty('flora-heat', 'visibility', 'none');
-                map.setLayoutProperty('fauna-heat', 'visibility', 'visible');
-                event.currentTarget.classList.add('active');
-            }
+            // Ocultar todas
+            ['flora', 'fauna', 'sacred'].forEach(l => map.setLayoutProperty(`${l}-heat`, 'visibility', 'none'));
+            
+            // Activar seleccionada
+            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
+            document.querySelector(`.btn-${layer}`).classList.add('active');
         };
 
         // ---------------------------------------------------------
-        // 3. EFECTOS VISUALES ORIGINALES (THREE.JS)
+        // 3. OPTIMIZACIÓN RENDIMIENTO (ThreeJS Pause)
         // ---------------------------------------------------------
-        
-        // A. FONDO GLOBAL (PARTÍCULAS TÚNEL)
+        let globalAnimateFunction = null;
+        let isGlobalAnimating = true;
+
+        window.toggleGlobalAnimation = function(shouldAnimate) {
+            isGlobalAnimating = shouldAnimate;
+        };
+
+        // FONDO PARTÍCULAS
         const initGlobalThree = () => {
             const canvas = document.getElementById('global-canvas');
             if(!canvas) return;
@@ -446,9 +495,10 @@
             camera.position.z = 1000;
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limitar DPI
 
-            const count = 6000; const geo = new THREE.BufferGeometry();
+            const count = 4000; // Reducido un poco para móviles
+            const geo = new THREE.BufferGeometry();
             const pos = new Float32Array(count*3);
             for(let i=0; i<count*3; i+=3) { pos[i]=(Math.random()-0.5)*2500; pos[i+1]=(Math.random()-0.5)*2500; pos[i+2]=(Math.random()-0.5)*4000; }
             geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -457,21 +507,30 @@
             scene.add(particles);
 
             const animate = () => {
-                const p = geo.attributes.position.array;
-                for(let i=0; i<count; i++) {
-                    const i3 = i*3; p[i3+2] += 2; 
-                    if(p[i3+2] > 1000) p[i3+2] = -3000;
+                if(isGlobalAnimating) {
+                    const p = geo.attributes.position.array;
+                    for(let i=0; i<count; i++) {
+                        const i3 = i*3; p[i3+2] += 2; 
+                        if(p[i3+2] > 1000) p[i3+2] = -3000;
+                    }
+                    geo.attributes.position.needsUpdate = true;
+                    renderer.render(scene, camera);
                 }
-                geo.attributes.position.needsUpdate = true;
-                renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
             animate();
-            window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+            window.addEventListener('resize', () => { 
+                camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); 
+                renderer.setSize(window.innerWidth, window.innerHeight); 
+            });
         };
         initGlobalThree();
 
-        // B. TEJIDO (WEAVING SECTION)
+        // ---------------------------------------------------------
+        // 4. INTERACCIÓN Y OTROS (Tejido, Cursor, Loader)
+        // ---------------------------------------------------------
+        
+        // TEJIDO 3D
         (function() {
             const container = document.getElementById('weaving-container');
             if(!container) return;
@@ -488,20 +547,15 @@
             scene.add(sphere);
 
             const animate = () => {
-                sphere.rotation.y += 0.002;
-                renderer.render(scene, camera);
+                if(isGlobalAnimating) { // Pausar si mapa abierto
+                    sphere.rotation.y += 0.002;
+                    renderer.render(scene, camera);
+                }
                 requestAnimationFrame(animate);
             };
             animate();
         })();
 
-        // C. LAPÜ SHADER (TEXTURA DE HUMO/SUEÑO)
-        // ... (Tu código de shader original puede ir aquí, por brevedad uso el cursor logic abajo)
-
-        // ---------------------------------------------------------
-        // 4. INTERACCIÓN UI
-        // ---------------------------------------------------------
-        
         // LOADER
         const loader = document.getElementById('loader');
         const loaderBar = document.getElementById('loader-bar');
@@ -516,31 +570,24 @@
             }
         }, 80);
 
-        // LENIS
-        const lenis = new Lenis({ duration: 1.2 });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-
         // CURSOR
         const cursor = document.getElementById('cursor');
         window.addEventListener('mousemove', e => {
             gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
         });
+        // Soporte Touch para Cursor
+        window.addEventListener('touchmove', e => {
+            const touch = e.touches[0];
+            gsap.to(cursor, { x: touch.clientX, y: touch.clientY, duration: 0.1 });
+        }, {passive: true});
+
         document.querySelector('.radar-container').addEventListener('mouseenter', () => { cursor.classList.add('map-mode'); });
         document.querySelector('.radar-container').addEventListener('mouseleave', () => { cursor.classList.remove('map-mode'); });
 
-        // AUDIO TOGGLE
-        const bgMusic = document.getElementById('bg-music');
-        const soundBtn = document.getElementById('sound-btn');
-        let isMusicPlaying = false;
-        
-        soundBtn.addEventListener('click', () => {
-            if(!isMusicPlaying) {
-                bgMusic.play().then(() => { isMusicPlaying = true; soundBtn.innerText = "SONIDO ON"; });
-            } else {
-                bgMusic.pause(); isMusicPlaying = false; soundBtn.innerText = "SONIDO OFF";
-            }
-        });
+        // LENIS
+        const lenis = new Lenis({ duration: 1.2 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
 
         // TILT
         if (typeof VanillaTilt !== 'undefined') {
