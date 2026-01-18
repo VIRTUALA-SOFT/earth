@@ -8,269 +8,494 @@
     <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Syncopate:wght@400;700&family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     
     <!-- LIBRERÍAS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    
-    <!-- MAPBOX (NUEVO) -->
+
+    <!-- MAPBOX GL JS -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
     
-    <!-- IMPORT MAP -->
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-      }
-    </script>
-    
     <style>
          :root {
-            --c-bg: #050200;
-            --c-sand: #C89F65;
-            --c-accent: #FF3B3B;
-            --c-cyan: #00f3ff;
-            --c-sacred: #ff0055;
-        }
+        --c-bg: #050200;
+        --c-sand: #C89F65;
+        --c-accent: #FF3B3B;
+        --c-star: #A5D8FF;
+    }
 
-        body { 
-            background-color: var(--c-bg); 
-            color: #f3f3f3; 
-            font-family: 'Manrope', sans-serif; 
-            overflow-x: hidden; 
-            cursor: none; 
-            margin: 0;
-        }
+    body { 
+        background-color: var(--c-bg); 
+        color: #f3f3f3; 
+        font-family: 'Manrope', sans-serif; 
+        overflow-x: hidden; 
+        cursor: none; 
+        margin: 0;
+    }
 
-        .font-display { font-family: 'Playfair Display', serif; }
-        .font-decor { font-family: 'Cinzel Decorative', serif; }
-        .font-tech { font-family: 'Syncopate', sans-serif; }
+    .font-display { font-family: 'Playfair Display', serif; }
+    .font-decor { font-family: 'Cinzel Decorative', serif; }
+    .font-tech { font-family: 'Syncopate', sans-serif; }
 
-        /* CURSOR */
-        #cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            background: #ffffff; border-radius: 50%; pointer-events: none; 
-            z-index: 99999; transform: translate(-50%, -50%); 
-            transition: width 0.3s, height 0.3s, background-color 0.2s;
-            mix-blend-mode: difference; display: flex; justify-content: center; align-items: center;
-        }
-        #cursor span { opacity: 0; font-size: 10px; font-weight: 800; color: white; font-family: 'Syncopate', sans-serif; letter-spacing: 1px; pointer-events: none; }
+    /* CURSOR */
+ #cursor {
+        position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+        background: #ffffff; 
+        border-radius: 50%;
+        pointer-events: none; 
+        z-index: 99999; /* Máxima prioridad */
+        transform: translate(-50%, -50%); 
+        transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                    height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+                    background-color 0.2s;
+        mix-blend-mode: difference; /* Inversión por defecto */
+        display: flex; justify-content: center; align-items: center;
+    }
+    
+    #cursor span { 
+        opacity: 0; 
+        font-size: 10px; font-weight: 800; color: white; 
+        font-family: 'Syncopate', sans-serif; letter-spacing: 1px;
+        pointer-events: none;
+    }
 
-        #cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
-        #cursor.audio-mode { width: 90px !important; height: 90px !important; background: #FF3B3B !important; mix-blend-mode: normal !important; opacity: 1 !important; box-shadow: 0 4px 30px rgba(255, 59, 59, 0.5) !important; }
-        #cursor.audio-mode span { opacity: 1 !important; color: white !important; }
-        #cursor.video-mode { width: 100px; height: 100px; background: white; mix-blend-mode: difference; }
-        #cursor.video-mode span { opacity: 1; color: black; }
-        #cursor.dream-mode { width: 150px; height: 150px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); mix-blend-mode: normal; }
-        /* Nuevo estado cursor mapa */
-        #cursor.map-mode { width: 80px; height: 80px; background: var(--c-cyan); mix-blend-mode: normal; color: black; box-shadow: 0 0 20px var(--c-cyan); }
+    /* ESTADO: AUDIO (EL ROJO IMPORTANTE) */
+    #cursor.audio-mode { 
+        width: 90px !important; 
+        height: 90px !important; 
+        background: #FF3B3B !important; /* Rojo Forzado */
+        border: none !important;
+        mix-blend-mode: normal !important; /* APAGAMOS LA MEZCLA para que se vea rojo puro */            
+        opacity: 1 !important;
+        box-shadow: 0 4 30px rgba(255, 59, 59, 0.5) !important;            
+    }
+    
+   #cursor.audio-mode span {         
+    opacity: 1 !important; 
+    color: white !important;
+    font-weight: 800;
+    font-size: 12px;
+  }
+/* ESTADO: HOVER SIMPLE */
+#cursor.hovered { width: 50px; height: 50px; background: white; mix-blend-mode: difference; }
 
-        /* UTILIDADES VISUALES */
-        #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+/* ESTADO: SUEÑOS */
+    #cursor.dream-mode { width: 150px; height: 150px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); mix-blend-mode: normal; }
+
+
+  /* ESTADO: VIDEO */
+    #cursor.video-mode { 
+        width: 100px; 
+        height: 100px; 
+        background: white; 
+        mix-blend-mode: difference; 
+    }
+    #cursor.video-mode span { 
+        opacity: 1; 
+        color: black; /* Texto negro sobre fondo blanco */
+    }
+ 
+
+    /* UTILIDADES VISUALES */
+    #global-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; }
+    
+    .giant-text {
+        font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
+    }
+    .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
+
+    .hero-video-bg {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        opacity: 0.5; filter: contrast(1.1) brightness(0.8);
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    }
+
+    /* TILT CARDS */
+ /*   .tilt-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform-style: preserve-3d;
+        transform: perspective(1000px);
+        transition: all 0.3s ease;
+    }*/
+   /* .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.1); }*/
+    .tilt-inner { transform: translateZ(20px); }        
+    
+    /* LOADER */
+    .loader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--c-bg); z-index: 10000;
+        display: flex; justify-content: center; align-items: center; flex-direction: column;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .loader-line {
+        width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear;
+    }
+    
+    /* Estado inicial del contenido principal */
+    #main-content {
+        opacity: 0;
+        transition: opacity 1.5s ease;
+    }
+
+    .cosmos-bg {
+        position: absolute; inset: 0; background: radial-gradient(circle at center, #0B1026 0%, #000000 100%);
+        opacity: 0; transition: opacity 1.5s ease; pointer-events: none;
+    }
+    
+     /* PLAY BUTTON */
+    .play-btn {
+        width: 48px; height: 48px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.3);
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.3s;
+    }
+    .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
+
+    ::-webkit-scrollbar { width: 0px; }
+
+    /* --- ECUALIZADOR ANIMADO --- */
+    @keyframes equalize {
+        0% { height: 3px; }
+        50% { height: 100%; }
+        100% { height: 3px; }
+    }
+    
+    .bar {
+        width: 3px;
+        background-color: currentColor; /* Hereda el color del texto */
+        border-radius: 9999px;
+        animation: equalize 1s infinite ease-in-out;
+    }
+    
+    /* Retrasos para que parezca aleatorio */
+    .bar:nth-child(1) { animation-delay: -0.4s; height: 60%; }
+    .bar:nth-child(2) { animation-delay: -0.2s; height: 100%; }
+    .bar:nth-child(3) { animation-delay: -0.6s; height: 40%; }
+    .bar:nth-child(4) { animation-delay: -0.8s; height: 80%; }
+    
+    /* Estado Pausado (opcional, si quieres que se detengan al pausar) */
+    .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
+
+    /* --- FONDO CINEMÁTICO --- */
+    .desert-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        /* Efecto de Zoom lento constante para dar vida */
+        animation: slowZoom 60s infinite alternate;
+    }
+    
+    @keyframes slowZoom {
+        from { transform: scale(1); }
+        to { transform: scale(1.15); }
+    }
+    
+    /* Capa oscura para garantizar lectura */
+    .desert-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+            /* --- TARJETAS CRISTAL (MIRAGE EFFECT) --- */
+    .tilt-card {
+        /* Fondo semi-transparente oscuro */
+        background: rgba(0, 0, 0, 0.4); 
+        /* Desenfoque fuerte para suavizar el fondo */
+        backdrop-filter: blur(20px); 
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+        z-index: 10; /* Encima del fondo */
+    }
+    
+    /* AL HACER HOVER O REPRODUCIR */
+    .tilt-card:hover, .tilt-card.playing {
+        /* Se vuelve más transparente para ver el desierto detrás */
+        background: rgba(255, 255, 255, 0.05); 
+        backdrop-filter: blur(5px); /* Menos desenfoque = Más nitidez del fondo */
+        border-color: var(--c-sand);
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    
+    /* Texto Wayuunaiki más brillante para contrastar */
+    .tilt-card h3 { text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+    /* --- DEGRADADO DE BORDES (CINEMATIC FADE) --- */
+    .cinematic-fade {
+        position: absolute;
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        pointer-events: none; /* Permite dar clic a través de ella */
+        z-index: 2; /* Se coloca encima de la imagen y del overlay oscuro */
+        background: linear-gradient(
+            to bottom,
+            #050200 0%,        /* Negro arriba */
+            transparent 20%,   /* Se vuelve transparente al bajar */
+            transparent 80%,   /* Se mantiene transparente */
+            #050200 100%       /* Vuelve a negro abajo */
+        );
+    }
+
+     /* HORIZONTAL SCROLL (IDENTITY) */
+    .horizontal-container {
+        width: 400%; /* 4 Paneles */
+        height: 100vh;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    .panel {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 4rem;
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+    .panel-bg {
+        position: absolute; inset: 0; z-index: 0;
+        filter: brightness(0.4) grayscale(0.5);
+        transition: transform 0.5s;
+    }
+    .panel:hover .panel-bg { transform: scale(1.02); filter: brightness(0.5) grayscale(0.2); }
+
+     /* JEPIRA (COSMOS) */
+    .warp-speed-effect {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at center, transparent 0%, #000 90%);
+        z-index: 1;
+    }
+
+    /* --- MEJORA DE VIDEO (MÁS LUZ Y COLOR) --- */
+.cinematic-video {
+width: 100%;
+height: 100%;
+object-fit: cover;
+opacity: 0.9; /* Subimos de 0.6 a 0.9 (Mucho más visible) /
+filter: contrast(1.1) saturate(1.2); / Realza los colores del desierto */
+transition: opacity 0.5s ease;
+}
+
+/* --- CONTINUIDAD (BORDES FUNDIDOS) --- */
+/* Esto crea el degradado negro arriba y abajo para que no se note el corte */
+.panel-fade {
+position: absolute;
+inset: 0;
+pointer-events: none; /* Permite dar clic a través */
+z-index: 2;
+background: linear-gradient(
+to bottom,
+#050200 0%,         /* Negro arriba (fusión con sección anterior) */
+transparent 15%,    /* Transparente rápido para ver el video */
+transparent 85%,    /* Se mantiene transparente */
+#050200 100%        /* Negro abajo (fusión con footer/siguiente) */
+);
+}
+/* --- SOMBRA SOLO DETRÁS DEL TEXTO --- /
+/ En lugar de oscurecer todo el video, oscurecemos solo donde va el texto */
+.text-protection {
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+z-index: 1;
+}
+/* JEPIRA: Fondo transparente para ver el Canvas */
+#jepira-section {
+position: relative;
+background-color: transparent !important; /* Forzar transparencia */
+z-index: 20;
+overflow: hidden; /* Evita scrollbars si las estrellas se salen */
+}
+/* El degradado azul cósmico (Sutil) */
+#cosmos-overlay {
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%);
+opacity: 0;
+transition: opacity 1s ease;
+z-index: -1; /* Detrás del texto */
+pointer-events: none;
+}
+
+        /* --- ESTILOS NUEVOS: BIO-RADAR Y MAPA --- */
+
+/* 1. SECCIÓN DEL RADAR */
+.radar-container {
+    position: relative; width: 400px; height: 400px;
+    max-width: 90vw; max-height: 90vw;
+    display: flex; justify-content: center; align-items: center; margin: 0 auto;
+}
+.radar-ring {
+    position: absolute; border-radius: 50%; border: 1px solid #00f3ff;
+    opacity: 0.3; box-shadow: 0 0 10px #00f3ff;
+}
+.ring-1 { width: 100%; height: 100%; animation: spin 40s linear infinite; border-style: dashed; opacity: 0.15; }
+.ring-2 { width: 65%; height: 65%; animation: pulse-ring 4s infinite; border: 1px solid rgba(0, 243, 255, 0.3); }
+
+/* Núcleo del Radar (Botón) */
+.radar-core { 
+    width: 30%; height: 30%; border-radius: 50%;
+    background: rgba(0, 243, 255, 0.05); border: 1px solid #00f3ff;
+    backdrop-filter: blur(5px); cursor: pointer; z-index: 10;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: 0.4s;
+}
+.radar-core:hover { background: rgba(0, 243, 255, 0.2); transform: scale(1.1); box-shadow: 0 0 30px #00f3ff; }
+
+/* Iconos Orbitales */
+.orbit-track { position: absolute; width: 100%; height: 100%; animation: spin 50s linear infinite; }
+.orbit-item { position: absolute; display: flex; flex-direction: column; align-items: center; animation: spin-reverse 50s linear infinite; }
+
+.orbit-icon {
+    width: 40px; height: 40px; background: #000; border: 1px solid #00f3ff; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center; color: #00f3ff; box-shadow: 0 0 10px #00f3ff; margin-bottom: 5px;
+}
+.orbit-label { font-family: 'Syncopate', sans-serif; font-size: 8px; color: #00f3ff; letter-spacing: 1px; }
+
+/* Posiciones de los satélites */
+.pos-1 { top: 0; left: 50%; transform: translate(-50%, -50%); } 
+.pos-2 { bottom: 15%; right: 15%; } 
+.pos-3 { bottom: 15%; left: 15%; }
+.pos-3 .orbit-icon { border-color: #ff0055; color: #ff0055; box-shadow: 0 0 10px #ff0055; } /* Sagrado */
+.pos-3 .orbit-label { color: #ff0055; }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+@keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.1; } 50% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(0.95); opacity: 0.1; } }
+
+/* 2. VENTANA MODAL DEL MAPA */
+#mapbox-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 9999; /* Encima de todo */
+    transform: translateY(100%); transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+}
+#mapbox-modal.open { transform: translateY(0); }
+#map-container { width: 100%; height: 100%; }
+
+/* Controles del Mapa (HUD) */
+.map-hud {
+    position: absolute; top: 100px; left: 5%; width: 300px; z-index: 10;
+    background: rgba(10,15,20,0.9); padding: 20px; border-left: 3px solid #C89F65;
+    backdrop-filter: blur(10px);
+}
+.layer-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px;
+    margin-top: 5px; background: rgba(255,255,255,0.05); cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1); color: #fff; transition: 0.3s;
+}
+.layer-btn:hover, .layer-btn.active { background: rgba(255,255,255,0.15); border-color: currentColor; }
+
+/* Colores */
+.btn-flora.active { color: #69f0ae; border-color: #69f0ae; }
+.btn-fauna.active { color: #00f3ff; border-color: #00f3ff; }
+.btn-sacred.active { color: #ff0055; border-color: #ff0055; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
         
-        .giant-text {
-            font-size: clamp(4rem, 15vw, 20rem); line-height: 0.8; color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3); mix-blend-mode: overlay;
-        }
-        .giant-text span { color: var(--c-sand); -webkit-text-stroke: 0; }
-
-        .hero-video-bg {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
-            opacity: 0.6; mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-        }
-
-        /* TILT CARDS */
-        .tilt-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); transition: all 0.3s ease;
-        }
-        .tilt-card:hover { border-color: var(--c-sand); background: rgba(255, 255, 255, 0.08); }
-
-        /* LOADER */
-        .loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--c-bg); z-index: 10000;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
-        }
-        .loader-line { width: 0%; height: 2px; background: linear-gradient(90deg, var(--c-accent), var(--c-sand)); transition: width 0.2s linear; }
-        #main-content { opacity: 0; transition: opacity 1.5s ease; }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 0px; }
-
-        /* ECUALIZADOR */
-        @keyframes equalize { 0% { height: 3px; } 50% { height: 100%; } 100% { height: 3px; } }
-        .bar { width: 3px; background-color: currentColor; border-radius: 9999px; animation: equalize 1s infinite ease-in-out; }
-        .paused .bar { animation-play-state: paused; height: 3px !important; transition: height 0.3s; }
-
-        /* FONDO DESIERTO */
-        .desert-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; animation: slowZoom 60s infinite alternate; }
-        @keyframes slowZoom { from { transform: scale(1); } to { transform: scale(1.15); } }
-        .desert-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(0,0,0,0.6) 0%, #050200 100%); z-index: 1; pointer-events: none; }
-        .cinematic-fade { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 20%, transparent 80%, #050200 100%); }
-
-        /* HORIZONTAL SCROLL */
-        .horizontal-container { width: 400%; height: 100vh; display: flex; flex-wrap: nowrap; }
-        .panel { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding: 4rem; border-right: 1px solid rgba(255,255,255,0.05); }
-        .panel-bg { position: absolute; inset: 0; z-index: 0; filter: brightness(0.4) grayscale(0.5); transition: transform 0.5s; }
-        .cinematic-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; filter: contrast(1.1) saturate(1.2); transition: opacity 0.5s ease; }
-        .panel-fade { position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(to bottom, #050200 0%, transparent 15%, transparent 85%, #050200 100%); }
-        .text-protection { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: 1; }
-
-        /* JEPIRA */
-        #jepira-section { position: relative; background-color: transparent !important; z-index: 20; overflow: hidden; }
-        #cosmos-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(11, 20, 54, 0.8) 0%, #000000 90%); opacity: 0; transition: opacity 1s ease; z-index: -1; pointer-events: none; }
-
-        /* -------------------------------------------
-           NUEVOS ESTILOS: RADAR Y MAPBOX (AÑADIDOS)
-           ------------------------------------------- */
-        
-        /* Contenedor del Radar */
-        .radar-container {
-            position: relative; width: 400px; height: 400px;
-            max-width: 90vw; max-height: 90vw; /* Responsivo */
-            display: flex; justify-content: center; align-items: center;
-        }
-        .radar-ring {
-            position: absolute; border-radius: 50%; border: 1px solid var(--c-cyan);
-            opacity: 0.3; box-shadow: 0 0 10px var(--c-cyan);
-        }
-        .ring-1 { width: 100%; height: 100%; animation: spin 40s linear infinite; border-style: dashed; opacity: 0.15; }
-        .ring-2 { width: 65%; height: 65%; animation: pulse-ring 4s infinite; border: 1px solid rgba(0, 243, 255, 0.3); }
-        
-        /* Botón Central */
-        .radar-core { 
-            width: 30%; height: 30%; border-radius: 50%;
-            background: rgba(0, 243, 255, 0.05); border: 1px solid var(--c-cyan);
-            backdrop-filter: blur(5px); cursor: pointer; z-index: 10;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 0.4s;
-        }
-        .radar-core:hover { background: rgba(0, 243, 255, 0.2); transform: scale(1.1); box-shadow: 0 0 30px var(--c-cyan); }
-        
-        /* Iconos Orbitales con ETIQUETAS */
-        .orbit-track { position: absolute; width: 100%; height: 100%; animation: spin 50s linear infinite; }
-        
-        .orbit-icon-wrapper {
-            position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            animation: spin-reverse 50s linear infinite; /* Contrarrestar rotación */
-        }
-        
-        .orbit-icon {
-            width: 40px; height: 40px;
-            background: #000; border: 1px solid var(--c-cyan); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan);
-            margin-bottom: 5px; transition: 0.3s;
-        }
-        .orbit-label {
-            font-family: 'Syncopate', sans-serif; font-size: 10px; color: var(--c-cyan);
-            letter-spacing: 1px; text-shadow: 0 0 5px var(--c-cyan);
-        }
-
-        /* Posiciones */
-        .pos-wrapper-1 { top: 0; left: 50%; transform: translate(-50%, -50%); } 
-        .pos-wrapper-2 { bottom: 15%; right: 15%; }
-        .pos-wrapper-3 { bottom: 15%; left: 15%; } 
-        
-        /* Estilo Sagrado */
-        .pos-wrapper-3 .orbit-icon { border-color: var(--c-sacred); color: var(--c-sacred); box-shadow: 0 0 10px var(--c-sacred); }
-        .pos-wrapper-3 .orbit-label { color: var(--c-sacred); text-shadow: 0 0 5px var(--c-sacred); }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-        @keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.1; } 50% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(0.95); opacity: 0.1; } }
-
-        /* Modal Mapbox */
-        #mapbox-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000;
-            transform: translateY(100%); transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
-        }
-        #mapbox-modal.open { transform: translateY(0); }
-        #map-container { width: 100%; height: 100%; }
-        
-        .map-hud {
-            position: absolute; top: 100px; left: 5%; width: 300px; z-index: 10;
-            background: rgba(10,15,20,0.9); padding: 20px; border-left: 3px solid var(--c-sand);
-            backdrop-filter: blur(10px); max-width: 90vw;
-        }
-        .layer-btn {
-            display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px;
-            margin-top: 5px; background: rgba(255,255,255,0.05); cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.1); color: #fff; transition: 0.3s;
-        }
-        .layer-btn:hover, .layer-btn.active { background: rgba(255,255,255,0.15); border-color: currentColor; }
-        
-        /* Colores Botones */
-        .btn-flora.active { border-color: #69f0ae; color: #69f0ae; }
-        .btn-fauna.active { border-color: #00f3ff; color: #00f3ff; }
-        .btn-sacred.active { border-color: var(--c-sacred); color: var(--c-sacred); }
-        .dot { width: 8px; height: 8px; border-radius: 50%; }
-        .flora-dot { background: #69f0ae; box-shadow: 0 0 10px #69f0ae; }
-        .fauna-dot { background: #00f3ff; box-shadow: 0 0 10px #00f3ff; }
-        .sacred-dot { background: var(--c-sacred); box-shadow: 0 0 10px var(--c-sacred); }
-
-        .mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right { display: none; }
-        
-        /* Play Button */
-        .play-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-        .tilt-card:hover .play-btn { background: var(--c-sand); border-color: var(--c-sand); color: black; transform: scale(1.1); }
-    </style>
+</style>
 </head>
 <body>
 
     <div id="cursor"><span id="cursor-text"></span></div>
-    
-    <!-- CANVAS THREE.JS (FONDO GLOBAL) -->
     <canvas id="global-canvas"></canvas>
 
     <!-- LOADER -->
     <div class="loader" id="loader">
-        <div class="font-tech text-xl tracking-[0.3em] text-[#C89F65] mb-4">CARGANDO</div>
+        <div class="font-tech text-xl tracking-[0.3em] text-[#D4A056] mb-4">WAYUU</div>
         <div class="w-48 h-[1px] bg-white/10 rounded overflow-hidden">
             <div class="loader-line h-full" id="loader-bar"></div>
         </div>
     </div>
-
-    <!-- NAVEGACIÓN -->
-    <nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
-        <div class="flex items-center gap-6">
-            <div class="text-xs font-tech tracking-[0.3em] hidden md:block" id="pueblo-nav-title">NACIÓN WAYUU</div>
-            <a href="javascript:history.back()" class="hover-trigger flex items-center gap-2 text-[10px] font-mono tracking-widest text-white/60 hover:text-[#C89F65] transition-colors">
-                <span>←</span> VOLVER AL GLOBO
-            </a>
-        </div>
-        <button id="sound-btn" class="hover-trigger text-[10px] tracking-widest uppercase">SONIDO OFF</button>
-    </nav>
-
-    <!-- AUDIO -->
+    
+    <!-- AUDIO DE FONDO -->
     <audio id="bg-music" loop>
-        <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mp3">
+        <source src="../../musica/musica_wayuu.wav" type="audio/wav">
     </audio>
 
-    <main id="main-content" class="opacity-0 transition-opacity duration-1000">
+    <!-- NAV BAR -->
+  <!-- NAV BAR (Fija) -->
+<nav class="fixed top-8 left-8 right-8 z-[100] flex justify-between items-center mix-blend-difference text-white">
+    
+    <!-- GRUPO IZQUIERDA: Logo + Volver -->
+    <div class="flex items-center gap-6 md:gap-8">
         
-        <!-- 1. HERO (VIDEO) -->
-        <section class="relative h-screen flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 z-0">
-                <video id="hero-video" autoplay muted playsinline class="hero-video-bg">
-                    <!-- Se llena con JS -->
-                    <source src="" type="video/mp4">
-                </video>
+        <!-- Logo -->
+        <div class="text-xs font-tech tracking-[0.3em] cursor-pointer hover-trigger" id="logo-btn">
+            NACIÓN WAYUU
+        </div>
+
+        <!-- Separador Vertical (Sutil) -->
+        <div class="h-4 w-[1px] bg-white/20 hidden md:block"></div>
+
+        <!-- BOTÓN VOLVER (Premium) -->
+        <!-- hover-trigger: Para que el cursor reaccione -->
+        <a href="javascript:history.back()" class="hover-trigger group flex items-center gap-3 text-[10px] font-mono tracking-widest text-white/60 hover:text-[#C89F65] transition-colors duration-300">
+            <!-- Flecha animada -->
+            <span class="transform group-hover:-translate-x-1 transition-transform duration-300 text-lg leading-none pb-1">←</span>
+            <span class="uppercase">Volver al Globo</span>
+        </a>
+
+    </div>
+
+    <!-- GRUPO DERECHA: Sonido + Menú -->
+    <div class="flex items-center gap-6">
+        
+        <!-- BOTÓN SONIDO -->
+        <button id="sound-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+            <span id="sound-text" class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Sound Off</span>
+            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                <svg id="icon-mute" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                <svg id="icon-sound" class="hidden" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
             </div>
+        </button>
+
+        <!-- BOTÓN MENÚ -->
+        <button id="menu-btn" class="hover-trigger group flex items-center gap-2 uppercase text-[10px] tracking-widest cursor-pointer">
+            <span class="hidden md:block opacity-50 group-hover:opacity-100 transition-opacity">Menú</span>
+            <div class="w-10 h-10 border border-white/30 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all relative overflow-hidden">
+                <div id="hamburger-line" class="w-4 h-[1px] bg-current transition-all duration-300"></div>
+                <div id="close-x" class="absolute inset-0 flex items-center justify-center opacity-0 scale-50 transition-all duration-300"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+            </div>
+        </button>
+
+    </div>
+</nav>
+    </nav>
+
+    <!-- OVERLAY MENÚ -->
+    <div id="menu-overlay" class="fixed inset-0 bg-[#050200] z-[90] hidden flex flex-col justify-center items-center opacity-0 transition-opacity duration-500">
+        <ul class="text-center space-y-4 md:space-y-8">
+            <li><a href="#main-content" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Origen</a></li>
+            <li><a href="#identity-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Identidad</a></li>
+            <li><a href="#weaving-container" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">El Tejido</a></li>
+            <li><a href=".desert-bg" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Wayuunaiki</a></li>
+            <li><a href="#jepira-section" class="menu-link block text-5xl md:text-7xl font-display text-white hover:text-[#C89F65] transition-colors translate-y-10 opacity-0">Jepira</a></li>
+        </ul>
+        <div class="absolute bottom-10 text-center opacity-50"><p class="text-[10px] font-mono tracking-[0.3em] text-white">NACIÓN WAYUU — 2025</p></div>
+    </div>
+
+    <!-- MAIN -->
+    <main id="main-content">
+        
+        <!-- 1. HERO -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden">
+            <video autoplay muted loop playsinline class="hero-video-bg"><source src="https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_desierto_ss.mp4" type="video/mp4"></video>
             <div class="text-center relative z-10 flex flex-col items-center">
                 <p class="font-tech text-xs tracking-[0.8em] text-white/60 mb-6 reveal-text">ORIGEN</p>
-                <h1 class="giant-text font-display reveal-title" id="pueblo-title">...</h1>
-                <p class="mt-8 text-lg font-light tracking-widest uppercase" id="pueblo-subtitle">...</p>
+                <h1 class="giant-text font-display reveal-title">WA<span>YUU</span></h1>
+                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">Hijos de la lluvia y la sequía</p>
+                <p class="mt-8 text-sm md:text-lg text-white/80 font-light tracking-widest max-w-md reveal-text uppercase">EL CAMINO DE LAS ALMAS</p>
             </div>
             <div class="absolute bottom-10 animate-bounce z-20 text-white/50">
                 <p class="text-[9px] tracking-[0.3em] mb-2 uppercase">Descubre su historia</p>
@@ -286,7 +511,7 @@
                     <div class="z-10 max-w-2xl px-6">
                         <span class="text-[#FF3B3B] font-mono text-xs tracking-widest mb-4 block">01 — IDENTIDAD</span>
                         <h2 class="text-5xl md:text-8xl font-display text-white mb-8">Los 4 Pilares <br><span class="italic text-[#C89F65]">Ancestrales</span></h2>
-                        <p class="text-gray-400 text-lg font-light">Estructura social y económica de la nación.<br><br><span class="text-xs font-mono border-b border-gray-600 pb-1 animate-pulse">DESLIZA ▶</span></p>
+                        <p class="text-gray-400 text-lg font-light">Más que una etnia, somos una civilización del desierto.<br><br><span class="text-xs font-mono border-b border-gray-600 pb-1 animate-pulse">DESLIZA ▶</span></p>
                     </div>
                     <div class="panel-fade"></div>
                 </div>
@@ -297,8 +522,9 @@
                         <div class="text-protection"></div><div class="panel-fade"></div>
                     </div>
                     <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
-                        <h3 class="text-4xl font-display text-white mb-4">Matrilineal</h3>
-                        <p class="text-gray-200 font-light mb-4 text-lg">El apellido y el clan (*Eiruku*) se heredan de la madre. Ella es la raíz de la sociedad.</p>
+                        <h3 class="text-4xl font-display text-white mb-4">La Sangre Materna</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">Sociedad <strong class="text-[#C89F65]">Matrilineal</strong>. El apellido y el clan (*Eiruku*) se heredan de la madre. Ella es la raíz.</p>
+                        <ul class="text-xs font-mono text-gray-300 space-y-2 border-t border-white/20 pt-4"><li>• Eiruku: Carne / Clan</li><li>• 30+ Clanes (Uriana, Epieyu...)</li></ul>
                     </div>
                 </div>
 
@@ -308,438 +534,1079 @@
                         <div class="text-protection"></div><div class="panel-fade"></div>
                     </div>
                     <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
-                        <h3 class="text-4xl font-display text-white mb-4">Pütchipü'ü</h3>
-                        <p class="text-gray-200 font-light mb-4 text-lg">El Palabrero resuelve conflictos mediante el diálogo y la compensación para restaurar la armonía.</p>
+                        <h3 class="text-4xl font-display text-white mb-4">La Palabra es Ley</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">El <strong class="text-[#C89F65]">Pütchipü'ü</strong> (Palabrero) resuelve conflictos con el poder de la palabra, evitando la guerra y restaurando la armonía.</p>
+                        <span class="text-xs uppercase tracking-widest text-[#C89F65]">Patrimonio de la Humanidad</span>
                     </div>
                 </div>
-                
-                 <!-- Agrega más paneles si es necesario -->
+
+                <div class="panel hover-trigger group relative">
+                    <div class="absolute inset-0 w-full h-full">
+                        <video autoplay muted loop playsinline class="cinematic-video"><source src="https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/default_video.mp4" type="video/mp4"></video>
+                        <div class="text-protection"></div><div class="panel-fade"></div>
+                    </div>
+                    <div class="glass-card p-10 max-w-xl z-20 relative backdrop-blur-md border border-white/10">
+                        <h3 class="text-4xl font-display text-white mb-4">Sustento y Arte</h3>
+                        <p class="text-gray-200 font-light mb-4 text-lg">Pastoreo, pesca y tejido. Cada mochila (*Susu*) cuenta una historia geométrica (*Kanas*) que refleja el universo Wayuu.</p>
+                        <span class="text-[#C89F65] text-4xl font-bold block mt-4">Kanas <span class="text-sm font-normal text-white">Geometría Sagrada</span></span>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- 3. EL HILO DE LA VIDA (TEJIDO) -->
+        <!-- 3. EL HILO DE LA VIDA -->
         <section class="h-screen w-full flex flex-col md:flex-row items-center justify-center relative bg-[#050200] overflow-hidden z-20">
             <div class="absolute md:relative z-30 w-full md:w-1/3 px-8 md:pl-24 text-center md:text-left pointer-events-none mix-blend-difference">
-                <span class="text-[#C89F65] font-mono text-xs tracking-widest uppercase mb-4 block">02 — WEAVING</span>
+                <span class="text-[#C89F65] font-mono text-xs tracking-widest uppercase mb-4 block">02 — El hilo de la vida</span>
+                <span class="text-[#FF3B3B] text-xs font-mono tracking-[0.4em] uppercase mb-4 block">Wale'kerü</span>
                 <h3 class="text-4xl md:text-6xl font-display text-white mb-6">El Tejido es <br><span class="italic text-[#C89F65]">Pensamiento</span></h3>
-                <p class="text-sm text-gray-300 font-light leading-relaxed max-w-md mx-auto md:mx-0" id="culture-desc">...</p>
+                <p class="text-sm text-gray-300 font-light leading-relaxed max-w-md mx-auto md:mx-0">"La araña nos enseñó que tejer no es solo cruzar hilos. Es organizar la vida. Cada nudo es una familia, cada línea un camino."</p>
+                <div class="mt-8 flex items-center justify-center md:justify-start gap-4 opacity-70">
+                    <span class="text-[10px] tracking-widest uppercase">Interactúa con la red</span>
+                </div>
             </div>
             <div id="weaving-container" class="absolute inset-0 md:relative md:w-2/3 h-full cursor-grab active:cursor-grabbing z-20 opacity-60 md:opacity-100"></div>
          </section>
 
-        <!-- 4. OBSERVATORIO TERRITORIAL (NUEVO CON UX MEJORADA) -->
-        <section id="observatory" class="h-screen w-full relative flex items-center justify-center bg-[#050200] overflow-hidden z-20">
-            <!-- Fondo sutil -->
-            <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920')] bg-cover bg-center grayscale mix-blend-screen"></div>
-            <div class="section-fade-top"></div>
-            <div class="section-fade-bottom"></div>
 
-            <div class="relative z-30 flex flex-col items-center justify-center w-full px-4">
-                <span class="text-[#00f3ff] font-mono text-xs tracking-[0.3em] mb-8 animate-pulse text-center">SISTEMA DE BIO-ESCANEO</span>
-                
-                <!-- EL BIO-RADAR -->
-                <div class="radar-container hover-trigger" onclick="openMapModal()">
-                    
-                    <div class="orbit-track">
-                        <!-- POSICIÓN 1: FLORA -->
-                        <div class="orbit-icon-wrapper pos-wrapper-1">
-                            <div class="orbit-icon"><span class="material-symbols-rounded">cactus</span></div>
-                            <div class="orbit-label">FLORA</div>
-                        </div>
+        <!-- 4. OBSERVATORIO TERRITORIAL (NUEVO) -->
+<section id="observatory" class="h-screen w-full relative flex items-center justify-center bg-[#050200] overflow-hidden z-20">
+    <!-- Fondo sutil estático para no cargar más 3D -->
+    <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920')] bg-cover bg-center grayscale mix-blend-screen pointer-events-none"></div>
 
-                        <!-- POSICIÓN 2: FAUNA -->
-                        <div class="orbit-icon-wrapper pos-wrapper-2">
-                            <div class="orbit-icon"><span class="material-symbols-rounded">pets</span></div>
-                            <div class="orbit-label">FAUNA</div>
-                        </div>
-
-                        <!-- POSICIÓN 3: SAGRADO -->
-                        <div class="orbit-icon-wrapper pos-wrapper-3">
-                            <div class="orbit-icon"><span class="material-symbols-rounded">temple_buddhist</span></div>
-                            <div class="orbit-label">SAGRADO</div>
-                        </div>
-                    </div>
-                    
-                    <div class="radar-ring ring-1"></div>
-                    <div class="radar-ring ring-2"></div>
-                    
-                    <div class="radar-core group">
-                        <span class="material-symbols-rounded text-4xl text-[#00f3ff] group-hover:text-white transition-colors">public</span>
-                        <span class="text-[10px] text-[#00f3ff] mt-2 font-mono tracking-widest group-hover:text-white">ABRIR SATÉLITE</span>
-                    </div>
+    <div class="relative z-30 flex flex-col items-center justify-center w-full px-4">
+        <span class="text-[#00f3ff] font-mono text-xs tracking-[0.3em] mb-12 animate-pulse text-center block">SISTEMA DE BIO-ESCANEO</span>
+        
+        <!-- EL RADAR -->
+        <div class="radar-container hover-trigger" onclick="openMapModal()">
+            <div class="orbit-track">
+                <!-- Icono 1 -->
+                <div class="orbit-item pos-1">
+                    <div class="orbit-icon"><span class="material-symbols-rounded">cactus</span></div>
+                    <div class="orbit-label">FLORA</div>
                 </div>
-
-                <p class="mt-12 text-gray-400 text-sm font-light max-w-md text-center leading-relaxed">
-                    Visualiza la topografía, flora, fauna y zonas sagradas prohibidas del territorio ancestral.
-                </p>
+                <!-- Icono 2 -->
+                <div class="orbit-item pos-2">
+                    <div class="orbit-icon"><span class="material-symbols-rounded">pets</span></div>
+                    <div class="orbit-label">FAUNA</div>
+                </div>
+                <!-- Icono 3 -->
+                <div class="orbit-item pos-3">
+                    <div class="orbit-icon"><span class="material-symbols-rounded">temple_buddhist</span></div>
+                    <div class="orbit-label">SAGRADO</div>
+                </div>
             </div>
-        </section>
+            
+            <div class="radar-ring ring-1"></div>
+            <div class="radar-ring ring-2"></div>
+            
+            <div class="radar-core group">
+                <span class="material-symbols-rounded text-4xl text-[#00f3ff] group-hover:text-white transition-colors">public</span>
+                <span class="text-[10px] text-[#00f3ff] mt-2 font-mono tracking-widest group-hover:text-white">ABRIR SATÉLITE</span>
+            </div>
+        </div>
 
-        <!-- 5. VOCES DEL VIENTO (AUDIO) -->
-        <section class="py-32 px-6 md:px-12 relative overflow-hidden h-auto min-h-screen flex flex-col justify-center bg-[#050200]">
+        <p class="mt-16 text-gray-400 text-sm font-light max-w-md text-center leading-relaxed">
+            Visualiza el terreno real, biodiversidad y zonas protegidas.
+        </p>
+    </div>
+</section>
+        
+        <!-- 5. VOCES DEL VIENTO -->
+        <section class="py-32 px-6 md:px-12 relative overflow-hidden h-auto min-h-screen flex flex-col justify-center">
             <img src="../../img/wayuu_desierto.jpeg" alt="Desierto" class="desert-bg">
             <div class="desert-overlay"></div>
-            <div class="cinematic-fade" style="z-index: 20;"></div>
+           <div class="cinematic-fade" style="z-index: 20;"></div>
             
-            <div class="max-w-[1400px] mx-auto w-full relative z-30">
-                <div class="mb-16 border-l-2 border-[#C89F65] pl-6">
-                    <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2">03 — WAYUUNAIKI</p>
-                    <h2 class="text-4xl md:text-6xl font-display text-white">El Idioma del <span class="italic text-[#C89F65]">Desierto</span></h2>
+            <div class="max-w-[1400px] mx-auto w-full relative cards-container">
+                <div class="mb-16 border-l-2 border-[#C89F65] pl-6 relative z-30">
+                    <p class="text-[#C89F65] font-mono text-xs tracking-widest mb-2 shadow-black drop-shadow-md">03 — WAYUUNAIKI</p>
+                    <h2 class="text-4xl md:text-6xl font-display text-white drop-shadow-2x1">El Idioma del <span class="italic text-[#C89F65] brightness-125">Desierto</span></h2>
                 </div>
-                <!-- GRID TARJETAS AUDIO -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-30">
                     <!-- Tarjeta 1 -->
-                    <div id="card-audio1" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="window.playRealAudio('audio1')">
+                    <div id="card-audio1" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio1')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <span class="text-xs font-mono text-gray-300">01</span>
-                                <div id="btn-audio1" class="play-btn"><span class="material-symbols-rounded">play_arrow</span></div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">01</span><div id="eq-audio1" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio1" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
-                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Jamaya</h3>
-                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Ja-ma-ya/ — "Hola"</p>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Achonnii</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/a-cho-nii/ — "Hijo"</p>
                         </div>
-                        <audio id="audio1" src="../../vocabulario/wayuu/jamaya.mp3"></audio>
+                        <audio id="audio1" src="../../vocabulario/wayuu/achonnii.mp3"></audio>
                     </div>
                     <!-- Tarjeta 2 -->
-                    <div id="card-audio2" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="window.playRealAudio('audio2')">
+                    <div id="card-audio2" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio2')">
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-12 h-8">
-                                <span class="text-xs font-mono text-gray-300">02</span>
-                                <div id="btn-audio2" class="play-btn"><span class="material-symbols-rounded">play_arrow</span></div>
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">02</span><div id="eq-audio2" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio2" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
                             </div>
-                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Mma</h3>
-                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Mma/ — "Tierra"</p>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Eyüü</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/e-yüü/ — "Madre"</p>
                         </div>
-                        <audio id="audio2" src="../../vocabulario/wayuu/mma.mp3"></audio>
+                        <audio id="audio2" src="../../vocabulario/wayuu/eyuu.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 3 -->
+                    <div id="card-audio3" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio3')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">03</span><div id="eq-audio3" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio3" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            </div>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Aa, anayawatsi</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Aa-a-na-ya-wat-si/ — "Sí, gracias"</p>
+                        </div>
+                        <audio id="audio3" src="../../vocabulario/wayuu/aaanayaguatsi.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 4 -->
+                    <div id="card-audio4" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio4')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">04</span><div id="eq-audio4" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio4" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            </div>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Anayawatsi ma'in</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/A-na-ya-wat-si-main/ — "Muchas gracias"</p>
+                        </div>
+                        <audio id="audio4" src="../../vocabulario/wayuu/anayaquatsi.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 5 -->
+                    <div id="card-audio5" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio5')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">05</span><div id="eq-audio5" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio5" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            </div>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Wattama'at</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Wa-tta-ma-at/ — "Es de mañana"</p>
+                        </div>
+                        <audio id="audio5" src="../../vocabulario/wayuu/guattamaat.mp3"></audio>
+                    </div>
+                    <!-- Tarjeta 6 -->
+                    <div id="card-audio6" class="tilt-card p-10 rounded-xl cursor-none group relative overflow-hidden" onclick="playRealAudio('audio6')">
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-12 h-8">
+                                <div class="flex items-end gap-2 h-full"><span class="text-xs font-mono text-gray-300 mb-1">06</span><div id="eq-audio6" class="flex gap-1 h-6 items-end opacity-0 transition-opacity duration-300"><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div><div class="bar bg-[#C89F65]"></div></div></div>
+                                <div id="btn-audio6" class="play-btn"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+                            </div>
+                            <h3 class="text-4xl font-display text-white group-hover:text-[#C89F65] transition-colors">Paliijü taya</h3>
+                            <p class="mt-2 text-gray-200 font-mono text-[10px] uppercase tracking-widest">/Pa-lii-jü-ta-ya/ — "Por favor"</p>
+                        </div>
+                        <audio id="audio6" src="../../vocabulario/wayuu/paliijiu.mp3"></audio>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 6. JEPIRA (COSMOS) -->
+        <!-- 6. LAPÜ -->
+        <section id="lapu-section" class="relative h-screen w-full bg-[#020202] overflow-hidden flex items-center justify-center cursor-none z-20">
+            <div id="dream-canvas-container" class="absolute inset-0 z-0"></div>
+            <div class="relative z-10 text-center pointer-events-none mix-blend-exclusion px-4">
+                <span class="text-xs font-tech text-[#FF3B3B] tracking-[0.5em] block mb-4">04 — LAPÜ (EL ORÁCULO)</span>
+                <h2 class="text-3xl md:text-5xl font-display text-white mb-6">El Sueño es la <br>verdadera vigilia</h2>
+                <div class="inline-flex flex-col items-center gap-2 mt-[30vh] opacity-60 animate-pulse">
+                    <div class="w-[1px] h-12 bg-white"></div>
+                    <p class="text-white text-[10px] font-mono tracking-widest uppercase">Disipa la niebla para recibir el mensaje</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. VIDEO (YOUTUBE LOOP PERFECTO + FADE) -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050200] video-cursor-area">
+            <!-- Contenedor API YouTube -->
+            <div id="yonna-player" class="absolute w-full h-full object-cover opacity-70 pointer-events-none scale-125 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+            <div class="cinematic-fade" style="z-index: 20;"></div>
+            <div class="relative z-30 text-center mix-blend-overlay px-4 pointer-events-none">
+                <h2 class="text-[12vw] font-display text-white leading-none tracking-tighter">RITUAL</h2>
+                <p class="text-white text-xl font-light italic mt-4">La Yonna</p>
+            </div>
+        </section>     
+
+        <!-- 7. JEPIRA (WARP SPEED + FONDO) -->
         <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
             <div id="cosmos-overlay" class="cosmos-bg"></div>
             <div class="relative z-10 text-center px-6 max-w-3xl">
                 <span class="text-[#A5D8FF] text-xs font-mono mb-6 block tracking-widest">05 — JEPIRA</span>
                 <h2 class="text-5xl md:text-7xl font-display text-white mb-8">El Camino de las Almas</h2>
                  <p class="text-gray-300 text-lg font-light leading-relaxed mb-12 max-w-lg mx-auto">
-                     El viaje hacia Jepira (Cabo de la Vela), donde las almas se convierten en lluvia o estrellas.
+                     En la cosmovisión Wayuu, la muerte no es el final. Es un viaje hacia Jepira (Cabo de la Vela), el lugar donde habitan los muertos. Allí, las almas (Yoluja) esperan para convertirse en lluvia o en estrellas de la Vía Láctea (Spieyu).
                  </p>
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-10 py-4 border border-white/30 rounded-full text-xs font-bold uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all hover-trigger bg-black/50 backdrop-blur-md">
-                    Regresar
+                    Regresar a la Tierra
                 </button>
             </div>
         </section>
-
+        
         <!-- FOOTER -->
-        <footer class="bg-[#050200] pt-24 pb-12 px-6 border-t border-white/5 relative z-20 text-center">
-            <p class="font-tech text-[10px] text-gray-600 tracking-[0.2em]">© 2025 PROYECTO ULULATO</p>
+        <footer class="bg-[#050200] pt-24 pb-12 px-6 border-t border-white/5 relative z-20">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+                    <div class="md:col-span-5 flex flex-col justify-between h-full">
+                        <div>
+                            <img src="../../img/Logo.png" alt="Logo Ululato" class="w-16 mb-8 opacity-80 hover:opacity-100 transition-opacity">
+                            <h2 class="text-3xl md:text-4xl font-display text-white leading-tight">Preservando la <br> <span class="text-[#C89F65] italic">memoria ancestral</span> <br> en el código digital.</h2>
+                        </div>
+                    </div>
+                    <div class="md:col-span-3 md:col-start-7">
+                        <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Explorar</span>
+                        <ul class="space-y-4">
+                            <li><a href="#main-content" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Origen</a></li>
+                            <li><a href="#identity-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Identidad</a></li>
+                            <li><a href="#weaving-container" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">El Tejido</a></li>
+                            <li><a href=".desert-bg" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Wayuunaiki</a></li>
+                            <li><a href="#jepira-section" class="footer-link text-gray-300 hover:text-[#C89F65] transition-colors text-sm uppercase tracking-wider font-light">Jepira</a></li>
+                        </ul>
+                    </div>
+                    <div class="md:col-span-3">
+                        <span class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-6 block">Conectar</span>
+                        <ul class="space-y-4">
+                            <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors"><span class="text-sm">Instagram</span></a></li>
+                            <li><a href="#" class="group flex items-center gap-2 text-gray-300 hover:text-white transition-colors"><span class="text-sm">Twitter / X</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="font-tech text-[10px] text-gray-600 tracking-[0.2em]">© 2025 PROYECTO ULULATO</p>
+                </div>
+            </div>
         </footer>
     </main>
 
-    <!-- MODAL MAPBOX (FULLSCREEN OVERLAY) -->
-    <div id="mapbox-modal">
-        <button class="absolute top-8 right-8 z-[2001] text-white hover:text-[#00f3ff] transition-colors flex items-center gap-2 bg-black/50 px-6 py-3 rounded-full backdrop-blur-md border border-white/20 hover:border-[#00f3ff]" onclick="closeMapModal()">
-            <span class="text-xs font-mono tracking-widest uppercase">Cerrar Mapa</span>
-            <span class="material-symbols-rounded">close</span>
+     <!-- MODAL MAPBOX (FULLSCREEN OVERLAY) -->
+<div id="mapbox-modal">
+    <button class="absolute top-8 right-8 z-[2001] text-white hover:text-[#00f3ff] transition-colors flex items-center gap-2 bg-black/50 px-6 py-3 rounded-full backdrop-blur-md border border-white/20 hover:border-[#00f3ff]" onclick="closeMapModal()">
+        <span class="text-xs font-mono tracking-widest uppercase">Cerrar Mapa</span>
+        <span class="material-symbols-rounded">close</span>
+    </button>
+    
+    <div id="map-container"></div>
+    
+    <div class="map-hud">
+        <h3 class="text-[#00f3ff] font-display text-xl mb-2">Datos Territoriales</h3>
+        <p class="text-xs text-gray-400 mb-4">Capas de densidad en tiempo real.</p>
+        
+        <button class="layer-btn btn-flora active" onclick="toggleLayer('flora')">
+            <span class="dot"></span> Flora (Cactus/Trupillo)
         </button>
-        
-        <div id="map-container"></div>
-        
-        <!-- HUD DENTRO DEL MAPA -->
-        <div class="map-hud">
-            <h3 class="text-[#00f3ff] font-display text-xl mb-2">Datos Territoriales</h3>
-            <p class="text-xs text-gray-400 mb-4">Capas de densidad y zonas de protección.</p>
-            
-            <button class="layer-btn btn-flora active" onclick="toggleLayer('flora')">
-                <span class="dot flora-dot"></span> Flora (Cactus/Trupillo)
-            </button>
-            <button class="layer-btn btn-fauna" onclick="toggleLayer('fauna')">
-                <span class="dot fauna-dot"></span> Fauna (Flamencos)
-            </button>
-            <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
-                <span class="dot sacred-dot"></span> Territorios Sagrados
-            </button>
-        </div>
+        <button class="layer-btn btn-fauna" onclick="toggleLayer('fauna')">
+            <span class="dot"></span> Fauna (Flamencos)
+        </button>
+        <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
+            <span class="dot"></span> Territorios Sagrados
+        </button>
     </div>
+</div>
+    
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
-    <!-- SCRIPTS LÓGICA -->
     <script type="module">
-        import * as THREE from 'three';
-        import { pueblosData } from '../../data_pueblos.js'; 
 
-        // 1. CARGA DE DATOS
-        const params = new URLSearchParams(window.location.search);
-        const puebloId = params.get('id') || 'wayuu'; 
-        const data = pueblosData.find(p => p.id === puebloId && p.type === 'main') || pueblosData[0];
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    // AJUSTA LA RUTA si es necesario (ej: './data_pueblos.js' o '../../data_pueblos.js')
+    import { pueblosData } from '../../data_pueblos.js'; 
 
-        // INYECCIÓN DE DATOS
-        document.getElementById('pueblo-nav-title').textContent = "NACIÓN " + data.name.toUpperCase();
-        const splitName = data.name.length > 3 ? data.name.substring(0, 3) : data.name;
-        const restName = data.name.substring(3);
-        document.getElementById('pueblo-title').innerHTML = `${splitName}<span>${restName}</span>`;
-        document.getElementById('pueblo-subtitle').textContent = data.region;
-        document.getElementById('culture-desc').textContent = data.desc;
+    // OBTENER DATOS (Para que el mapa sepa dónde centrarse)
+    const params = new URLSearchParams(window.location.search);
+    const puebloId = params.get('id') || 'wayuu'; 
+    // Variable global 'data' para que la usen el video y el mapa
+    // Simplemente busca por ID
+    window.puebloData = pueblosData.find(p => p.id === puebloId) || pueblosData[0];;
+
         
-        // VIDEO HERO
-        const videoSrc = data.video || "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_desierto_ss.mp4";
-        document.querySelector('#hero-video source').src = videoSrc;
-        document.getElementById('hero-video').load();
+    // ==========================================
+    // 1. VARIABLES Y FUNCIONES GLOBALES
+    // ==========================================
+    let lenis; 
+    let player; // Para YouTube
 
-        // ---------------------------------------------------------
-        // 2. MAPBOX OPTIMIZADO (HEATMAPS + SAGRADO)
-        // ---------------------------------------------------------
-        mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ'; // Tu token
-
-        let map;
-
-        window.openMapModal = function() {
-            document.getElementById('mapbox-modal').classList.add('open');
-            toggleGlobalAnimation(false); // Pausa el fondo 3D para rendimiento
-            
-            if (!map) {
-                setTimeout(() => initMap(), 500); 
-            }
-        };
-
-        window.closeMapModal = function() {
-            document.getElementById('mapbox-modal').classList.remove('open');
-            toggleGlobalAnimation(true); // Reanuda el fondo
-        };
-
-        function initMap() {
-            const lng = data.lon || -71.80; 
-            const lat = data.lat || 11.95;
-
-            map = new mapboxgl.Map({
-                container: 'map-container',
-                style: 'mapbox://styles/mapbox/satellite-streets-v12',
-                center: [lng, lat],
-                zoom: 10, pitch: 60, bearing: -20, projection: 'globe'
-            });
-
-            map.on('style.load', () => {
-                map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
-                map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-                map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
-
-                // -- GENERACIÓN DE DATOS (Más puntos para visibilidad) --
-                const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
-                const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
-                const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05); // Zona prohibida concentrada
-
-                addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
-                addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
-                addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
-
-                // Estado inicial
-                map.setLayoutProperty('flora-heat', 'visibility', 'visible');
-                map.setLayoutProperty('fauna-heat', 'visibility', 'none');
-                map.setLayoutProperty('sacred-heat', 'visibility', 'none');
-                
-                rotateCamera(0);
-            });
-        }
-
-        // Helpers de Datos
-        function generateRandomPoints(cx, cy, count, spread) {
-            const points = [];
-            for(let i=0; i<count; i++) {
-                points.push({
-                    "type": "Feature", "properties": { "density": Math.random() },
-                    "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] }
-                });
-            }
-            return { "type": "FeatureCollection", "features": points };
-        }
-
-        function addHeatmapLayer(id, data, c1, c2) {
-            map.addSource(id, { type: 'geojson', data: data });
-            map.addLayer({
-                id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-                paint: {
-                    'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
-                    'heatmap-intensity': 2, 
-                    'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
-                    'heatmap-radius': 30, 
-                    'heatmap-opacity': 0.8
-                }
-            });
-        }
-
-        function rotateCamera(timestamp) { if(map) map.rotateTo((timestamp / 100) % 360, { duration: 0 }); requestAnimationFrame(rotateCamera); }
-
-        window.toggleLayer = function(layer) {
-            if(!map) return;
-            document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-            // Ocultar todas
-            ['flora', 'fauna', 'sacred'].forEach(l => map.setLayoutProperty(`${l}-heat`, 'visibility', 'none'));
-            
-            // Activar seleccionada
-            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            document.querySelector(`.btn-${layer}`).classList.add('active');
-        };
-
-        // ---------------------------------------------------------
-        // 3. OPTIMIZACIÓN RENDIMIENTO
-        // ---------------------------------------------------------
-        let isGlobalAnimating = true;
-        window.toggleGlobalAnimation = function(shouldAnimate) { isGlobalAnimating = shouldAnimate; };
-
-        // FONDO PARTÍCULAS (Three.js)
-        const initGlobalThree = () => {
-            const canvas = document.getElementById('global-canvas');
-            if(!canvas) return;
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050200, 0.0015);
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-            camera.position.z = 1000;
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
-
-            const count = 4000; 
-            const geo = new THREE.BufferGeometry();
-            const pos = new Float32Array(count*3);
-            for(let i=0; i<count*3; i+=3) { pos[i]=(Math.random()-0.5)*2500; pos[i+1]=(Math.random()-0.5)*2500; pos[i+2]=(Math.random()-0.5)*4000; }
-            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            const mat = new THREE.PointsMaterial({ size: 2, color: 0xC89F65, transparent: true, opacity: 0.8 });
-            const particles = new THREE.Points(geo, mat);
-            scene.add(particles);
-
-            const animate = () => {
-                if(isGlobalAnimating) {
-                    const p = geo.attributes.position.array;
-                    for(let i=0; i<count; i++) {
-                        const i3 = i*3; p[i3+2] += 2; 
-                        if(p[i3+2] > 1000) p[i3+2] = -3000;
-                    }
-                    geo.attributes.position.needsUpdate = true;
-                    renderer.render(scene, camera);
-                }
-                requestAnimationFrame(animate);
-            };
-            animate();
-            window.addEventListener('resize', () => { 
-                camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); 
-                renderer.setSize(window.innerWidth, window.innerHeight); 
-            });
-        };
-        initGlobalThree();
-
-        // ---------------------------------------------------------
-        // 4. INTERACCIÓN Y UI
-        // ---------------------------------------------------------
+    // --- SISTEMA DE AUDIO (TARJETAS) ---
+    function playRealAudio(id) {
+        const allAudios = document.querySelectorAll('audio');
+        const targetAudio = document.getElementById(id);
+        const targetBtn = document.getElementById(`btn-${id}`);
+        const targetEq = document.getElementById(`eq-${id}`);
+        const targetCard = document.getElementById(`card-${id}`); 
         
-        // TEJIDO 3D
-        (function() {
-            const container = document.getElementById('weaving-container');
-            if(!container) return;
-            const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x050200, 0.002);
-            const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
-            camera.position.z = 15;
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
+        const playIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        const pauseIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    
+        if (!targetAudio) return;
+    
+        // A. Si ya está sonando este audio -> PAUSAR
+        if (!targetAudio.paused) {
+            targetAudio.pause();
+            if(targetBtn) targetBtn.innerHTML = playIcon;
+            if(targetEq) { targetEq.classList.remove('opacity-100'); targetEq.classList.add('opacity-0'); }
+            if(targetCard) targetCard.classList.remove('playing');
+            return;
+        }
+    
+        // B. Si es otro audio -> RESETEAR TODOS (menos música de fondo)
+        allAudios.forEach(audio => {
+            if(audio.id === 'bg-music') return; 
             
-            const geo = new THREE.IcosahedronGeometry(7, 1);
-            const mat = new THREE.MeshBasicMaterial({ color: 0xFF3B3B, wireframe: true, transparent: true, opacity: 0.3 });
-            const sphere = new THREE.Mesh(geo, mat);
-            scene.add(sphere);
+            audio.pause();
+            audio.currentTime = 0;
+            const btn = document.getElementById(`btn-${audio.id}`);
+            const eq = document.getElementById(`eq-${audio.id}`);
+            const card = document.getElementById(`card-${audio.id}`);
+            
+            if(btn) btn.innerHTML = playIcon;
+            if(eq) { eq.classList.remove('opacity-100'); eq.classList.add('opacity-0'); }
+            if(card) card.classList.remove('playing');
+        });
+    
+        // C. REPRODUCIR EL ELEGIDO
+        targetAudio.volume = 0.8;
+        targetAudio.play().then(() => {
+            if(targetBtn) targetBtn.innerHTML = pauseIcon;
+            if(targetEq) { targetEq.classList.remove('opacity-0'); targetEq.classList.add('opacity-100'); }
+            if(targetCard) targetCard.classList.add('playing');
+        }).catch(e => console.log("Interacción requerida para audio"));
+    
+        // D. AL TERMINAR
+        targetAudio.onended = () => {
+            if(targetBtn) targetBtn.innerHTML = playIcon;
+            if(targetEq) { targetEq.classList.remove('opacity-100'); targetEq.classList.add('opacity-0'); }
+            if(targetCard) targetCard.classList.remove('playing');
+        };
+    }
 
-            const animate = () => {
-                if(isGlobalAnimating) { 
-                    sphere.rotation.y += 0.002;
-                    renderer.render(scene, camera);
-                }
-                requestAnimationFrame(animate);
-            };
-            animate();
-        })();
-
-        // LOADER
+    // --- SISTEMA DE CARGA ---
+    function revealSite() {
         const loader = document.getElementById('loader');
+        const main = document.getElementById('main-content');
+        const canvas = document.getElementById('global-canvas');
+        if (loader.style.opacity === '0') return; 
+        try {
+            const tl = gsap.timeline();
+            tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
+              .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
+              .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
+              .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
+              .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
+        } catch (e) {
+            loader.style.opacity = 0;
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+            main.style.opacity = 1;
+            canvas.style.opacity = 1;
+        }
+    }
+
+    // --- YOUTUBE API CALLBACK (Debe ser global) ---
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('yonna-player', {
+            videoId: 'yJMXzvZEZlQ',
+            playerVars: {
+                'autoplay': 1, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0,
+                'modestbranding': 1, 'disablekb': 1, 'fs': 0, 'playsinline': 1,
+                'loop': 1, 'playlist': 'yJMXzvZEZlQ'
+            },
+            events: { 'onReady': onPlayerReady }
+        });
+    }
+    function onPlayerReady(event) {
+        event.target.playVideo();
+        checkVideoTime();
+    }
+    function checkVideoTime() {
+        if (player && player.getCurrentTime) {
+            if (player.getCurrentTime() >= 42) player.seekTo(0);
+        }
+        requestAnimationFrame(checkVideoTime);
+    }
+
+    // ==========================================
+    // 2. INICIALIZACIÓN (DOM READY)
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        if(typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
+
+        // A. CARGA DE API YOUTUBE
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // B. LOADER
         const loaderBar = document.getElementById('loader-bar');
         let progress = 0;
         const interval = setInterval(() => {
-            progress += 5; loaderBar.style.width = `${progress}%`;
-            if(progress >= 100) {
-                clearInterval(interval);
-                gsap.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' });
-                document.getElementById('main-content').style.opacity = 1;
-                document.getElementById('global-canvas').style.opacity = 1;
-                
-                // Animación de entrada inicial
-                gsap.from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" });
-                gsap.from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 });
-            }
-        }, 80);
+            progress += Math.random() * 8;
+            if(loaderBar) loaderBar.style.width = `${progress}%`;
+            if(progress >= 100) { clearInterval(interval); revealSite(); }
+        }, 50);
+        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
 
-        // SCROLL HORIZONTAL
+        // C. CURSOR (INTERACCIÓN VISUAL)
+        const cursor = document.getElementById('cursor');
+        const cursorText = document.getElementById('cursor-text');
+
+        window.addEventListener('mousemove', (e) => {
+            if(typeof gsap !== 'undefined') gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
+            else { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
+        });
+
+        const resetCursor = () => {
+            cursor.className = ''; 
+            cursorText.innerText = "";
+        };
+
+        // 1. Tarjetas de Audio (CURSOR ROJO)
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                resetCursor();
+                cursor.classList.add('audio-mode');
+                cursorText.innerText = "OÍR";
+            });
+            card.addEventListener('mouseleave', () => resetCursor());
+            card.addEventListener('mousedown', () => gsap.to(cursor, { scale: 0.9, duration: 0.1 }));
+            card.addEventListener('mouseup', () => gsap.to(cursor, { scale: 1, duration: 0.1 }));
+        });
+
+        // 2. General
+        document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                if(!e.target.closest('.tilt-card')) { 
+                    resetCursor();
+                    cursor.classList.add('hovered');
+                }
+            });
+            el.addEventListener('mouseleave', () => resetCursor());
+        });
+
+        // 3. Zonas
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText = "VER"; });
+        document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => resetCursor());
+        document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
+        document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
+
+      // D. MENÚ Y SONIDO DE FONDO (AUTO-START)
+        const soundBtn = document.getElementById('sound-btn');
+        const bgMusic = document.getElementById('bg-music');
+        const iconMute = document.getElementById('icon-mute');
+        const iconSound = document.getElementById('icon-sound');
+        const soundText = document.getElementById('sound-text');
+        
+        let isBgPlaying = false;
+
+        // Función para actualizar la UI (Iconos y Texto)
+        const updateSoundUI = (playing) => {
+            if (playing) {
+                iconMute.classList.add('hidden');
+                iconSound.classList.remove('hidden');
+                soundText.innerText = "ON";
+                soundBtn.classList.add('text-[#C89F65]'); // Color activo
+            } else {
+                iconMute.classList.remove('hidden');
+                iconSound.classList.add('hidden');
+                soundText.innerText = "OFF";
+                soundBtn.classList.remove('text-[#C89F65]');
+            }
+        };
+
+        if(soundBtn && bgMusic) {
+            bgMusic.volume = 0.4; // Volumen inicial
+
+            // 1. INTENTO DE AUTOPLAY INMEDIATO
+            const attemptPlay = () => {
+                bgMusic.play().then(() => {
+                    isBgPlaying = true;
+                    updateSoundUI(true);
+                    console.log("Audio iniciado automáticamente.");
+                }).catch(error => {
+                    console.log("Autoplay bloqueado por el navegador. Esperando interacción...");
+                    // 2. FALLBACK: Activar al primer clic en cualquier lado
+                    document.addEventListener('click', () => {
+                        if (!isBgPlaying) {
+                            bgMusic.play();
+                            isBgPlaying = true;
+                            updateSoundUI(true);
+                        }
+                    }, { once: true }); // Se ejecuta una sola vez
+                });
+            };
+
+            // Ejecutar intento al cargar
+            attemptPlay();
+
+            // 3. Lógica del Botón (Manual)
+            soundBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita conflicto con el listener global
+                if(!isBgPlaying) {
+                    bgMusic.play().then(() => {
+                        isBgPlaying = true;
+                        updateSoundUI(true);
+                    });
+                } else {
+                    bgMusic.pause();
+                    isBgPlaying = false;
+                    updateSoundUI(false);
+                }
+            });
+        }
+        
+
+        const menuBtn = document.getElementById('menu-btn');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const hamLine = document.getElementById('hamburger-line');
+        const closeX = document.getElementById('close-x');
+        const menuLinks = document.querySelectorAll('.menu-link');
+        let isMenuOpen = false;
+
+        function toggleMenu() {
+            if(!isMenuOpen) {
+                menuOverlay.classList.remove('hidden');
+                gsap.to(menuOverlay, {opacity: 1, duration: 0.5});
+                gsap.to(menuLinks, {y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out"});
+                hamLine.classList.add('opacity-0');
+                closeX.classList.remove('opacity-0', 'scale-50');
+            } else {
+                gsap.to(menuLinks, {y: 50, opacity: 0, duration: 0.3});
+                gsap.to(menuOverlay, {opacity: 0, duration: 0.5, delay: 0.1, onComplete: () => menuOverlay.classList.add('hidden')});
+                hamLine.classList.remove('opacity-0');
+                closeX.classList.add('opacity-0', 'scale-50');
+            }
+            isMenuOpen = !isMenuOpen;
+        }
+
+        if(menuBtn) menuBtn.addEventListener('click', toggleMenu);
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                toggleMenu(); 
+                // Navegación inteligente
+                if(href === '.desert-bg') {
+                     if(lenis) lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
+                } else {
+                     if(lenis) lenis.scrollTo(href);
+                     else document.querySelector(href).scrollIntoView({behavior:'smooth'});
+                }
+            });
+        });
+        
+        // Footer links logic
+        document.querySelectorAll('.footer-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                if(targetId === '.desert-bg') {
+                     if(lenis) lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
+                } else {
+                     if(lenis) lenis.scrollTo(targetId);
+                     else document.querySelector(targetId).scrollIntoView({behavior:'smooth'});
+                }
+            });
+             link.addEventListener('mouseenter', () => {
+                const cursor = document.getElementById('cursor');
+                if(cursor) {
+                    cursor.classList.add('hovered');
+                    cursor.classList.remove('audio-mode', 'video-mode'); // Limpieza
+                }
+            });
+            link.addEventListener('mouseleave', () => {
+                const cursor = document.getElementById('cursor');
+                if(cursor) cursor.classList.remove('hovered');
+            });
+        });
+
+        document.getElementById('logo-btn')?.addEventListener('click', () => {
+            if(lenis) lenis.scrollTo(0);
+        });
+
+        // E. SCROLL HORIZONTAL (IDENTIDAD)
         const panels = gsap.utils.toArray(".panel");
         const containerH = document.getElementById("horizontal-wrapper");
-        if(panels.length > 0) {
+        if(panels.length > 0 && containerH) {
             gsap.to(panels, {
-                xPercent: -100 * (panels.length - 1), ease: "none",
+                xPercent: -100 * (panels.length - 1),
+                ease: "none",
                 scrollTrigger: {
                     trigger: "#identity-section", pin: true, scrub: 1,
                     snap: 1 / (panels.length - 1), end: () => "+=" + containerH.offsetWidth
                 }
             });
+            const idSection = document.getElementById('identity-section');
+            if(idSection) {
+                idSection.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('hovered'); cursorText.innerText = "DESLIZA"; });
+                idSection.addEventListener('mouseleave', () => resetCursor());
+            }
         }
 
-        // CURSOR
-        const cursor = document.getElementById('cursor');
-        window.addEventListener('mousemove', e => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
-        });
-        window.addEventListener('touchmove', e => {
-            const touch = e.touches[0];
-            gsap.to(cursor, { x: touch.clientX, y: touch.clientY, duration: 0.1 });
-        }, {passive: true});
-
-        document.querySelector('.radar-container').addEventListener('mouseenter', () => { cursor.classList.add('map-mode'); });
-        document.querySelector('.radar-container').addEventListener('mouseleave', () => { cursor.classList.remove('map-mode'); });
-
-        // AUDIO TOGGLE
-        const bgMusic = document.getElementById('bg-music');
-        const soundBtn = document.getElementById('sound-btn');
-        let isMusicPlaying = false;
-        soundBtn.addEventListener('click', () => {
-            if(!isMusicPlaying) {
-                bgMusic.play().then(() => { isMusicPlaying = true; soundBtn.innerText = "SONIDO ON"; });
-            } else {
-                bgMusic.pause(); isMusicPlaying = false; soundBtn.innerText = "SONIDO OFF";
-            }
-        });
-        
-        // AUDIO PLAYER INDIVIDUAL
-        window.playRealAudio = function(id) {
-            const targetAudio = document.getElementById(id);
-            const btn = document.getElementById(`btn-${id}`);
-            if(!targetAudio) return;
-            
-            if(!targetAudio.paused) {
-                targetAudio.pause();
-                btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>';
-            } else {
-                document.querySelectorAll('audio').forEach(a => { if(a.id !== 'bg-music') { a.pause(); a.currentTime=0; } }); // Reset otros
-                targetAudio.play();
-                btn.innerHTML = '<span class="material-symbols-rounded">pause</span>';
-            }
-            targetAudio.onended = () => { btn.innerHTML = '<span class="material-symbols-rounded">play_arrow</span>'; };
-        };
-
-        // LENIS
-        const lenis = new Lenis({ duration: 1.2 });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-
-        // TILT
+        // F. TILT
         if (typeof VanillaTilt !== 'undefined') {
              VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
         }
 
-    </script>
+        // G. THREE.JS GLOBAL
+        const initGlobalThree = () => {
+            const canvas = document.getElementById('global-canvas');
+            if(!canvas) return;
+            const scene = new THREE.Scene();
+            // Niebla para efecto de profundidad
+            scene.fog = new THREE.FogExp2(0x000000, 0.0015);
+            
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+            camera.position.z = 1000; // Cámara lejos para efecto túnel
+            
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const count = 6000; // Más partículas para warp
+            const geometry = new THREE.BufferGeometry();
+            const pos = new Float32Array(count*3);
+            const colors = new Float32Array(count*3);
+            
+            const cSand = new THREE.Color('#C89F65');
+            const cStar = new THREE.Color('#FFFFFF');
+
+            for(let i=0; i<count*3; i+=3) {
+                // Distribución en túnel profundo (Z hasta -4000)
+                pos[i] = (Math.random()-0.5)*2500; 
+                pos[i+1] = (Math.random()-0.5)*2500; 
+                pos[i+2] = (Math.random()-0.5)*4000;
+                
+                colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({ 
+                size: 2, 
+                vertexColors: true, 
+                transparent: true, 
+                opacity: 0.8, 
+                sizeAttenuation: true, 
+                blending: THREE.AdditiveBlending 
+            });
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            const simplex = new SimplexNoise();
+            const clock = new THREE.Clock();
+            
+            let speed = 0.5;
+            let targetSpeed = 0.5;
+
+            const animate = () => {
+                // Interpolación de velocidad
+                speed += (targetSpeed - speed) * 0.03;
+                
+                const p = geometry.attributes.position.array;
+                for(let i=0; i<count; i++) {
+                    const i3 = i*3;
+                    
+                    // MOVER HACIA LA CÁMARA (EJE Z)
+                    p[i3+2] += speed;
+
+                    // Si pasa la cámara, reiniciar al fondo
+                    if(p[i3+2] > 1000) {
+                        p[i3+2] = -3000;
+                        // Redistribuir X e Y
+                        p[i3] = (Math.random()-0.5)*2500;
+                        p[i3+1] = (Math.random()-0.5)*2500;
+                    }
+                }
+                // Rotación leve
+                particles.rotation.z += 0.0002 * speed;
+                
+                geometry.attributes.position.needsUpdate = true;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+            // Animación Jepira (Trigger)
+            if(document.getElementById('cosmos-overlay')) {
+                ScrollTrigger.create({
+                    trigger: "#jepira-section", start: "top center",
+                    onEnter: () => {
+                        targetSpeed = 40; // WARP SPEED
+                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
+                        
+                        const c = geometry.attributes.color.array;
+                        const obj = {t:0};
+                        gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                            for(let i=0; i<count*3; i+=3) {
+                                c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
+                                c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
+                                c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
+                            }
+                            geometry.attributes.color.needsUpdate = true;
+                        }});
+                    },
+                    onLeaveBack: () => {
+                         targetSpeed = 0.5; // FRENAR
+                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
+                         
+                         const c = geometry.attributes.color.array;
+                         const obj = {t:0};
+                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
+                            for(let i=0; i<count*3; i+=3) {
+                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
+                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
+                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
+                            }
+                            geometry.attributes.color.needsUpdate = true;
+                         }});
+                    }
+                });
+            }
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+        initGlobalThree();
+
+        // H. THREE.JS WEAVING
+        (function() {
+            const container = document.getElementById('weaving-container');
+            if(!container) return;
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050200, 0.002);
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+            camera.position.z = 15;
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            const group = new THREE.Group();
+            scene.add(group);
+            const pCount = 300;
+            const pData = [];
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount*3);
+            for(let i=0; i<pCount; i++) {
+                const theta = Math.random()*Math.PI*2;
+                const phi = Math.acos((Math.random()*2)-1);
+                const r = 6;
+                pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+                pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+                pPos[i*3+2] = r*Math.cos(phi);
+                pData.push({ vel: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiplyScalar(0.02), con:0 });
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
+            const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
+            group.add(points);
+            const lGeo = new THREE.BufferGeometry();
+            const lPos = new Float32Array(pCount*pCount*3);
+            const lCol = new Float32Array(pCount*pCount*3);
+            lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3).setUsage(THREE.DynamicDrawUsage));
+            lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
+            const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
+            group.add(lines);
+            let mx=0, my=0;
+            container.addEventListener('mousemove', e => {
+                mx = ((e.clientX - container.getBoundingClientRect().left)/container.clientWidth)*2-1;
+                my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
+            });
+            const animate = () => {
+                group.rotation.x += 0.002 + my*0.01;
+                group.rotation.y += 0.002 + mx*0.01;
+                let vPos=0, cPos=0, con=0;
+                for(let i=0; i<pCount; i++) pData[i].con=0;
+                for(let i=0; i<pCount; i++) {
+                    pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
+                    const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
+                    if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
+                    if(pData[i].con>=3) continue;
+                    for(let j=i+1; j<pCount; j++) {
+                        if(pData[j].con>=3) continue;
+                        const dx = pPos[i*3]-pPos[j*3], dy = pPos[i*3+1]-pPos[j*3+1], dz = pPos[i*3+2]-pPos[j*3+2];
+                        const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
+                        if(dist<2.5) {
+                            pData[i].con++; pData[j].con++;
+                            lPos[vPos++]=pPos[i*3]; lPos[vPos++]=pPos[i*3+1]; lPos[vPos++]=pPos[i*3+2];
+                            lPos[vPos++]=pPos[j*3]; lPos[vPos++]=pPos[j*3+1]; lPos[vPos++]=pPos[j*3+2];
+                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
+                            con++;
+                        }
+                    }
+                }
+                lines.geometry.setDrawRange(0, con*2);
+                lines.geometry.attributes.position.needsUpdate = true;
+                lines.geometry.attributes.color.needsUpdate = true;
+                points.geometry.attributes.position.needsUpdate = true;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+        })();
+
+      // I. THREE.JS SHADER (LAPÜ) - VERSIÓN MÓVIL OPTIMIZADA
+        (function() {
+            const container = document.getElementById('dream-canvas-container');
+            if(!container) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); // Antialias activado
+            
+            // Ajuste de DPI para nitidez en móviles Samsung/iPhone
+            const pixelRatio = Math.min(window.devicePixelRatio, 2); 
+            renderer.setPixelRatio(pixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            function createTextTexture() {
+                const cvs = document.createElement('canvas');
+                // Multiplicamos por pixelRatio para alta resolución
+                const w = window.innerWidth * pixelRatio;
+                const h = window.innerHeight * pixelRatio;
+                cvs.width = w; 
+                cvs.height = h;
+                const ctx = cvs.getContext('2d');
+                
+                const cx = w / 2;
+                const cy = h / 2;
+                
+                // Detectar si es móvil
+                const isMobile = window.innerWidth < 768;
+
+                // 1. TÍTULO "LAPÜ" (Más grande en móvil para que se lea bien)
+                const titleSize = isMobile ? w * 0.25 : w * 0.15; 
+                ctx.font = `italic 700 ${titleSize}px 'Playfair Display'`; 
+                ctx.fillStyle = "white"; 
+                ctx.textAlign = "center"; 
+                ctx.textBaseline = "middle";
+                ctx.fillText("LAPÜ", cx, cy - (isMobile ? h * 0.05 : 0)); // Subir un poco en móvil
+                
+                // 2. MENSAJE DE SABIDURÍA (Dividido en líneas para móvil)
+                const subSize = isMobile ? w * 0.05 : w * 0.015; 
+                ctx.font = `300 ${subSize}px 'Manrope'`; 
+                ctx.fillStyle = "#C89F65"; // Dorado
+                
+                const msg = "Los ancestros hablan cuando cierras los ojos";
+                const offsetY = cy + (titleSize * 0.6);
+
+                if (isMobile) {
+                    // Dividir en dos líneas en celular
+                    ctx.fillText("Los ancestros hablan", cx, offsetY);
+                    ctx.fillText("cuando cierras los ojos", cx, offsetY + (subSize * 1.5));
+                } else {
+                    ctx.fillText(msg, cx, offsetY);
+                }
+                
+                return new THREE.CanvasTexture(cvs);
+            }
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: { 
+                    uTime: {value:0}, 
+                    uMouse: {value: new THREE.Vector2(0.5, 0.5)}, 
+                    uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, 
+                    uTexture: {value: createTextTexture()} 
+                },
+                vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
+                fragmentShader: `
+                    uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
+                    
+                    // Funciones de ruido (sin cambios)
+                    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+                    float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
+                    
+                    void main(){
+                        vec2 uv = vUv; 
+                        vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
+                        
+                        // Distancia del mouse/dedo
+                        float dist = distance(uv*ratio, uMouse*ratio);
+                        
+                        // Niebla más fluida
+                        float fog = snoise(uv*ratio*2.5 - uTime*0.15)*0.5 + snoise(uv*ratio*6.0 + uTime*0.05)*0.2;
+                        
+                        // Aumentamos el radio de visión (0.25 -> 0.35) para que el dedo no tape el texto
+                        float reveal = smoothstep(0.35, 0.15, dist + fog*0.15);
+                        
+                        // Menos distorsión en el texto para que sea más legible
+                        vec4 tex = texture2D(uTexture, uv + vec2(fog*0.03*(1.0-reveal)));
+                        
+                        // Fondo negro profundo
+                        vec3 col = mix(vec3(0.01,0.01,0.03), tex.rgb, reveal*tex.a);
+                        
+                        // Borde dorado más brillante
+                        col += vec3(0.9,0.7,0.3) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.3;
+                        
+                        gl_FragColor = vec4(col, 1.0);
+                    }
+                `
+            });
+            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
+            
+            const clock = new THREE.Clock();
+            const mouse = new THREE.Vector2(0.5, 0.5);
+            
+            // EVENTO MOUSE (PC)
+            window.addEventListener('mousemove', e => { 
+                mouse.x = e.clientX / window.innerWidth; 
+                mouse.y = 1.0 - e.clientY / window.innerHeight; 
+            });
+
+            // EVENTO TOUCH (MÓVIL) - ¡CRUCIAL!
+            window.addEventListener('touchmove', e => {
+                const touch = e.touches[0];
+                mouse.x = touch.clientX / window.innerWidth;
+                mouse.y = 1.0 - touch.clientY / window.innerHeight;
+            }, {passive: true});
+
+            const animate = () => {
+                material.uniforms.uTime.value = clock.getElapsedTime();
+                // Interpolación más rápida en móvil para que se sienta responsive
+                material.uniforms.uMouse.value.lerp(mouse, 0.15);
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            };
+            animate();
+            
+            window.addEventListener('resize', ()=>{
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                renderer.setSize(w, h);
+                material.uniforms.uResolution.value.set(w, h);
+                material.uniforms.uTexture.value = createTextTexture();
+            });
+        })();
+
+        
+        // J. SMOOTH SCROLL
+        if (typeof Lenis !== 'undefined') {
+            lenis = new Lenis({ duration: 1.5, smoothWheel: true });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        }
+    });
+
+
+    // =========================================================
+    // LÓGICA DE MAPBOX (OBSERVATORIO TERRITORIAL)
+    // =========================================================
+    
+    // Tu Token (necesario para ver el mapa)
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ';
+
+    let map;
+
+    // Función Global para abrir el modal desde el HTML
+    window.openMapModal = function() {
+        document.getElementById('mapbox-modal').classList.add('open');
+        
+        // Iniciamos el mapa con un pequeño retraso para que la animación CSS termine
+        if (!map) {
+            setTimeout(() => initMap(), 500); 
+        }
+    };
+
+    // Función Global para cerrar
+    window.closeMapModal = function() {
+        document.getElementById('mapbox-modal').classList.remove('open');
+    };
+
+    function initMap() {
+        // Usamos los datos cargados al inicio (window.puebloData)
+        const lng = window.puebloData.lon || -71.80; 
+        const lat = window.puebloData.lat || 11.95;
+
+        map = new mapboxgl.Map({
+            container: 'map-container',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12', // 3. PAISAJES REALES
+            center: [lng, lat],
+            zoom: 9, 
+            pitch: 60, 
+            bearing: -20, 
+            projection: 'globe'
+        });
+
+        // 2. HERRAMIENTA DE ZOOM (+ / -)
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+        map.on('style.load', () => {
+            // Terreno 3D
+            map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+            
+            // Atmósfera
+            map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
+
+            // Generar Puntos (Simulación basada en coordenadas reales)
+            const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
+            const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
+            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
+
+            // Agregar Capas
+            addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
+            addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
+            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
+
+            // Iniciar mostrando Flora
+            window.toggleLayer('flora');
+            
+            rotateCamera(0);
+        });
+    }
+
+    // Función Global para los botones del menú
+    window.toggleLayer = function(layer) {
+        if(!map) return;
+        
+        // Actualizar UI
+        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector(`.btn-${layer}`);
+        if(btn) btn.classList.add('active');
+
+        // Ocultar todo
+        ['flora', 'fauna', 'sacred'].forEach(l => {
+            if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
+        });
+        
+        // Mostrar seleccionado
+        if(map.getLayer(`${layer}-heat`)) map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
+    };
+
+    // --- Helpers Internos ---
+    function generateRandomPoints(cx, cy, count, spread) {
+        const points = [];
+        for(let i=0; i<count; i++) {
+            points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
+        }
+        return { "type": "FeatureCollection", "features": points };
+    }
+
+    function addHeatmapLayer(id, data, c1, c2) {
+        map.addSource(id, { type: 'geojson', data: data });
+        map.addLayer({
+            id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
+            paint: {
+                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
+                'heatmap-intensity': 2, 
+                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
+                'heatmap-radius': 30, 'heatmap-opacity': 0.8
+            }
+        });
+    }
+
+    function rotateCamera(timestamp) { 
+        if(map && !map.isZooming()) { 
+            map.rotateTo((timestamp / 100) % 360, { duration: 0 }); 
+        }
+        requestAnimationFrame(rotateCamera); 
+    }
+        
+</script>
+
+    
 </body>
 </html>
