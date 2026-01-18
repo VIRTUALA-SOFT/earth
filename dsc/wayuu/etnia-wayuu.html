@@ -1525,94 +1525,89 @@ pointer-events: none;
         document.getElementById('mapbox-modal').classList.remove('open');
     };
 
+ let isAutoRotating = true;
+
     function initMap() {
-        // Usamos los datos cargados al inicio (window.puebloData)
-        const lng = window.puebloData.lon || -71.80; 
-        const lat = window.puebloData.lat || 11.95;
+        const lng = data.lon || -71.80; 
+        const lat = data.lat || 11.95;
 
         map = new mapboxgl.Map({
             container: 'map-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12', // 3. PAISAJES REALES
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
             center: [lng, lat],
             zoom: 9, 
             pitch: 60, 
             bearing: -20, 
-            projection: 'globe'
+            projection: 'globe',
+            // Habilitamos todo el control manual
+            dragPan: true,
+            scrollZoom: true,
+            pitchWithRotate: true
         });
 
-        // 2. HERRAMIENTA DE ZOOM (+ / -)
-        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        // 1. AGREGAR CONTROLES DE ZOOM (Visuales)
+        map.addControl(new mapboxgl.NavigationControl({ showCompass: true, showZoom: true }), 'bottom-right');
+
+        // 2. DETECTAR INTERACCIÓN DEL USUARIO
+        // Si el usuario hace CUALQUIER cosa sobre el mapa, paramos la rotación
+        const stopRotation = () => {
+            if (isAutoRotating) {
+                isAutoRotating = false; 
+                // Opcional: Console log para verificar
+                // console.log("Rotación detenida por usuario");
+            }
+        };
+
+        map.on('mousedown', stopRotation);  // Clic ratón
+        map.on('touchstart', stopRotation); // Dedo móvil
+        map.on('wheel', stopRotation);      // Rueda ratón
+        map.on('dragstart', stopRotation);  // Arrastre
+        map.on('zoomstart', stopRotation);  // Zoom
 
         map.on('style.load', () => {
-            // Terreno 3D
+            // ... (Carga de terreno y niebla igual que antes) ...
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-            
-            // Atmósfera
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Generar Puntos (Simulación basada en coordenadas reales)
+            // ... (Carga de capas de calor igual que antes) ...
+            // (Pega aquí tus funciones generateRandomPoints y addHeatmapLayer calls...)
+            
             const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
             const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
             const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
 
-            // Agregar Capas
             addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
             addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
             addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
-            // Iniciar mostrando Flora
             window.toggleLayer('flora');
             
-            rotateCamera(0);
+            // Iniciar bucle de animación
+            rotateCamera();
         });
     }
 
-    // Función Global para los botones del menú
-    window.toggleLayer = function(layer) {
-        if(!map) return;
-        
-        // Actualizar UI
-        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-        const btn = document.querySelector(`.btn-${layer}`);
-        if(btn) btn.classList.add('active');
 
-        // Ocultar todo
-        ['flora', 'fauna', 'sacred'].forEach(l => {
-            if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
-        });
-        
-        // Mostrar seleccionado
-        if(map.getLayer(`${layer}-heat`)) map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-    };
-
-    // --- Helpers Internos ---
-    function generateRandomPoints(cx, cy, count, spread) {
-        const points = [];
-        for(let i=0; i<count; i++) {
-            points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
+  // 3. FUNCIÓN DE ROTACIÓN MEJORADA (INCREMENTAL)
+    function rotateCamera() {
+        // Solo rotamos si la bandera es TRUE y el mapa está cargado
+        if (isAutoRotating && map) {
+            // Obtenemos el ángulo actual y le sumamos un poquito
+            const currentBearing = map.getBearing();
+            
+            // easeTo es más suave que rotateTo
+            map.easeTo({
+                bearing: currentBearing + 0.05, // Velocidad (ajusta el 0.05 si quieres más rápido)
+                duration: 0,
+                easing: t => t // Lineal para que no acelere/frene
+            });
+            
+            // Solicitamos el siguiente frame
+            requestAnimationFrame(rotateCamera);
         }
-        return { "type": "FeatureCollection", "features": points };
-    }
-
-    function addHeatmapLayer(id, data, c1, c2) {
-        map.addSource(id, { type: 'geojson', data: data });
-        map.addLayer({
-            id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-            paint: {
-                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
-                'heatmap-intensity': 2, 
-                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
-                'heatmap-radius': 30, 'heatmap-opacity': 0.8
-            }
-        });
-    }
-
-    function rotateCamera(timestamp) { 
-        if(map && !map.isZooming()) { 
-            map.rotateTo((timestamp / 100) % 360, { duration: 0 }); 
-        }
-        requestAnimationFrame(rotateCamera); 
+        // Si isAutoRotating es false, la función deja de llamarse a sí misma y se detiene.
+        // Al detenerse, el mapa se queda EXACTAMENTE donde el usuario lo dejó.
     }
         
 </script>
