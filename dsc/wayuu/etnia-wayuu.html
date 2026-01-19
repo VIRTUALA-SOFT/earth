@@ -497,6 +497,13 @@ pointer-events: none;
     .btn-flora.active { border-color: var(--c-flora); background: rgba(105, 240, 174, 0.1); }
     .btn-fauna.active { border-color: var(--c-cyan); background: rgba(0, 243, 255, 0.1); }
     .btn-sacred.active { border-color: #ff0055; color: #ff0055; }
+    .btn-all.active { 
+        border-color: #ffffff; 
+        color: #ffffff; 
+        background: rgba(255, 255, 255, 0.15); 
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+  
 
     .dot { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
 
@@ -945,7 +952,7 @@ pointer-events: none;
           <span class="dot" style="background: #ff0055; box-shadow: 0 0 10px #ff0055;"></span> Territorios Sagrados
        </button>
        <button class="layer-btn btn-all" onclick="toggleLayer('all')">
-          <span class="dot" style="background: #ffffff; box-shadow: 0 0 10px #ffffff;"></span> Ver Todo
+          <span class="dot" style="background: #ffffff;  border: 1px solid #fff; box-shadow: 0 0 10px rgba(255,255,255,0.8)0 0 20px rgba(255,255,255,0.4);"></span> Ver Todo
        </button>
     </div>
 </div>
