@@ -552,6 +552,50 @@ pointer-events: none;
     .mapboxgl-ctrl-group > button + button {
         border-top: 1px solid rgba(200, 159, 101, 0.3) !important;
     }
+
+   /* --- OPTIMIZACIÓN MÓVIL (TOUCH) --- */    
+    /* Detectar dispositivos táctiles */
+    @media (hover: none) and (pointer: coarse) {
+        /* Ocultar la bolita del cursor */
+        #cursor { display: none !important; }
+        
+        /* Restaurar el cursor nativo del sistema */
+        body, a, button, .tilt-card { cursor: auto !important; }
+        
+        /* Ajustar textos gigantes para que no rompan la pantalla */
+        .giant-text { font-size: 15vw !important; }
+    }
+
+    /* --- HUD RESPONSIVE --- */
+    @media (max-width: 768px) {
+        .map-hud {
+            /* Posición: Abajo en lugar de arriba-izquierda */
+            top: auto !important;
+            bottom: 40px !important;
+            left: 50% !important;
+            
+            /* Centrado */
+            transform: translateX(-50%);
+            
+            /* Ancho adaptable */
+            width: 90% !important;
+            max-width: 400px;
+            
+            /* Reducir padding */
+            padding: 20px !important;
+        }
+
+        /* Hacer los textos más pequeños */
+        .map-hud h3 { font-size: 1.2rem !important; }
+        .layer-btn { padding: 10px 15px !important; font-size: 0.75rem !important; }
+        
+        /* Mover el botón de cerrar mapa para que no estorbe */
+        .close-map-btn {
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+        }
+    }
         
 </style>
 
@@ -1749,7 +1793,8 @@ pointer-events: none;
             maxZoom: 16,
             dragPan: true,
             scrollZoom: true,
-            touchZoomRotate: true
+            touchZoomRotate: true, // Permite zoom y rotar con dos dedos
+            cooperativeGestures: true // Útil en móviles: pide usar dos dedos para hacer zoom si el mapa ocupa toda la página, para no bloquear el scroll de la web.
         });
 
         map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
