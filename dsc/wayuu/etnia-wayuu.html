@@ -1628,20 +1628,15 @@ pointer-events: none;
     let map;
 
     // Funciones Globales para onclick
-    window.openMapModal = function() {
+  window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        
-        // Pausar fondo
-        if(typeof isGlobalAnimating !== 'undefined') isGlobalAnimating = false;
+        isGlobalAnimating = false;
         
         if (!map) {
-            // Si no existe, crearlo
-            setTimeout(() => initMap(), 500); 
+            setTimeout(() => initMap(), 500);
         } else {
-            // SI YA EXISTE, FORZAR EL REDIBUJADO (Solución Pantalla Negra)
-            setTimeout(() => {
-                map.resize(); 
-            }, 600);
+            // Si el mapa ya existe, redimensiónalo al abrir
+            setTimeout(() => map.resize(), 600);
         }
     };
      
@@ -1692,7 +1687,13 @@ pointer-events: none;
             addLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
             window.toggleLayer('flora');
+            rotateCamera();
         });
+
+        map.on('load', function() {
+            map.resize();
+        });
+        
     }
 
     window.toggleLayer = function(layer) {
