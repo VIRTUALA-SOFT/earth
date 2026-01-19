@@ -1630,18 +1630,37 @@ pointer-events: none;
     // Funciones Globales para onclick
     window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        window.isGlobalAnimating = false; // PAUSA TODO EL FONDO 3D
-        if (!map) setTimeout(initMap, 500);
+        
+        // Pausar fondo
+        if(typeof isGlobalAnimating !== 'undefined') isGlobalAnimating = false;
+        
+        if (!map) {
+            // Si no existe, crearlo
+            setTimeout(() => initMap(), 500); 
+        } else {
+            // SI YA EXISTE, FORZAR EL REDIBUJADO (Solución Pantalla Negra)
+            setTimeout(() => {
+                map.resize(); 
+            }, 600);
+        }
     };
-
+     
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
         window.isGlobalAnimating = true; // REANUDA TODO EL FONDO 3D
     };
 
     function initMap() {
-        const lng = window.puebloData.lon || -71.80; 
-        const lat = window.puebloData.lat || 11.95;
+        if(map) return;
+
+        // PROTECCIÓN: Si no hay datos cargados, usar coordenadas de La Guajira por defecto
+        const defaultLat = 11.95;
+        const defaultLon = -71.80;        
+       
+        const lng = (window.puebloData && window.puebloData.lon) ? window.puebloData.lon : defaultLon;
+        const lat = (window.puebloData && window.puebloData.lat) ? window.puebloData.lat : defaultLat;
+
+        console.log("Iniciando mapa en:", lat, lng); // Para verificar en consola
 
         map = new mapboxgl.Map({
             container: 'map-container',
