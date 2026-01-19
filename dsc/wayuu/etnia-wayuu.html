@@ -44,15 +44,17 @@
     /* CURSOR */
  #cursor {
         position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-        background: #ffffff; 
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid white;
         border-radius: 50%;
+        box-shadow: 0 0 10px white;
         pointer-events: none; 
         z-index: 99999; /* Máxima prioridad */
         transform: translate(-50%, -50%); 
         transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
                     height 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
                     background-color 0.2s;
-        mix-blend-mode: difference; /* Inversión por defecto */
+        mix-blend-mode: normal; /* Inversión por defecto */
         display: flex; justify-content: center; align-items: center;
     }
     
@@ -479,7 +481,7 @@ pointer-events: none;
     /* Sobreescribir colores activos específicos */
     .btn-flora.active { border-color: var(--c-flora); background: rgba(105, 240, 174, 0.1); }
     .btn-fauna.active { border-color: var(--c-cyan); background: rgba(0, 243, 255, 0.1); }
-    .btn-sacred.active { border-color: var(--c-accent); background: rgba(255, 59, 59, 0.1); }
+    .btn-sacred.active { border-color: #ff0055; color: #ff0055; }
 
     .dot { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
 
@@ -680,41 +682,41 @@ pointer-events: none;
         <div class="radar-container hover-trigger" onclick="openMapModal()">
             
             <!-- Pista Orbital con Iconos -->
-            <div class="orbit-track">
-                <!-- Flora -->
-                <div class="orbit-icon-wrapper pos-wrapper-1" style="position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);">
-                    <div class="orbit-icon pos-1"> <!-- Clase pos-1 para color verde -->
-                        <span id="icon-flora" class="material-symbols-rounded">cactus</span>
-                    </div>
-                    <div class="orbit-label">FLORA</div>
-                </div>
+          <!-- Pista Orbital -->
+<div class="orbit-track">
+    <!-- Flora (Icono Hoja) -->
+    <div class="orbit-icon-wrapper pos-wrapper-1" style="position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center;">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid var(--c-cyan); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan); margin-bottom: 5px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v18"/><path d="M10 15h7c1.7 0 3-1.3 3-3V7c0-1.7-1.3-3-3-3h-7"/><path d="M7 10H4c-1.7 0-3 1.3-3 3v2c0 1.7 1.3 3 3 3h3"/></svg>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: var(--c-cyan); letter-spacing: 1px;">FLORA</div>
+    </div>
 
-                <!-- Fauna -->
-                <div class="orbit-icon-wrapper pos-wrapper-2" style="position: absolute; bottom: 15%; right: 15%;">
-                    <div class="orbit-icon pos-2"> <!-- Clase pos-2 para color cian -->
-                        <span id="icon-fauna" class="material-symbols-rounded">pets</span>
-                    </div>
-                    <div class="orbit-label">FAUNA</div>
-                </div>
+    <!-- Fauna (Icono Huella) -->
+    <div class="orbit-icon-wrapper pos-wrapper-2" style="position: absolute; bottom: 15%; right: 15%; display: flex; flex-direction: column; align-items: center;">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid var(--c-cyan); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan); margin-bottom: 5px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10a5 5 0 0 1 5 5v5H9a5 5 0 0 1-5-5v-5h5z"/><line x1="8" y1="2" x2="8" y2="2"/><line x1="16" y1="2" x2="16" y2="2"/><line x1="4" y1="6" x2="4" y2="6"/><line x1="20" y1="6" x2="20" y2="6"/></svg>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: var(--c-cyan); letter-spacing: 1px;">FAUNA</div>
+    </div>
 
-                <!-- Sagrado -->
-                <div class="orbit-icon-wrapper pos-wrapper-3" style="position: absolute; bottom: 15%; left: 15%;">
-                    <div class="orbit-icon pos-3"> <!-- Clase pos-3 para color rojo -->
-                        <span id="icon-sacred" class="material-symbols-rounded">temple_buddhist</span>
-                    </div>
-                    <div class="orbit-label">SAGRADO</div>
-                </div>
-            </div>
-            
-            <!-- Anillos Decorativos -->
-            <div class="radar-ring ring-1"></div>
-            <div class="radar-ring ring-2"></div>
-            
-            <!-- Núcleo Central (Botón visual) -->
-            <div class="radar-core group">
-                <span class="material-symbols-rounded">public</span>
-                <span class="text-[10px] font-mono tracking-widest mt-2">VER SATÉLITE</span>
-            </div>
+    <!-- Sagrado (Icono Estrella) -->
+    <div class="orbit-icon-wrapper pos-wrapper-3" style="position: absolute; bottom: 15%; left: 15%; display: flex; flex-direction: column; align-items: center;">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid #ff0055; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #ff0055; box-shadow: 0 0 10px #ff0055; margin-bottom: 5px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: #ff0055; letter-spacing: 1px;">SAGRADO</div>
+    </div>
+</div>
+
+<div class="radar-ring ring-1"></div>
+<div class="radar-ring ring-2"></div>
+
+<!-- Botón Central Claro -->
+<div class="radar-core group">
+    <span class="material-symbols-rounded text-4xl text-[#00f3ff] group-hover:text-white transition-colors">public</span>
+    <span class="text-[9px] text-[#00f3ff] mt-2 font-mono tracking-widest group-hover:text-white">EXPLORAR MAPA 3D</span>
+</div>
         </div>
 
         <p class="mt-16 text-gray-400 text-sm font-light max-w-md text-center leading-relaxed">
@@ -908,7 +910,7 @@ pointer-events: none;
         </button>
        <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
        <span class="dot" style="background: #ff0055; box-shadow: 0 0 10px #ff0055;"></span> Territorios Sagrados
-</button>
+       </button>
     </div>
 </div>
     
@@ -921,10 +923,12 @@ pointer-events: none;
 
     <script type="module">
 
-         // 1. IMPORTS (Siempre van arriba)
+    // 1. IMPORTS (Siempre van arriba)
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { pueblosData } from '../../data_pueblos.js'; 
+
+    let isGlobalAnimating = true;
         
     // ==========================================
     // 1. VARIABLES Y FUNCIONES GLOBALES
@@ -1421,6 +1425,7 @@ pointer-events: none;
                 my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
             });
             const animate = () => {
+              if (isGlobalAnimating) {
                 group.rotation.x += 0.002 + my*0.01;
                 group.rotation.y += 0.002 + mx*0.01;
                 let vPos=0, cPos=0, con=0;
@@ -1449,6 +1454,7 @@ pointer-events: none;
                 lines.geometry.attributes.color.needsUpdate = true;
                 points.geometry.attributes.position.needsUpdate = true;
                 renderer.render(scene, camera);
+              }
                 requestAnimationFrame(animate);
             };
             animate();
@@ -1596,109 +1602,114 @@ pointer-events: none;
         }
     });
 
-    // =========================================================
-    // NUEVO: OBSERVATORIO TERRITORIAL (MAPBOX & RADAR)
-    // =========================================================
-
-    // 1. CARGA DE DATOS SEGURA
-    // Importamos dinámicamente para no romper el flujo si el archivo no está
-    import('../../data_pueblos.js').then(module => {
-        const pueblosData = module.pueblosData;
-        const params = new URLSearchParams(window.location.search);
-        const puebloId = params.get('id') || 'wayuu'; 
-        
-        // Guardamos en window para uso global
-        window.puebloData = pueblosData.find(p => p.id === puebloId) || pueblosData[0];
-        
-        // Actualizar Iconos del Radar si existen
+   // ==========================================
+    // LÓGICA MAPBOX CORREGIDA Y OPTIMIZADA
+    // ==========================================
+    
+    // 1. INYECTAR DATOS VISUALES EN EL RADAR (ICONOS Y TEXTO)
+    // Esto conecta tu data_pueblos.js con el HTML del radar
+    if(window.puebloData) {
+        // Si hay iconos personalizados, úsalos
         if(window.puebloData.icons) {
-            const i = window.puebloData.icons;
-            if(i.flora) document.getElementById('icon-flora').innerText = i.flora;
-            if(i.fauna) document.getElementById('icon-fauna').innerText = i.fauna;
-            if(i.sacred) document.getElementById('icon-sacred').innerText = i.sacred;
+            if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
+            if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
+            if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
         }
-    }).catch(err => console.log("Data no cargada, usando defaults", err));
+    }
 
-    // 2. CONFIGURACIÓN MAPBOX
+    // 2. CONFIGURACIÓN DEL MAPA
     mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ';
-    let map;
 
-    // Funciones Globales (HTML onclick)
+    let map;
+    let isAutoRotating = true;
+
+    // Funciones Globales para los botones HTML (onclick)
     window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        
-        // Pausar animaciones pesadas del fondo para que el mapa vuele
-        // (Usamos una bandera global que puedes chequear en tus loops animate)
-        window.isGlobalAnimating = false; 
-        
-        if (!map) setTimeout(initMap, 500);
+        isGlobalAnimating = false; // PAUSA EL FONDO (Optimización vital)
+        if (!map) setTimeout(() => initMap(), 500);
     };
 
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
-        window.isGlobalAnimating = true; // Reanudar fondo
+        isGlobalAnimating = true; // REANUDA EL FONDO
     };
 
     function initMap() {
-        const data = window.puebloData || { lat: 11.95, lon: -71.80 }; // Fallback Wayuu
-        
+        // Usamos los datos globales (si no hay, usa coordenadas default)
+        const lng = (window.puebloData && window.puebloData.lon) || -71.80; 
+        const lat = (window.puebloData && window.puebloData.lat) || 11.95;
+
         map = new mapboxgl.Map({
             container: 'map-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satélite Real
-            center: [data.lon, data.lat],
-            zoom: 9,
-            pitch: 60,
-            bearing: -20,
+            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satélite real
+            center: [lng, lat],
+            zoom: 9, 
+            pitch: 60, 
+            bearing: -20, 
             projection: 'globe',
-            maxZoom: 16,     // Zoom profundo permitido
-            dragPan: true,   // Mover con mouse/dedo
-            scrollZoom: true
+            // --- MEJORAS DE UX ---
+            maxZoom: 16,     // Evita que se vea borroso (pixelado)
+            dragPan: true,   // Permite mover con el mouse/dedo
+            scrollZoom: true,
+            touchZoomRotate: true
         });
 
+        // Controles de Zoom (+ / -)
         map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
+        // Detener rotación automática si el usuario interactúa
+        const stopRot = () => { isAutoRotating = false; };
+        map.on('mousedown', stopRot);
+        map.on('touchstart', stopRot);
+        map.on('wheel', stopRot);
+
         map.on('style.load', () => {
-            // Terreno 3D
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Datos Simulados
-            const floraData = generateRandomPoints(data.lon, data.lat, 400, 0.2);
-            const faunaData = generateRandomPoints(data.lon, data.lat, 300, 0.3);
-            const sacredData = generateRandomPoints(data.lon + 0.05, data.lat + 0.05, 150, 0.05);
+            // Generar Datos Simulados alrededor del punto
+            const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
+            const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
+            // Zona Sagrada (Más concentrada)
+            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05); 
 
-            // Capas
-            addHeatmapLayer('flora', floraData, '#69f0ae', '#C89F65');
+            // Capas de Calor (Heatmaps)
+            addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
             addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
             addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
+            // Iniciar con Flora
             window.toggleLayer('flora');
             rotateCamera();
         });
-        
-        // Detener rotación al tocar
-        map.on('mousedown', () => isAutoRotating = false);
-        map.on('touchstart', () => isAutoRotating = false);
     }
 
-    let isAutoRotating = true;
-    function rotateCamera() {
-        if(map && isAutoRotating) {
-            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 });
-            requestAnimationFrame(rotateCamera);
+    function rotateCamera() { 
+        if(map && isAutoRotating) { 
+            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 }); 
+            requestAnimationFrame(rotateCamera); 
         }
     }
 
-    // Toggle Capas
+    // Control de Botones de Capas
     window.toggleLayer = function(layer) {
         if(!map) return;
+        
+        // Actualizar UI (Clase active)
         document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+        
+        // Ocultar todas
         ['flora', 'fauna', 'sacred'].forEach(l => {
              if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
         });
+        
+        // Mostrar seleccionada
         if(map.getLayer(`${layer}-heat`)) {
             map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
+            
+            // Buscar el botón correspondiente para activarlo
             const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
             if(btn) btn.classList.add('active');
         }
@@ -1712,19 +1723,24 @@ pointer-events: none;
         }
         return { "type": "FeatureCollection", "features": points };
     }
+
     function addHeatmapLayer(id, data, c1, c2) {
         map.addSource(id, { type: 'geojson', data: data });
         map.addLayer({
             id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-            paint: { 'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2], 'heatmap-intensity': 2, 'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2], 'heatmap-radius': 30, 'heatmap-opacity': 0.8 }
+            paint: {
+                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
+                'heatmap-intensity': 2, 
+                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
+                'heatmap-radius': 30, 'heatmap-opacity': 0.8
+            }
         });
     }
 
-    // 3. OPTIMIZACIÓN GLOBAL (Conectar con tu código existente)
-    // Agrega esta variable al inicio de tu script original si no existe:
-    // let isGlobalAnimating = true;
-    // Y envuelve tus loops 'animate()' existentes con: if(window.isGlobalAnimating) { ... }
-    window.isGlobalAnimating = true;
+    // Variable global de animación para pausar Three.js (Debe estar declarada al inicio del script principal también)
+    // Si no la tienes arriba, asegúrate de que exista:
+    if (typeof isGlobalAnimating === 'undefined') { var isGlobalAnimating = true; }
+        
 </script>
     
 </body>
