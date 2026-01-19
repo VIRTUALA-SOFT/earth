@@ -393,6 +393,21 @@ pointer-events: none;
         box-shadow: 0 0 15px rgba(200, 159, 101, 0.2);
         transition: 0.3s;
     }
+
+     .orbit-icon-wrapper {
+        animation: spin-reverse 60s linear infinite; 
+    }
+
+    @keyframes spin { 
+        from { transform: rotate(0deg); } 
+        to { transform: rotate(360deg); } 
+    }
+
+    @keyframes spin-reverse { 
+        from { transform: rotate(360deg); } 
+        to { transform: rotate(0deg); } 
+    }
+        
     .orbit-label {
         font-family: 'Manrope', sans-serif; font-size: 9px; 
         color: var(--c-sand); letter-spacing: 0.2em; text-transform: uppercase;
