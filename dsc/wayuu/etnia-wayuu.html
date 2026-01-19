@@ -402,6 +402,7 @@ pointer-events: none;
 .btn-fauna.active { color: #00f3ff; border-color: #00f3ff; }
 .btn-sacred.active { color: #ff0055; border-color: #ff0055; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+.sacred-dot { background: #ff0055; box-shadow: 0 0 10px #ff0055; }
         
 </style>
 
@@ -597,12 +598,12 @@ pointer-events: none;
                 </div>
                 <!-- Icono 2 -->
                 <div class="orbit-item pos-2">
-                    <div class="orbit-icon"><span class="material-symbols-rounded">Chivos</span></div>
+                    <div class="orbit-icon"><span class="material-symbols-rounded">pets</span></div>
                     <div class="orbit-label">FAUNA</div>
                 </div>
                 <!-- Icono 3 -->
                 <div class="orbit-item pos-3">
-                    <div class="orbit-icon"><span class="material-symbols-rounded">Terreno sagrado</span></div>
+                    <div class="orbit-icon"><span class="material-symbols-rounded">volcano</span></div>
                     <div class="orbit-label">SAGRADO</div>
                 </div>
             </div>
@@ -805,7 +806,7 @@ pointer-events: none;
             <span class="dot"></span> Fauna (Flamencos)
         </button>
         <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
-            <span class="dot"></span> Territorios Sagrados
+            <span class="dot sacred-dot"></span> Territorios Sagrados
         </button>
     </div>
 </div>
@@ -823,6 +824,8 @@ pointer-events: none;
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     // AJUSTA LA RUTA si es necesario (ej: './data_pueblos.js' o '../../data_pueblos.js')
     import { pueblosData } from '../../data_pueblos.js'; 
+
+    let isGlobalAnimating = true; // Control de rendimiento
 
     // OBTENER DATOS (Para que el mapa sepa dónde centrarse)
     const params = new URLSearchParams(window.location.search);
@@ -1211,6 +1214,7 @@ pointer-events: none;
             let targetSpeed = 0.5;
 
             const animate = () => {
+                f(isGlobalAnimating) {
                 // Interpolación de velocidad
                 speed += (targetSpeed - speed) * 0.03;
                 
@@ -1234,8 +1238,10 @@ pointer-events: none;
                 
                 geometry.attributes.position.needsUpdate = true;
                 renderer.render(scene, camera);
-                requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);                
             };
+            
             animate();
 
             // Animación Jepira (Trigger)
@@ -1513,7 +1519,7 @@ pointer-events: none;
     // Función Global para abrir el modal desde el HTML
     window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        
+        isGlobalAnimating = false; // PAUSA EL FONDO (Mejora rendimiento)
         // Iniciamos el mapa con un pequeño retraso para que la animación CSS termine
         if (!map) {
             setTimeout(() => initMap(), 500); 
@@ -1523,6 +1529,7 @@ pointer-events: none;
     // Función Global para cerrar
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
+        isGlobalAnimating = true; // REANUDA EL FONDO
     };
 
  let isAutoRotating = true;
