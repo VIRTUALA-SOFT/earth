@@ -939,10 +939,13 @@ pointer-events: none;
             <span class="dot"></span> Flora (Cactus/Trupillo)
         </button>
         <button class="layer-btn btn-fauna" onclick="toggleLayer('fauna')">
-            <span class="dot"></span> Fauna (Flamencos)
+           span class="dot"></span> Fauna (Flamencos)
         </button>
        <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
-       <span class="dot" style="background: #ff0055; box-shadow: 0 0 10px #ff0055;"></span> Territorios Sagrados
+          <span class="dot" style="background: #ff0055; box-shadow: 0 0 10px #ff0055;"></span> Territorios Sagrados
+       </button>
+       <button class="layer-btn btn-all" onclick="toggleLayer('all')">
+          <span class="dot" style="background: #ffffff; box-shadow: 0 0 10px #ffffff;"></span> Ver Todo
        </button>
     </div>
 </div>
@@ -1751,24 +1754,38 @@ pointer-events: none;
     }
 
     // Función para cambiar capas
-    window.toggleLayer = function(layer) {
+   // Función para cambiar capas (Actualizada para "Ver Todo")
+    window.toggleLayer = function(layerId) {
         if(!map) return;
         
-        // UI Update
+        // 1. ACTUALIZAR UI (BOTONES)
+        // Quitamos la clase 'active' de todos los botones
         document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-        const btn = document.querySelector(`.btn-${layer}`);
+        
+        // Añadimos 'active' al botón pulsado
+        const btn = document.querySelector(`.btn-${layerId}`);
         if(btn) btn.classList.add('active');
 
-        // Ocultar todas
-        ['flora', 'fauna', 'sacred'].forEach(l => {
-             if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
-             if(map.getLayer(`${l}-point`)) map.setLayoutProperty(`${l}-point`, 'visibility', 'none');
-        });
-        
-        // Mostrar seleccionada
-        if(map.getLayer(`${layer}-heat`)) {
-            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            map.setLayoutProperty(`${layer}-point`, 'visibility', 'visible');
+        // Lista de todas tus capas
+        const allLayers = ['flora', 'fauna', 'sacred'];
+
+        // 2. LÓGICA DEL MAPA
+        if (layerId === 'all') {
+            // CASO: Mostrar TODO
+            allLayers.forEach(l => {
+                if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'visible');
+                if(map.getLayer(`${l}-point`)) map.setLayoutProperty(`${l}-point`, 'visibility', 'visible');
+            });
+        } else {
+            // CASO: Mostrar solo UNA (comportamiento normal)
+            allLayers.forEach(l => {
+                // Si la capa 'l' coincide con la seleccionada 'layerId', la mostramos ('visible')
+                // Si no coincide, la ocultamos ('none')
+                const visibility = (l === layerId) ? 'visible' : 'none';
+                
+                if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', visibility);
+                if(map.getLayer(`${l}-point`)) map.setLayoutProperty(`${l}-point`, 'visibility', visibility);
+            });
         }
     };
 
