@@ -1214,7 +1214,7 @@ pointer-events: none;
             let targetSpeed = 0.5;
 
             const animate = () => {
-                f(isGlobalAnimating) {
+                if(isGlobalAnimating) {
                 // Interpolación de velocidad
                 speed += (targetSpeed - speed) * 0.03;
                 
