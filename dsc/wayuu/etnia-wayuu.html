@@ -590,23 +590,31 @@ pointer-events: none;
         
         <!-- EL RADAR -->
         <div class="radar-container hover-trigger" onclick="openMapModal()">
-            <div class="orbit-track">
-                <!-- Icono 1 -->
-                <div class="orbit-item pos-1">
-                    <div class="orbit-icon"><span class="material-symbols-rounded">Cactus</span></div>
-                    <div class="orbit-label">FLORA</div>
-                </div>
-                <!-- Icono 2 -->
-                <div class="orbit-item pos-2">
-                    <div class="orbit-icon"><span class="material-symbols-rounded">pets</span></div>
-                    <div class="orbit-label">FAUNA</div>
-                </div>
-                <!-- Icono 3 -->
-                <div class="orbit-item pos-3">
-                    <div class="orbit-icon"><span class="material-symbols-rounded">volcano</span></div>
-                    <div class="orbit-label">SAGRADO</div>
-                </div>
-            </div>
+           <div class="orbit-track">
+    <!-- Icono 1: Flora -->
+    <div class="orbit-icon-wrapper pos-wrapper-1" style="position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid var(--c-cyan); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan); margin-bottom: 5px;">
+            <span id="icon-flora" class="material-symbols-rounded">cactus</span>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: var(--c-cyan); letter-spacing: 1px; text-align: center;">FLORA</div>
+    </div>
+
+    <!-- Icono 2: Fauna -->
+    <div class="orbit-icon-wrapper pos-wrapper-2" style="position: absolute; bottom: 15%; right: 15%;">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid var(--c-cyan); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: var(--c-cyan); box-shadow: 0 0 10px var(--c-cyan); margin-bottom: 5px;">
+            <span id="icon-fauna" class="material-symbols-rounded">pets</span>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: var(--c-cyan); letter-spacing: 1px; text-align: center;">FAUNA</div>
+    </div>
+
+    <!-- Icono 3: Sagrado -->
+    <div class="orbit-icon-wrapper pos-wrapper-3" style="position: absolute; bottom: 15%; left: 15%;">
+        <div class="orbit-icon" style="width: 40px; height: 40px; background: #000; border: 1px solid #ff0055; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #ff0055; box-shadow: 0 0 10px #ff0055; margin-bottom: 5px;">
+            <span id="icon-sacred" class="material-symbols-rounded">temple_buddhist</span>
+        </div>
+        <div class="orbit-label" style="font-family: 'Syncopate', sans-serif; font-size: 8px; color: #ff0055; letter-spacing: 1px; text-align: center;">SAGRADO</div>
+    </div>
+</div>
             
             <div class="radar-ring ring-1"></div>
             <div class="radar-ring ring-2"></div>
@@ -736,7 +744,7 @@ pointer-events: none;
             </div>
         </section>     
 
-        <!-- 7. JEPIRA (WARP SPEED + FONDO) -->
+        <!-- 8. JEPIRA (WARP SPEED + FONDO) -->
         <section id="jepira-section" class="min-h-screen flex flex-col items-center justify-center relative">
             <div id="cosmos-overlay" class="cosmos-bg"></div>
             <div class="relative z-10 text-center px-6 max-w-3xl">
@@ -805,9 +813,9 @@ pointer-events: none;
         <button class="layer-btn btn-fauna" onclick="toggleLayer('fauna')">
             <span class="dot"></span> Fauna (Flamencos)
         </button>
-        <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
-            <span class="dot sacred-dot"></span> Territorios Sagrados
-        </button>
+       <button class="layer-btn btn-sacred" onclick="toggleLayer('sacred')">
+       <span class="dot" style="background: #ff0055; box-shadow: 0 0 10px #ff0055;"></span> Territorios Sagrados
+</button>
     </div>
 </div>
     
@@ -1526,17 +1534,28 @@ pointer-events: none;
         }
     };
 
-    // Función Global para cerrar
+      // Inyectar Iconos Dinámicos en el Radar (Si existen en la data)
+    // Esto hace que aparezca "Cactus" en vez del icono genérico si está en data_pueblos.js
+    if(window.puebloData && window.puebloData.icons) {
+        if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
+        if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
+        if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
+    }
+
+    window.openMapModal = function() {
+        document.getElementById('mapbox-modal').classList.add('open');
+        isGlobalAnimating = false; // PAUSA EL FONDO (Mejora rendimiento brutalmente)
+        if (!map) setTimeout(() => initMap(), 500);
+    };
+
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
         isGlobalAnimating = true; // REANUDA EL FONDO
     };
 
- let isAutoRotating = true;
-
     function initMap() {
-        const lng = data.lon || -71.80; 
-        const lat = data.lat || 11.95;
+        const lng = window.puebloData.lon || -71.80; 
+        const lat = window.puebloData.lat || 11.95;
 
         map = new mapboxgl.Map({
             container: 'map-container',
@@ -1546,54 +1565,97 @@ pointer-events: none;
             pitch: 60, 
             bearing: -20, 
             projection: 'globe',
-            // Habilitamos todo el control manual
-            dragPan: true,
+            // OPTIMIZACIONES DE UX:
+            maxZoom: 16,     // Permite acercarse bastante sin romperse
+            dragPan: true,   // Permite mover con el dedo/mouse
             scrollZoom: true,
-            pitchWithRotate: true
+            touchZoomRotate: true
         });
+        
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-        // 1. AGREGAR CONTROLES DE ZOOM (Visuales)
-        map.addControl(new mapboxgl.NavigationControl({ showCompass: true, showZoom: true }), 'bottom-right');
-
-        // 2. DETECTAR INTERACCIÓN DEL USUARIO
-        // Si el usuario hace CUALQUIER cosa sobre el mapa, paramos la rotación
-        const stopRotation = () => {
-            if (isAutoRotating) {
-                isAutoRotating = false; 
-                // Opcional: Console log para verificar
-                // console.log("Rotación detenida por usuario");
-            }
-        };
-
-        map.on('mousedown', stopRotation);  // Clic ratón
-        map.on('touchstart', stopRotation); // Dedo móvil
-        map.on('wheel', stopRotation);      // Rueda ratón
-        map.on('dragstart', stopRotation);  // Arrastre
-        map.on('zoomstart', stopRotation);  // Zoom
+        // Detener rotación automática si el usuario toca el mapa
+        map.on('mousedown', () => isAutoRotating = false);
+        map.on('touchstart', () => isAutoRotating = false);
 
         map.on('style.load', () => {
-            // ... (Carga de terreno y niebla igual que antes) ...
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // ... (Carga de capas de calor igual que antes) ...
-            // (Pega aquí tus funciones generateRandomPoints y addHeatmapLayer calls...)
-            
+            // Generar Datos (Flora, Fauna y SAGRADO)
             const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
             const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
-            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
+            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05); // Zona sagrada
 
             addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
             addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
-            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
+            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00'); // Capa roja
 
+            // Estado Inicial
             window.toggleLayer('flora');
-            
-            // Iniciar bucle de animación
             rotateCamera();
         });
     }
+
+    let isAutoRotating = true;
+    function rotateCamera() { 
+        if(map && isAutoRotating) { 
+            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 }); 
+            requestAnimationFrame(rotateCamera); 
+        }
+    }
+
+    // Helpers (Asegúrate de tener estas funciones también)
+    function generateRandomPoints(cx, cy, count, spread) {
+        const points = [];
+        for(let i=0; i<count; i++) {
+            points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
+        }
+        return { "type": "FeatureCollection", "features": points };
+    }
+
+    function addHeatmapLayer(id, data, c1, c2) {
+        map.addSource(id, { type: 'geojson', data: data });
+        map.addLayer({
+            id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
+            paint: {
+                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
+                'heatmap-intensity': 2, 
+                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
+                'heatmap-radius': 30, 'heatmap-opacity': 0.8
+            }
+        });
+    }
+
+    window.toggleLayer = function(layer) {
+        if(!map) return;
+        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+        
+        ['flora', 'fauna', 'sacred'].forEach(l => {
+             if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
+        });
+        
+        if(map.getLayer(`${layer}-heat`)) {
+            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
+            const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
+            if(btn) btn.classList.add('active');
+        }
+    };
+
+ let isAutoRotating = true;
+
+    // Configura coordenadas
+    const lng = data.lon || -71.80; 
+    const lat = data.lat || 11.95;
+
+         if(data.icons) {
+        if(data.icons.flora) document.getElementById('icon-flora').innerText = data.icons.flora;
+        if(data.icons.fauna) document.getElementById('icon-fauna').innerText = data.icons.fauna;
+        if(data.icons.sacred) document.getElementById('icon-sacred').innerText = data.icons.sacred;
+    }
+
+
 
 
   // 3. FUNCIÓN DE ROTACIÓN MEJORADA (INCREMENTAL)
