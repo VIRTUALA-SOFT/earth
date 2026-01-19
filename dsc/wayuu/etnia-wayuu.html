@@ -827,770 +827,140 @@ pointer-events: none;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
     <script type="module">
-
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    // AJUSTA LA RUTA si es necesario (ej: './data_pueblos.js' o '../../data_pueblos.js')
     import { pueblosData } from '../../data_pueblos.js'; 
 
-    let isGlobalAnimating = true; // Control de rendimiento
+    // ==========================================
+    // 0. CONFIGURACIÓN GLOBAL
+    // ==========================================
+    let isGlobalAnimating = true; // Control de rendimiento (Pausa fondo al abrir mapa)
+    let isAutoRotating = true;    // Control de rotación del mapa
+    let map;                      // Instancia del mapa
+    let lenis;                    // Smooth scroll
+    let player;                   // Youtube Player
 
-    // OBTENER DATOS (Para que el mapa sepa dónde centrarse)
+    // ==========================================
+    // 1. CARGA DE DATOS
+    // ==========================================
     const params = new URLSearchParams(window.location.search);
     const puebloId = params.get('id') || 'wayuu'; 
-    // Variable global 'data' para que la usen el video y el mapa
-    // Simplemente busca por ID
-    window.puebloData = pueblosData.find(p => p.id === puebloId) || pueblosData[0];;
+    
+    // Guardamos data en variable global
+    window.puebloData = pueblosData.find(p => p.id === puebloId) || pueblosData[0];
+    
+    console.log("Cargando:", window.puebloData.name);
 
-        
-    // ==========================================
-    // 1. VARIABLES Y FUNCIONES GLOBALES
-    // ==========================================
-    let lenis; 
-    let player; // Para YouTube
+    // --- INYECTAR DATOS EN EL DOM ---
+    
+    // 1.1 Textos Principales
+    const navTitle = document.getElementById('pueblo-nav-title');
+    if(navTitle) navTitle.textContent = "NACIÓN " + window.puebloData.name.toUpperCase();
 
-    // --- SISTEMA DE AUDIO (TARJETAS) ---
-    function playRealAudio(id) {
-        const allAudios = document.querySelectorAll('audio');
-        const targetAudio = document.getElementById(id);
-        const targetBtn = document.getElementById(`btn-${id}`);
-        const targetEq = document.getElementById(`eq-${id}`);
-        const targetCard = document.getElementById(`card-${id}`); 
-        
-        const playIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-        const pauseIcon = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    
-        if (!targetAudio) return;
-    
-        // A. Si ya está sonando este audio -> PAUSAR
-        if (!targetAudio.paused) {
-            targetAudio.pause();
-            if(targetBtn) targetBtn.innerHTML = playIcon;
-            if(targetEq) { targetEq.classList.remove('opacity-100'); targetEq.classList.add('opacity-0'); }
-            if(targetCard) targetCard.classList.remove('playing');
-            return;
-        }
-    
-        // B. Si es otro audio -> RESETEAR TODOS (menos música de fondo)
-        allAudios.forEach(audio => {
-            if(audio.id === 'bg-music') return; 
-            
-            audio.pause();
-            audio.currentTime = 0;
-            const btn = document.getElementById(`btn-${audio.id}`);
-            const eq = document.getElementById(`eq-${audio.id}`);
-            const card = document.getElementById(`card-${audio.id}`);
-            
-            if(btn) btn.innerHTML = playIcon;
-            if(eq) { eq.classList.remove('opacity-100'); eq.classList.add('opacity-0'); }
-            if(card) card.classList.remove('playing');
-        });
-    
-        // C. REPRODUCIR EL ELEGIDO
-        targetAudio.volume = 0.8;
-        targetAudio.play().then(() => {
-            if(targetBtn) targetBtn.innerHTML = pauseIcon;
-            if(targetEq) { targetEq.classList.remove('opacity-0'); targetEq.classList.add('opacity-100'); }
-            if(targetCard) targetCard.classList.add('playing');
-        }).catch(e => console.log("Interacción requerida para audio"));
-    
-        // D. AL TERMINAR
-        targetAudio.onended = () => {
-            if(targetBtn) targetBtn.innerHTML = playIcon;
-            if(targetEq) { targetEq.classList.remove('opacity-100'); targetEq.classList.add('opacity-0'); }
-            if(targetCard) targetCard.classList.remove('playing');
-        };
+    const titleEl = document.getElementById('pueblo-title');
+    if(titleEl) {
+        const name = window.puebloData.name;
+        const splitName = name.length > 3 ? name.substring(0, 3) : name;
+        const restName = name.length > 3 ? name.substring(3) : "";
+        titleEl.innerHTML = `${splitName}<span>${restName}</span>`;
     }
 
-    // --- SISTEMA DE CARGA ---
-    function revealSite() {
-        const loader = document.getElementById('loader');
-        const main = document.getElementById('main-content');
-        const canvas = document.getElementById('global-canvas');
-        if (loader.style.opacity === '0') return; 
-        try {
-            const tl = gsap.timeline();
-            tl.to(loader, { opacity: 0, duration: 1, onComplete: () => { loader.style.display = 'none'; } })
-              .to(main, { opacity: 1, duration: 1.5 }, "-=0.5")
-              .to(canvas, { opacity: 1, duration: 2 }, "-=1.5")
-              .from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" }, "-=1")
-              .from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 }, "-=1");
-        } catch (e) {
-            loader.style.opacity = 0;
-            setTimeout(() => { loader.style.display = 'none'; }, 500);
-            main.style.opacity = 1;
-            canvas.style.opacity = 1;
-        }
+    const subEl = document.getElementById('pueblo-subtitle');
+    if(subEl) subEl.textContent = window.puebloData.region;
+
+    const descEl = document.getElementById('culture-desc');
+    if(descEl) descEl.textContent = window.puebloData.desc;
+
+    // 1.2 Iconos del Radar Dinámicos
+    // Si la data tiene iconos personalizados, los usamos. Si no, usamos defaults.
+    const icons = window.puebloData.icons || { flora: 'cactus', fauna: 'pets', sacred: 'temple_buddhist' };
+    
+    const iconFlora = document.getElementById('icon-flora');
+    if(iconFlora) iconFlora.textContent = icons.flora;
+    
+    const iconFauna = document.getElementById('icon-fauna');
+    if(iconFauna) iconFauna.textContent = icons.fauna;
+    
+    const iconSacred = document.getElementById('icon-sacred');
+    if(iconSacred) iconSacred.textContent = icons.sacred;
+
+    // 1.3 Video Hero de Fondo
+    const videoHero = document.getElementById('hero-video');
+    // Usamos video de la data o uno por defecto
+    const videoSrc = window.puebloData.video || "https://pub-fafba38564814a0f9795e9a424b79815.r2.dev/video/wayuu_desierto_ss.mp4";
+    
+    if(videoHero) {
+        const source = videoHero.querySelector('source');
+        if(source) source.src = videoSrc;
+        else videoHero.src = videoSrc;
+        videoHero.load();
     }
 
-    // --- YOUTUBE API CALLBACK (Debe ser global) ---
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('yonna-player', {
-            videoId: 'yJMXzvZEZlQ',
-            playerVars: {
-                'autoplay': 1, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0,
-                'modestbranding': 1, 'disablekb': 1, 'fs': 0, 'playsinline': 1,
-                'loop': 1, 'playlist': 'yJMXzvZEZlQ'
-            },
-            events: { 'onReady': onPlayerReady }
-        });
-    }
-    function onPlayerReady(event) {
-        event.target.playVideo();
-        checkVideoTime();
-    }
-    function checkVideoTime() {
-        if (player && player.getCurrentTime) {
-            if (player.getCurrentTime() >= 42) player.seekTo(0);
-        }
-        requestAnimationFrame(checkVideoTime);
-    }
 
     // ==========================================
-    // 2. INICIALIZACIÓN (DOM READY)
+    // 2. MAPBOX (OBSERVATORIO)
     // ==========================================
-    document.addEventListener('DOMContentLoaded', () => {
-        if(typeof gsap !== 'undefined') gsap.registerPlugin(ScrollTrigger);
-
-        // A. CARGA DE API YOUTUBE
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // B. LOADER
-        const loaderBar = document.getElementById('loader-bar');
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 8;
-            if(loaderBar) loaderBar.style.width = `${progress}%`;
-            if(progress >= 100) { clearInterval(interval); revealSite(); }
-        }, 50);
-        setTimeout(() => { if (progress < 100) { clearInterval(interval); revealSite(); } }, 4000);
-
-        // C. CURSOR (INTERACCIÓN VISUAL)
-        const cursor = document.getElementById('cursor');
-        const cursorText = document.getElementById('cursor-text');
-
-        window.addEventListener('mousemove', (e) => {
-            if(typeof gsap !== 'undefined') gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: 'power2.out' });
-            else { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
-        });
-
-        const resetCursor = () => {
-            cursor.className = ''; 
-            cursorText.innerText = "";
-        };
-
-        // 1. Tarjetas de Audio (CURSOR ROJO)
-        document.querySelectorAll('.tilt-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                resetCursor();
-                cursor.classList.add('audio-mode');
-                cursorText.innerText = "OÍR";
-            });
-            card.addEventListener('mouseleave', () => resetCursor());
-            card.addEventListener('mousedown', () => gsap.to(cursor, { scale: 0.9, duration: 0.1 }));
-            card.addEventListener('mouseup', () => gsap.to(cursor, { scale: 1, duration: 0.1 }));
-        });
-
-        // 2. General
-        document.querySelectorAll('a, button, .hover-trigger, .play-btn').forEach(el => {
-            el.addEventListener('mouseenter', (e) => {
-                if(!e.target.closest('.tilt-card')) { 
-                    resetCursor();
-                    cursor.classList.add('hovered');
-                }
-            });
-            el.addEventListener('mouseleave', () => resetCursor());
-        });
-
-        // 3. Zonas
-        document.querySelector('.video-cursor-area')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('video-mode'); cursorText.innerText = "VER"; });
-        document.querySelector('.video-cursor-area')?.addEventListener('mouseleave', () => resetCursor());
-        document.getElementById('lapu-section')?.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('dream-mode'); });
-        document.getElementById('lapu-section')?.addEventListener('mouseleave', () => resetCursor());
-
-      // D. MENÚ Y SONIDO DE FONDO (AUTO-START)
-        const soundBtn = document.getElementById('sound-btn');
-        const bgMusic = document.getElementById('bg-music');
-        const iconMute = document.getElementById('icon-mute');
-        const iconSound = document.getElementById('icon-sound');
-        const soundText = document.getElementById('sound-text');
-        
-        let isBgPlaying = false;
-
-        // Función para actualizar la UI (Iconos y Texto)
-        const updateSoundUI = (playing) => {
-            if (playing) {
-                iconMute.classList.add('hidden');
-                iconSound.classList.remove('hidden');
-                soundText.innerText = "ON";
-                soundBtn.classList.add('text-[#C89F65]'); // Color activo
-            } else {
-                iconMute.classList.remove('hidden');
-                iconSound.classList.add('hidden');
-                soundText.innerText = "OFF";
-                soundBtn.classList.remove('text-[#C89F65]');
-            }
-        };
-
-        if(soundBtn && bgMusic) {
-            bgMusic.volume = 0.4; // Volumen inicial
-
-            // 1. INTENTO DE AUTOPLAY INMEDIATO
-            const attemptPlay = () => {
-                bgMusic.play().then(() => {
-                    isBgPlaying = true;
-                    updateSoundUI(true);
-                    console.log("Audio iniciado automáticamente.");
-                }).catch(error => {
-                    console.log("Autoplay bloqueado por el navegador. Esperando interacción...");
-                    // 2. FALLBACK: Activar al primer clic en cualquier lado
-                    document.addEventListener('click', () => {
-                        if (!isBgPlaying) {
-                            bgMusic.play();
-                            isBgPlaying = true;
-                            updateSoundUI(true);
-                        }
-                    }, { once: true }); // Se ejecuta una sola vez
-                });
-            };
-
-            // Ejecutar intento al cargar
-            attemptPlay();
-
-            // 3. Lógica del Botón (Manual)
-            soundBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Evita conflicto con el listener global
-                if(!isBgPlaying) {
-                    bgMusic.play().then(() => {
-                        isBgPlaying = true;
-                        updateSoundUI(true);
-                    });
-                } else {
-                    bgMusic.pause();
-                    isBgPlaying = false;
-                    updateSoundUI(false);
-                }
-            });
-        }
-        
-
-        const menuBtn = document.getElementById('menu-btn');
-        const menuOverlay = document.getElementById('menu-overlay');
-        const hamLine = document.getElementById('hamburger-line');
-        const closeX = document.getElementById('close-x');
-        const menuLinks = document.querySelectorAll('.menu-link');
-        let isMenuOpen = false;
-
-        function toggleMenu() {
-            if(!isMenuOpen) {
-                menuOverlay.classList.remove('hidden');
-                gsap.to(menuOverlay, {opacity: 1, duration: 0.5});
-                gsap.to(menuLinks, {y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power4.out"});
-                hamLine.classList.add('opacity-0');
-                closeX.classList.remove('opacity-0', 'scale-50');
-            } else {
-                gsap.to(menuLinks, {y: 50, opacity: 0, duration: 0.3});
-                gsap.to(menuOverlay, {opacity: 0, duration: 0.5, delay: 0.1, onComplete: () => menuOverlay.classList.add('hidden')});
-                hamLine.classList.remove('opacity-0');
-                closeX.classList.add('opacity-0', 'scale-50');
-            }
-            isMenuOpen = !isMenuOpen;
-        }
-
-        if(menuBtn) menuBtn.addEventListener('click', toggleMenu);
-
-        menuLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const href = link.getAttribute('href');
-                toggleMenu(); 
-                // Navegación inteligente
-                if(href === '.desert-bg') {
-                     if(lenis) lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
-                } else {
-                     if(lenis) lenis.scrollTo(href);
-                     else document.querySelector(href).scrollIntoView({behavior:'smooth'});
-                }
-            });
-        });
-        
-        // Footer links logic
-        document.querySelectorAll('.footer-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                if(targetId === '.desert-bg') {
-                     if(lenis) lenis.scrollTo(document.querySelector('.desert-bg'), {offset: -100});
-                } else {
-                     if(lenis) lenis.scrollTo(targetId);
-                     else document.querySelector(targetId).scrollIntoView({behavior:'smooth'});
-                }
-            });
-             link.addEventListener('mouseenter', () => {
-                const cursor = document.getElementById('cursor');
-                if(cursor) {
-                    cursor.classList.add('hovered');
-                    cursor.classList.remove('audio-mode', 'video-mode'); // Limpieza
-                }
-            });
-            link.addEventListener('mouseleave', () => {
-                const cursor = document.getElementById('cursor');
-                if(cursor) cursor.classList.remove('hovered');
-            });
-        });
-
-        document.getElementById('logo-btn')?.addEventListener('click', () => {
-            if(lenis) lenis.scrollTo(0);
-        });
-
-        // E. SCROLL HORIZONTAL (IDENTIDAD)
-        const panels = gsap.utils.toArray(".panel");
-        const containerH = document.getElementById("horizontal-wrapper");
-        if(panels.length > 0 && containerH) {
-            gsap.to(panels, {
-                xPercent: -100 * (panels.length - 1),
-                ease: "none",
-                scrollTrigger: {
-                    trigger: "#identity-section", pin: true, scrub: 1,
-                    snap: 1 / (panels.length - 1), end: () => "+=" + containerH.offsetWidth
-                }
-            });
-            const idSection = document.getElementById('identity-section');
-            if(idSection) {
-                idSection.addEventListener('mouseenter', () => { resetCursor(); cursor.classList.add('hovered'); cursorText.innerText = "DESLIZA"; });
-                idSection.addEventListener('mouseleave', () => resetCursor());
-            }
-        }
-
-        // F. TILT
-        if (typeof VanillaTilt !== 'undefined') {
-             VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
-        }
-
-        // G. THREE.JS GLOBAL
-        const initGlobalThree = () => {
-            const canvas = document.getElementById('global-canvas');
-            if(!canvas) return;
-            const scene = new THREE.Scene();
-            // Niebla para efecto de profundidad
-            scene.fog = new THREE.FogExp2(0x000000, 0.0015);
-            
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
-            camera.position.z = 1000; // Cámara lejos para efecto túnel
-            
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            const count = 6000; // Más partículas para warp
-            const geometry = new THREE.BufferGeometry();
-            const pos = new Float32Array(count*3);
-            const colors = new Float32Array(count*3);
-            
-            const cSand = new THREE.Color('#C89F65');
-            const cStar = new THREE.Color('#FFFFFF');
-
-            for(let i=0; i<count*3; i+=3) {
-                // Distribución en túnel profundo (Z hasta -4000)
-                pos[i] = (Math.random()-0.5)*2500; 
-                pos[i+1] = (Math.random()-0.5)*2500; 
-                pos[i+2] = (Math.random()-0.5)*4000;
-                
-                colors[i]=cSand.r; colors[i+1]=cSand.g; colors[i+2]=cSand.b;
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({ 
-                size: 2, 
-                vertexColors: true, 
-                transparent: true, 
-                opacity: 0.8, 
-                sizeAttenuation: true, 
-                blending: THREE.AdditiveBlending 
-            });
-            const particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-
-            const simplex = new SimplexNoise();
-            const clock = new THREE.Clock();
-            
-            let speed = 0.5;
-            let targetSpeed = 0.5;
-
-            const animate = () => {
-                if(isGlobalAnimating) {
-                // Interpolación de velocidad
-                speed += (targetSpeed - speed) * 0.03;
-                
-                const p = geometry.attributes.position.array;
-                for(let i=0; i<count; i++) {
-                    const i3 = i*3;
-                    
-                    // MOVER HACIA LA CÁMARA (EJE Z)
-                    p[i3+2] += speed;
-
-                    // Si pasa la cámara, reiniciar al fondo
-                    if(p[i3+2] > 1000) {
-                        p[i3+2] = -3000;
-                        // Redistribuir X e Y
-                        p[i3] = (Math.random()-0.5)*2500;
-                        p[i3+1] = (Math.random()-0.5)*2500;
-                    }
-                }
-                // Rotación leve
-                particles.rotation.z += 0.0002 * speed;
-                
-                geometry.attributes.position.needsUpdate = true;
-                renderer.render(scene, camera);
-                }
-                requestAnimationFrame(animate);                
-            };
-            
-            animate();
-
-            // Animación Jepira (Trigger)
-            if(document.getElementById('cosmos-overlay')) {
-                ScrollTrigger.create({
-                    trigger: "#jepira-section", start: "top center",
-                    onEnter: () => {
-                        targetSpeed = 40; // WARP SPEED
-                        gsap.to("#cosmos-overlay", {opacity: 1, duration: 2});
-                        
-                        const c = geometry.attributes.color.array;
-                        const obj = {t:0};
-                        gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
-                            for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cSand.r, cStar.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cSand.g, cStar.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cSand.b, cStar.b, obj.t);
-                            }
-                            geometry.attributes.color.needsUpdate = true;
-                        }});
-                    },
-                    onLeaveBack: () => {
-                         targetSpeed = 0.5; // FRENAR
-                         gsap.to("#cosmos-overlay", {opacity: 0, duration: 2});
-                         
-                         const c = geometry.attributes.color.array;
-                         const obj = {t:0};
-                         gsap.to(obj, {t:1, duration:2, onUpdate:()=>{
-                            for(let i=0; i<count*3; i+=3) {
-                                c[i] = THREE.MathUtils.lerp(cStar.r, cSand.r, obj.t);
-                                c[i+1] = THREE.MathUtils.lerp(cStar.g, cSand.g, obj.t);
-                                c[i+2] = THREE.MathUtils.lerp(cStar.b, cSand.b, obj.t);
-                            }
-                            geometry.attributes.color.needsUpdate = true;
-                         }});
-                    }
-                });
-            }
-            
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
-        initGlobalThree();
-
-        // H. THREE.JS WEAVING
-        (function() {
-            const container = document.getElementById('weaving-container');
-            if(!container) return;
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050200, 0.002);
-            const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
-            camera.position.z = 15;
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(renderer.domElement);
-            const group = new THREE.Group();
-            scene.add(group);
-            const pCount = 300;
-            const pData = [];
-            const pGeo = new THREE.BufferGeometry();
-            const pPos = new Float32Array(pCount*3);
-            for(let i=0; i<pCount; i++) {
-                const theta = Math.random()*Math.PI*2;
-                const phi = Math.acos((Math.random()*2)-1);
-                const r = 6;
-                pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
-                pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
-                pPos[i*3+2] = r*Math.cos(phi);
-                pData.push({ vel: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).multiplyScalar(0.02), con:0 });
-            }
-            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3).setUsage(THREE.DynamicDrawUsage));
-            const points = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xFF3B3B, size: 0.1, transparent:true}));
-            group.add(points);
-            const lGeo = new THREE.BufferGeometry();
-            const lPos = new Float32Array(pCount*pCount*3);
-            const lCol = new Float32Array(pCount*pCount*3);
-            lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3).setUsage(THREE.DynamicDrawUsage));
-            lGeo.setAttribute('color', new THREE.BufferAttribute(lCol, 3).setUsage(THREE.DynamicDrawUsage));
-            const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({vertexColors: true, transparent:true, opacity:0.4}));
-            group.add(lines);
-            let mx=0, my=0;
-            container.addEventListener('mousemove', e => {
-                mx = ((e.clientX - container.getBoundingClientRect().left)/container.clientWidth)*2-1;
-                my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
-            });
-            const animate = () => {
-                group.rotation.x += 0.002 + my*0.01;
-                group.rotation.y += 0.002 + mx*0.01;
-                let vPos=0, cPos=0, con=0;
-                for(let i=0; i<pCount; i++) pData[i].con=0;
-                for(let i=0; i<pCount; i++) {
-                    pPos[i*3] += pData[i].vel.x; pPos[i*3+1] += pData[i].vel.y; pPos[i*3+2] += pData[i].vel.z;
-                    const d = Math.sqrt(pPos[i*3]**2 + pPos[i*3+1]**2 + pPos[i*3+2]**2);
-                    if(d>7 || d<4) pData[i].vel.multiplyScalar(-1);
-                    if(pData[i].con>=3) continue;
-                    for(let j=i+1; j<pCount; j++) {
-                        if(pData[j].con>=3) continue;
-                        const dx = pPos[i*3]-pPos[j*3], dy = pPos[i*3+1]-pPos[j*3+1], dz = pPos[i*3+2]-pPos[j*3+2];
-                        const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
-                        if(dist<2.5) {
-                            pData[i].con++; pData[j].con++;
-                            lPos[vPos++]=pPos[i*3]; lPos[vPos++]=pPos[i*3+1]; lPos[vPos++]=pPos[i*3+2];
-                            lPos[vPos++]=pPos[j*3]; lPos[vPos++]=pPos[j*3+1]; lPos[vPos++]=pPos[j*3+2];
-                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
-                            lCol[cPos++]=1; lCol[cPos++]=0.2+(dist*0.2); lCol[cPos++]=0.2;
-                            con++;
-                        }
-                    }
-                }
-                lines.geometry.setDrawRange(0, con*2);
-                lines.geometry.attributes.position.needsUpdate = true;
-                lines.geometry.attributes.color.needsUpdate = true;
-                points.geometry.attributes.position.needsUpdate = true;
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            };
-            animate();
-        })();
-
-      // I. THREE.JS SHADER (LAPÜ) - VERSIÓN MÓVIL OPTIMIZADA
-        (function() {
-            const container = document.getElementById('dream-canvas-container');
-            if(!container) return;
-            const scene = new THREE.Scene();
-            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); // Antialias activado
-            
-            // Ajuste de DPI para nitidez en móviles Samsung/iPhone
-            const pixelRatio = Math.min(window.devicePixelRatio, 2); 
-            renderer.setPixelRatio(pixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-
-            function createTextTexture() {
-                const cvs = document.createElement('canvas');
-                // Multiplicamos por pixelRatio para alta resolución
-                const w = window.innerWidth * pixelRatio;
-                const h = window.innerHeight * pixelRatio;
-                cvs.width = w; 
-                cvs.height = h;
-                const ctx = cvs.getContext('2d');
-                
-                const cx = w / 2;
-                const cy = h / 2;
-                
-                // Detectar si es móvil
-                const isMobile = window.innerWidth < 768;
-
-                // 1. TÍTULO "LAPÜ" (Más grande en móvil para que se lea bien)
-                const titleSize = isMobile ? w * 0.25 : w * 0.15; 
-                ctx.font = `italic 700 ${titleSize}px 'Playfair Display'`; 
-                ctx.fillStyle = "white"; 
-                ctx.textAlign = "center"; 
-                ctx.textBaseline = "middle";
-                ctx.fillText("LAPÜ", cx, cy - (isMobile ? h * 0.05 : 0)); // Subir un poco en móvil
-                
-                // 2. MENSAJE DE SABIDURÍA (Dividido en líneas para móvil)
-                const subSize = isMobile ? w * 0.05 : w * 0.015; 
-                ctx.font = `300 ${subSize}px 'Manrope'`; 
-                ctx.fillStyle = "#C89F65"; // Dorado
-                
-                const msg = "Los ancestros hablan cuando cierras los ojos";
-                const offsetY = cy + (titleSize * 0.6);
-
-                if (isMobile) {
-                    // Dividir en dos líneas en celular
-                    ctx.fillText("Los ancestros hablan", cx, offsetY);
-                    ctx.fillText("cuando cierras los ojos", cx, offsetY + (subSize * 1.5));
-                } else {
-                    ctx.fillText(msg, cx, offsetY);
-                }
-                
-                return new THREE.CanvasTexture(cvs);
-            }
-
-            const material = new THREE.ShaderMaterial({
-                uniforms: { 
-                    uTime: {value:0}, 
-                    uMouse: {value: new THREE.Vector2(0.5, 0.5)}, 
-                    uResolution: {value: new THREE.Vector2(window.innerWidth, window.innerHeight)}, 
-                    uTexture: {value: createTextTexture()} 
-                },
-                vertexShader: `varying vec2 vUv; void main(){vUv=uv; gl_Position=vec4(position,1.0);}`,
-                fragmentShader: `
-                    uniform float uTime; uniform vec2 uMouse; uniform vec2 uResolution; uniform sampler2D uTexture; varying vec2 vUv;
-                    
-                    // Funciones de ruido (sin cambios)
-                    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;} vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;} vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
-                    float snoise(vec2 v){ const vec4 C=vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439); vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx); vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0); vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod289(i); vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0)); vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0); m=m*m; m=m*m; vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5; vec3 ox=floor(x+0.5); vec3 a0=x-ox; m*=1.79284291400159-0.85373472095314*(a0*a0+h*h); vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw; return 130.0*dot(m,g); }
-                    
-                    void main(){
-                        vec2 uv = vUv; 
-                        vec2 ratio = vec2(uResolution.x/uResolution.y, 1.0);
-                        
-                        // Distancia del mouse/dedo
-                        float dist = distance(uv*ratio, uMouse*ratio);
-                        
-                        // Niebla más fluida
-                        float fog = snoise(uv*ratio*2.5 - uTime*0.15)*0.5 + snoise(uv*ratio*6.0 + uTime*0.05)*0.2;
-                        
-                        // Aumentamos el radio de visión (0.25 -> 0.35) para que el dedo no tape el texto
-                        float reveal = smoothstep(0.35, 0.15, dist + fog*0.15);
-                        
-                        // Menos distorsión en el texto para que sea más legible
-                        vec4 tex = texture2D(uTexture, uv + vec2(fog*0.03*(1.0-reveal)));
-                        
-                        // Fondo negro profundo
-                        vec3 col = mix(vec3(0.01,0.01,0.03), tex.rgb, reveal*tex.a);
-                        
-                        // Borde dorado más brillante
-                        col += vec3(0.9,0.7,0.3) * (smoothstep(0.0,0.1,reveal)*(1.0-smoothstep(0.9,1.0,reveal))) * 0.3;
-                        
-                        gl_FragColor = vec4(col, 1.0);
-                    }
-                `
-            });
-            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
-            
-            const clock = new THREE.Clock();
-            const mouse = new THREE.Vector2(0.5, 0.5);
-            
-            // EVENTO MOUSE (PC)
-            window.addEventListener('mousemove', e => { 
-                mouse.x = e.clientX / window.innerWidth; 
-                mouse.y = 1.0 - e.clientY / window.innerHeight; 
-            });
-
-            // EVENTO TOUCH (MÓVIL) - ¡CRUCIAL!
-            window.addEventListener('touchmove', e => {
-                const touch = e.touches[0];
-                mouse.x = touch.clientX / window.innerWidth;
-                mouse.y = 1.0 - touch.clientY / window.innerHeight;
-            }, {passive: true});
-
-            const animate = () => {
-                material.uniforms.uTime.value = clock.getElapsedTime();
-                // Interpolación más rápida en móvil para que se sienta responsive
-                material.uniforms.uMouse.value.lerp(mouse, 0.15);
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            };
-            animate();
-            
-            window.addEventListener('resize', ()=>{
-                const w = window.innerWidth;
-                const h = window.innerHeight;
-                renderer.setSize(w, h);
-                material.uniforms.uResolution.value.set(w, h);
-                material.uniforms.uTexture.value = createTextTexture();
-            });
-        })();
-
-        
-        // J. SMOOTH SCROLL
-        if (typeof Lenis !== 'undefined') {
-            lenis = new Lenis({ duration: 1.5, smoothWheel: true });
-            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-            requestAnimationFrame(raf);
-        }
-    });
-
-
-    // =========================================================
-    // LÓGICA DE MAPBOX (OBSERVATORIO TERRITORIAL)
-    // =========================================================
-    
-    // Tu Token (necesario para ver el mapa)
     mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ';
 
-    let map;
-
-    // Función Global para abrir el modal desde el HTML
     window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        isGlobalAnimating = false; // PAUSA EL FONDO (Mejora rendimiento)
-        // Iniciamos el mapa con un pequeño retraso para que la animación CSS termine
+        isGlobalAnimating = false; // Pausar fondo para ahorrar recursos
+        
         if (!map) {
             setTimeout(() => initMap(), 500); 
         }
     };
 
-      // Inyectar Iconos Dinámicos en el Radar (Si existen en la data)
-    // Esto hace que aparezca "Cactus" en vez del icono genérico si está en data_pueblos.js
-    if(window.puebloData && window.puebloData.icons) {
-        if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
-        if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
-        if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
-    }
-
-    window.openMapModal = function() {
-        document.getElementById('mapbox-modal').classList.add('open');
-        isGlobalAnimating = false; // PAUSA EL FONDO (Mejora rendimiento brutalmente)
-        if (!map) setTimeout(() => initMap(), 500);
-    };
-
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
-        isGlobalAnimating = true; // REANUDA EL FONDO
+        isGlobalAnimating = true; // Reanudar fondo
     };
 
     function initMap() {
+        if(map) return;
+
         const lng = window.puebloData.lon || -71.80; 
         const lat = window.puebloData.lat || 11.95;
 
         map = new mapboxgl.Map({
             container: 'map-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12', // VISTA REAL
             center: [lng, lat],
             zoom: 9, 
             pitch: 60, 
             bearing: -20, 
             projection: 'globe',
-            // OPTIMIZACIONES DE UX:
-            maxZoom: 16,     // Permite acercarse bastante sin romperse
-            dragPan: true,   // Permite mover con el dedo/mouse
+            maxZoom: 16,     // Limite para que no se vea borroso
+            dragPan: true,   // Mover con mouse/dedo
             scrollZoom: true,
             touchZoomRotate: true
         });
-        
+
+        // Controles de Zoom (+ / -)
         map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
 
-        // Detener rotación automática si el usuario toca el mapa
-        map.on('mousedown', () => isAutoRotating = false);
-        map.on('touchstart', () => isAutoRotating = false);
+        // Detener rotación si el usuario toca
+        const stopRotation = () => { isAutoRotating = false; };
+        map.on('mousedown', stopRotation);
+        map.on('touchstart', stopRotation);
+        map.on('wheel', stopRotation);
+        map.on('dragstart', stopRotation);
 
         map.on('style.load', () => {
+            // Terreno 3D
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Generar Datos (Flora, Fauna y SAGRADO)
+            // Generar Puntos
             const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
             const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
-            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05); // Zona sagrada
+            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
 
+            // Capas
             addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
             addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
-            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00'); // Capa roja
+            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
             // Estado Inicial
             window.toggleLayer('flora');
@@ -1598,15 +968,31 @@ pointer-events: none;
         });
     }
 
-    let isAutoRotating = true;
-    function rotateCamera() { 
-        if(map && isAutoRotating) { 
-            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 }); 
-            requestAnimationFrame(rotateCamera); 
+    function rotateCamera() {
+        if (map && isAutoRotating) {
+            const currentBearing = map.getBearing();
+            map.easeTo({ bearing: currentBearing + 0.05, duration: 0, easing: t => t });
+            requestAnimationFrame(rotateCamera);
         }
     }
 
-    // Helpers (Asegúrate de tener estas funciones también)
+    // Toggle Capas
+    window.toggleLayer = function(layer) {
+        if(!map) return;
+        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+        
+        ['flora', 'fauna', 'sacred'].forEach(l => {
+             if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
+        });
+        
+        if(map.getLayer(`${layer}-heat`)) {
+            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
+            const btn = document.querySelector(`.btn-${layer}`);
+            if(btn) btn.classList.add('active');
+        }
+    };
+
+    // Helpers Mapbox
     function generateRandomPoints(cx, cy, count, spread) {
         const points = [];
         for(let i=0; i<count; i++) {
@@ -1628,59 +1014,206 @@ pointer-events: none;
         });
     }
 
-    window.toggleLayer = function(layer) {
-        if(!map) return;
-        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-        
-        ['flora', 'fauna', 'sacred'].forEach(l => {
-             if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
-        });
-        
-        if(map.getLayer(`${layer}-heat`)) {
-            map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
-            if(btn) btn.classList.add('active');
+
+    // ==========================================
+    // 3. FUNCIONES VISUALES Y AUDIO
+    // ==========================================
+
+    // LOADER (Para quitar la pantalla negra al inicio)
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loader');
+        if(loader) {
+            gsap.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' });
+            document.getElementById('main-content').style.opacity = 1;
+            document.getElementById('global-canvas').style.opacity = 1;
+            
+            // Animaciones de entrada
+            gsap.from(".reveal-title", { y: 100, opacity: 0, duration: 1.5, ease: "power4.out" });
+            gsap.from(".reveal-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2 });
         }
+    });
+
+    // Audio Player Individual
+    window.playRealAudio = function(id) {
+        const targetAudio = document.getElementById(id);
+        const btn = document.getElementById(`btn-${id}`);
+        // Verifica si los elementos existen para evitar errores
+        if (!targetAudio || !btn) return;
+
+        const playIcon = '<span class="material-symbols-rounded">play_arrow</span>';
+        const pauseIcon = '<span class="material-symbols-rounded">pause</span>';
+
+        if (!targetAudio.paused) {
+            targetAudio.pause();
+            btn.innerHTML = playIcon;
+            return;
+        }
+
+        // Pausar otros
+        document.querySelectorAll('audio').forEach(a => {
+            if(a.id !== 'bg-music' && a !== targetAudio) {
+                a.pause(); a.currentTime = 0;
+            }
+        });
+        // Reset visual de otros botones
+        document.querySelectorAll('.play-btn').forEach(b => b.innerHTML = playIcon);
+
+        targetAudio.play();
+        btn.innerHTML = pauseIcon;
+        targetAudio.onended = () => { btn.innerHTML = playIcon; };
     };
 
- let isAutoRotating = true;
-
-    // Configura coordenadas
-    const lng = data.lon || -71.80; 
-    const lat = data.lat || 11.95;
-
-         if(data.icons) {
-        if(data.icons.flora) document.getElementById('icon-flora').innerText = data.icons.flora;
-        if(data.icons.fauna) document.getElementById('icon-fauna').innerText = data.icons.fauna;
-        if(data.icons.sacred) document.getElementById('icon-sacred').innerText = data.icons.sacred;
+    // Toggle Audio de Fondo
+    const bgMusic = document.getElementById('bg-music');
+    const soundBtn = document.getElementById('sound-btn');
+    let isMusicPlaying = false;
+    
+    if(bgMusic && soundBtn) {
+        bgMusic.volume = 0.4;
+        soundBtn.addEventListener('click', () => {
+            if(!isMusicPlaying) {
+                bgMusic.play().then(() => { isMusicPlaying = true; soundBtn.innerText = "SONIDO ON"; });
+            } else {
+                bgMusic.pause(); isMusicPlaying = false; soundBtn.innerText = "SONIDO OFF";
+            }
+        });
     }
 
 
+    // ==========================================
+    // 4. THREE.JS (FONDO Y TEJIDO)
+    // ==========================================
 
+    // Fondo de Partículas (Túnel)
+    const initGlobalThree = () => {
+        const canvas = document.getElementById('global-canvas');
+        if(!canvas) return;
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050200, 0.0015);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+        camera.position.z = 1000;
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // 3. FUNCIÓN DE ROTACIÓN MEJORADA (INCREMENTAL)
-    function rotateCamera() {
-        // Solo rotamos si la bandera es TRUE y el mapa está cargado
-        if (isAutoRotating && map) {
-            // Obtenemos el ángulo actual y le sumamos un poquito
-            const currentBearing = map.getBearing();
-            
-            // easeTo es más suave que rotateTo
-            map.easeTo({
-                bearing: currentBearing + 0.05, // Velocidad (ajusta el 0.05 si quieres más rápido)
-                duration: 0,
-                easing: t => t // Lineal para que no acelere/frene
-            });
-            
-            // Solicitamos el siguiente frame
-            requestAnimationFrame(rotateCamera);
-        }
-        // Si isAutoRotating es false, la función deja de llamarse a sí misma y se detiene.
-        // Al detenerse, el mapa se queda EXACTAMENTE donde el usuario lo dejó.
-    }
+        const count = 4000; 
+        const geo = new THREE.BufferGeometry();
+        const pos = new Float32Array(count*3);
+        for(let i=0; i<count*3; i+=3) { pos[i]=(Math.random()-0.5)*2500; pos[i+1]=(Math.random()-0.5)*2500; pos[i+2]=(Math.random()-0.5)*4000; }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.PointsMaterial({ size: 2, color: 0xC89F65, transparent: true, opacity: 0.8 });
+        const particles = new THREE.Points(geo, mat);
+        scene.add(particles);
+
+        const animate = () => {
+            // SOLO ANIMAR SI EL MAPA NO ESTÁ ABIERTO (Optimización)
+            if(isGlobalAnimating) {
+                const p = geo.attributes.position.array;
+                for(let i=0; i<count; i++) {
+                    const i3 = i*3; p[i3+2] += 2; 
+                    if(p[i3+2] > 1000) p[i3+2] = -3000;
+                }
+                geo.attributes.position.needsUpdate = true;
+                renderer.render(scene, camera);
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+        window.addEventListener('resize', () => { 
+            camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); 
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+        });
+    };
+    initGlobalThree();
+
+    // Tejido 3D (Weaving)
+    (function() {
+        const container = document.getElementById('weaving-container');
+        if(!container) return;
+        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x050200, 0.002);
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+        camera.position.z = 15;
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
         
-</script>
+        const geo = new THREE.IcosahedronGeometry(7, 1);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xFF3B3B, wireframe: true, transparent: true, opacity: 0.3 });
+        const sphere = new THREE.Mesh(geo, mat);
+        scene.add(sphere);
 
+        const animate = () => {
+            if(isGlobalAnimating) { 
+                sphere.rotation.y += 0.002;
+                renderer.render(scene, camera);
+            }
+            requestAnimationFrame(animate);
+        };
+        animate();
+    })();
+
+    // ==========================================
+    // 5. EFECTOS UI (CURSOR, SCROLL, TILT)
+    // ==========================================
+
+    // Scroll Horizontal
+    gsap.registerPlugin(ScrollTrigger);
+    const panels = gsap.utils.toArray(".panel");
+    const containerH = document.getElementById("horizontal-wrapper");
+    if(panels.length > 0 && containerH) {
+        gsap.to(panels, {
+            xPercent: -100 * (panels.length - 1), ease: "none",
+            scrollTrigger: {
+                trigger: "#identity-section", pin: true, scrub: 1,
+                snap: 1 / (panels.length - 1), end: () => "+=" + containerH.offsetWidth
+            }
+        });
+    }
+
+    // Efecto Jepira (Fondo cósmico)
+    if(document.getElementById('cosmos-overlay')) {
+        ScrollTrigger.create({
+            trigger: "#jepira-section", start: "top center",
+            onEnter: () => gsap.to("#cosmos-overlay", {opacity: 1, duration: 2}),
+            onLeaveBack: () => gsap.to("#cosmos-overlay", {opacity: 0, duration: 2})
+        });
+    }
+
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    window.addEventListener('mousemove', e => {
+        gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+    });
+    window.addEventListener('touchmove', e => {
+        const touch = e.touches[0];
+        gsap.to(cursor, { x: touch.clientX, y: touch.clientY, duration: 0.1 });
+    }, {passive: true});
+
+    const radar = document.querySelector('.radar-container');
+    if(radar) {
+        radar.addEventListener('mouseenter', () => { cursor.classList.add('map-mode'); });
+        radar.addEventListener('mouseleave', () => { cursor.classList.remove('map-mode'); });
+    }
+
+    document.querySelectorAll('.hover-trigger').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+    });
+
+    // Lenis Smooth Scroll
+    if (typeof Lenis !== 'undefined') {
+        lenis = new Lenis({ duration: 1.2 });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+        lenis.on('scroll', ScrollTrigger.update);
+    }
+
+    // Tilt Cards
+    if (typeof VanillaTilt !== 'undefined') {
+         VanillaTilt.init(document.querySelectorAll(".tilt-card"), { max: 10, speed: 400, glare: true, "max-glare": 0.2 });
+    }
+
+</script>
     
 </body>
 </html>
