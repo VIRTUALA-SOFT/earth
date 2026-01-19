@@ -485,6 +485,15 @@ pointer-events: none;
 
     .dot { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
 
+  #map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Detrás del HUD pero dentro del modal */
+}
+
         
 </style>
 
@@ -1617,8 +1626,8 @@ pointer-events: none;
     // LÓGICA DE MAPBOX (OBSERVATORIO TERRITORIAL) - CORREGIDO
     // =========================================================
     
-    // Inyectar Iconos en el HTML del Radar (Si el HTML existe)
-    if(document.getElementById('icon-flora') && window.puebloData.icons) {
+      // 1. Inyectar Iconos en el HTML del Radar (Si el HTML existe)
+    if(document.getElementById('icon-flora') && window.puebloData && window.puebloData.icons) {
         if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
         if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
         if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
@@ -1628,27 +1637,34 @@ pointer-events: none;
     let map;
     let isAutoRotating = true; // Variable para controlar la rotación
 
-    // Funciones Globales
+    // 2. Funciones Globales para el HTML
     window.openMapModal = function() {
-        document.getElementById('mapbox-modal').classList.add('open');
-        isGlobalAnimating = false; // PAUSA EL FONDO
+        const modal = document.getElementById('mapbox-modal');
+        if(modal) modal.classList.add('open');
+        
+        window.isGlobalAnimating = false; // PAUSA EL FONDO THREE.JS
         
         if (!map) {
-            setTimeout(() => initMap(), 500);
+            // Un pequeño retraso para asegurar que el div tenga dimensiones antes de cargar
+            setTimeout(() => initMap(), 100);
         } else {
-            setTimeout(() => map.resize(), 600);
+            // Mapbox necesita saber que el tamaño cambió (de display:none/hidden a visible)
+            setTimeout(() => {
+                map.resize();
+            }, 600); // Espera a que termine la transición CSS (0.8s en tu CSS)
         }
     };
 
     window.closeMapModal = function() {
-        document.getElementById('mapbox-modal').classList.remove('open');
-        isGlobalAnimating = true; // REANUDA EL FONDO
+        const modal = document.getElementById('mapbox-modal');
+        if(modal) modal.classList.remove('open');
+        window.isGlobalAnimating = true; // REANUDA EL FONDO
     };
 
     function initMap() {
         if(map) return;
 
-        // Protección de datos
+        // Protección de datos si puebloData no cargó
         const lng = (window.puebloData && window.puebloData.lon) ? window.puebloData.lon : -71.80; 
         const lat = (window.puebloData && window.puebloData.lat) ? window.puebloData.lat : 11.95;
 
@@ -1656,7 +1672,7 @@ pointer-events: none;
             container: 'map-container',
             style: 'mapbox://styles/mapbox/satellite-streets-v12',
             center: [lng, lat],
-            zoom: 9, 
+            zoom: 11, // Zoom un poco más cerca para ver detalle
             pitch: 60, 
             bearing: -20, 
             projection: 'globe',
@@ -1672,71 +1688,114 @@ pointer-events: none;
         const stopRot = () => { isAutoRotating = false; };
         map.on('mousedown', stopRot);
         map.on('touchstart', stopRot);
+        map.on('wheel', stopRot);
 
         map.on('style.load', () => {
+            // Añadir terreno 3D
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Generar Puntos (CORREGIDO: Nombre de función coincidente)
-            const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
-            const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
-            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
+            // Generar Puntos Ficticios (Mock Data)
+            const floraData = generateRandomPoints(lng, lat, 400, 0.05); 
+            const faunaData = generateRandomPoints(lng, lat, 300, 0.06); 
+            const sacredData = generateRandomPoints(lng + 0.02, lat + 0.02, 150, 0.02);
 
-            // Capas
+            // Añadir Capas
             addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
             addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
             addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
+            // Activar Flora por defecto
             window.toggleLayer('flora');
+            
+            // Iniciar rotación
             rotateCamera();
         });
         
+        // Asegurar resize al cargar
         map.on('load', function() { map.resize(); });
     }
 
-    // Función faltante en tu código anterior
-    function rotateCamera() {
-        if(map && isAutoRotating) {
+    // Función de Rotación de Cámara
+    function rotateCamera(timestamp) {
+        if (map && isAutoRotating) {
+            // Rotar lentamente
             map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 });
             requestAnimationFrame(rotateCamera);
         }
     }
 
-    // Función faltante en tu código anterior
+    // Función para cambiar capas
     window.toggleLayer = function(layer) {
         if(!map) return;
-        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
         
+        // UI Update
+        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector(`.btn-${layer}`);
+        if(btn) btn.classList.add('active');
+
+        // Ocultar todas
         ['flora', 'fauna', 'sacred'].forEach(l => {
              if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
+             if(map.getLayer(`${l}-point`)) map.setLayoutProperty(`${l}-point`, 'visibility', 'none');
         });
         
+        // Mostrar seleccionada
         if(map.getLayer(`${layer}-heat`)) {
             map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            // Buscar botón por clase específica o selector genérico
-            const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
-            if(btn) btn.classList.add('active');
+            map.setLayoutProperty(`${layer}-point`, 'visibility', 'visible');
         }
     };
 
-    // Helper (Renombrado para coincidir con la llamada)
+    // Helper: Generar puntos aleatorios alrededor de una coordenada
     function generateRandomPoints(cx, cy, count, spread) {
         const points = [];
         for(let i=0; i<count; i++) {
-            points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
+            points.push({ 
+                "type": "Feature", 
+                "properties": { "density": Math.random() }, 
+                "geometry": { 
+                    "type": "Point", 
+                    "coordinates": [
+                        cx + (Math.random()-0.5)*spread, 
+                        cy + (Math.random()-0.5)*spread
+                    ] 
+                } 
+            });
         }
         return { "type": "FeatureCollection", "features": points };
     }
 
+    // Helper: Añadir capa de calor + puntos brillantes
     function addHeatmapLayer(id, data, c1, c2) {
         map.addSource(id, { type: 'geojson', data: data });
+        
+        // 1. Capa Heatmap (Resplandor)
         map.addLayer({
             id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-            paint: { 'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2], 'heatmap-intensity': 2, 'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2], 'heatmap-radius': 30, 'heatmap-opacity': 0.8 }
+            paint: { 
+                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 1], 
+                'heatmap-intensity': 1, 
+                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2], 
+                'heatmap-radius': 25, 
+                'heatmap-opacity': 0.7 
+            }
+        });
+
+        // 2. Capa Puntos (Núcleo)
+        map.addLayer({
+            id: `${id}-point`, type: 'circle', source: id, layout: { 'visibility': 'none' },
+            paint: {
+                'circle-radius': 3,
+                'circle-color': '#fff',
+                'circle-stroke-color': c1,
+                'circle-stroke-width': 1,
+                'circle-opacity': ['interpolate', ['linear'], ['zoom'], 10, 0, 15, 1] 
+            }
         });
     }
-        
+     
 </script>
     
 </body>
