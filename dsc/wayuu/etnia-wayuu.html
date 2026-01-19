@@ -923,12 +923,21 @@ pointer-events: none;
 
     <script type="module">
 
-    // 1. IMPORTS (Siempre van arriba)
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+ <script type="module">
+
+      import * as THREE from 'three';
+    // Ajusta la ruta si es necesario (ej: ../../data_pueblos.js)
     import { pueblosData } from '../../data_pueblos.js'; 
 
-    let isGlobalAnimating = true;
+    // --- VARIABLES GLOBALES ---
+    window.isGlobalAnimating = true; // Interruptor para optimizar rendimiento
+    window.puebloData = null; // Datos del pueblo seleccionado
+
+    // --- CARGAR DATOS DEL PUEBLO (Para usarlos en el mapa) ---
+    const params = new URLSearchParams(window.location.search);
+    const puebloId = params.get('id') || 'wayuu'; 
+    window.puebloData = pueblosData.find(p => p.id === puebloId) || pueblosData[0];
+
         
     // ==========================================
     // 1. VARIABLES Y FUNCIONES GLOBALES
@@ -1425,7 +1434,7 @@ pointer-events: none;
                 my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
             });
             const animate = () => {
-              if (isGlobalAnimating) {
+              if (window.isGlobalAnimating) {
                 group.rotation.x += 0.002 + my*0.01;
                 group.rotation.y += 0.002 + mx*0.01;
                 let vPos=0, cPos=0, con=0;
@@ -1576,10 +1585,12 @@ pointer-events: none;
             }, {passive: true});
 
             const animate = () => {
+              if (window.isGlobalAnimating) {
                 material.uniforms.uTime.value = clock.getElapsedTime();
                 // Interpolación más rápida en móvil para que se sienta responsive
                 material.uniforms.uMouse.value.lerp(mouse, 0.15);
                 renderer.render(scene, camera);
+              }
                 requestAnimationFrame(animate);
             };
             animate();
@@ -1602,121 +1613,87 @@ pointer-events: none;
         }
     });
 
-   // ==========================================
-    // LÓGICA MAPBOX CORREGIDA Y OPTIMIZADA
+
+        // ==========================================
+    // NUEVO: LÓGICA DEL OBSERVATORIO (MAPBOX)
     // ==========================================
     
-    // 1. INYECTAR DATOS VISUALES EN EL RADAR (ICONOS Y TEXTO)
-    // Esto conecta tu data_pueblos.js con el HTML del radar
-    if(window.puebloData) {
-        // Si hay iconos personalizados, úsalos
-        if(window.puebloData.icons) {
-            if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
-            if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
-            if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
-        }
+    // Inyectar Iconos en el HTML del Radar (Si el HTML existe)
+    const iconFlora = document.getElementById('icon-flora');
+    if(iconFlora && window.puebloData.icons) {
+        if(window.puebloData.icons.flora) iconFlora.innerText = window.puebloData.icons.flora;
+        if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
+        if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
     }
 
-    // 2. CONFIGURACIÓN DEL MAPA
-    mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ';
-
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ'; // Tu token
     let map;
-    let isAutoRotating = true;
 
-    // Funciones Globales para los botones HTML (onclick)
+    // Funciones Globales para onclick
     window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        isGlobalAnimating = false; // PAUSA EL FONDO (Optimización vital)
-        if (!map) setTimeout(() => initMap(), 500);
+        window.isGlobalAnimating = false; // PAUSA TODO EL FONDO 3D
+        if (!map) setTimeout(initMap, 500);
     };
 
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
-        isGlobalAnimating = true; // REANUDA EL FONDO
+        window.isGlobalAnimating = true; // REANUDA TODO EL FONDO 3D
     };
 
     function initMap() {
-        // Usamos los datos globales (si no hay, usa coordenadas default)
-        const lng = (window.puebloData && window.puebloData.lon) || -71.80; 
-        const lat = (window.puebloData && window.puebloData.lat) || 11.95;
+        const lng = window.puebloData.lon || -71.80; 
+        const lat = window.puebloData.lat || 11.95;
 
         map = new mapboxgl.Map({
             container: 'map-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satélite real
+            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satélite
             center: [lng, lat],
             zoom: 9, 
             pitch: 60, 
             bearing: -20, 
             projection: 'globe',
-            // --- MEJORAS DE UX ---
-            maxZoom: 16,     // Evita que se vea borroso (pixelado)
-            dragPan: true,   // Permite mover con el mouse/dedo
-            scrollZoom: true,
-            touchZoomRotate: true
+            maxZoom: 16,     // Zoom permitido
+            dragPan: true,   // Mover habilitado
+            scrollZoom: true
         });
 
-        // Controles de Zoom (+ / -)
         map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
-        // Detener rotación automática si el usuario interactúa
-        const stopRot = () => { isAutoRotating = false; };
-        map.on('mousedown', stopRot);
-        map.on('touchstart', stopRot);
-        map.on('wheel', stopRot);
 
         map.on('style.load', () => {
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Generar Datos Simulados alrededor del punto
-            const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
-            const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
-            // Zona Sagrada (Más concentrada)
-            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05); 
+            // Generar Puntos y Capas
+            const floraData = generatePoints(lng, lat, 400, 0.2); 
+            const faunaData = generatePoints(lng, lat, 300, 0.3); 
+            const sacredData = generatePoints(lng + 0.05, lat + 0.05, 150, 0.05);
 
-            // Capas de Calor (Heatmaps)
-            addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
-            addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
-            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
+            addLayer('flora', floraData, '#69f0ae', '#00ff00');
+            addLayer('fauna', faunaData, '#00f3ff', '#0044ff');
+            addLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
-            // Iniciar con Flora
             window.toggleLayer('flora');
-            rotateCamera();
         });
     }
 
-    function rotateCamera() { 
-        if(map && isAutoRotating) { 
-            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 }); 
-            requestAnimationFrame(rotateCamera); 
-        }
-    }
-
-    // Control de Botones de Capas
     window.toggleLayer = function(layer) {
         if(!map) return;
-        
-        // Actualizar UI (Clase active)
         document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
         
-        // Ocultar todas
         ['flora', 'fauna', 'sacred'].forEach(l => {
              if(map.getLayer(`${l}-heat`)) map.setLayoutProperty(`${l}-heat`, 'visibility', 'none');
         });
         
-        // Mostrar seleccionada
         if(map.getLayer(`${layer}-heat`)) {
             map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            
-            // Buscar el botón correspondiente para activarlo
-            const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
+            const btn = document.querySelector(`.btn-${layer}`);
             if(btn) btn.classList.add('active');
         }
     };
 
-    // Helpers
-    function generateRandomPoints(cx, cy, count, spread) {
+    function generatePoints(cx, cy, count, spread) {
         const points = [];
         for(let i=0; i<count; i++) {
             points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
@@ -1724,22 +1701,13 @@ pointer-events: none;
         return { "type": "FeatureCollection", "features": points };
     }
 
-    function addHeatmapLayer(id, data, c1, c2) {
+    function addLayer(id, data, c1, c2) {
         map.addSource(id, { type: 'geojson', data: data });
         map.addLayer({
             id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
-            paint: {
-                'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2],
-                'heatmap-intensity': 2, 
-                'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2],
-                'heatmap-radius': 30, 'heatmap-opacity': 0.8
-            }
+            paint: { 'heatmap-weight': ['interpolate', ['linear'], ['get', 'density'], 0, 0, 1, 2], 'heatmap-intensity': 2, 'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)', 0.2, c1, 1, c2], 'heatmap-radius': 30, 'heatmap-opacity': 0.8 }
         });
     }
-
-    // Variable global de animación para pausar Three.js (Debe estar declarada al inicio del script principal también)
-    // Si no la tienes arriba, asegúrate de que exista:
-    if (typeof isGlobalAnimating === 'undefined') { var isGlobalAnimating = true; }
         
 </script>
     
