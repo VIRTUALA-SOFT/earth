@@ -924,6 +924,7 @@ pointer-events: none;
 
  <script type="module">
     import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     // Ajusta la ruta si es necesario (ej: ../../data_pueblos.js)
     import { pueblosData } from '../../data_pueblos.js'; 
 
@@ -1316,7 +1317,7 @@ pointer-events: none;
             let targetSpeed = 0.5;
 
             const animate = () => {
-               if (window.isGlobalAnimating) {
+               if (isGlobalAnimating) {
                 // Interpolación de velocidad
                 speed += (targetSpeed - speed) * 0.03;
                 
@@ -1432,7 +1433,7 @@ pointer-events: none;
                 my = -((e.clientY - container.getBoundingClientRect().top)/container.clientHeight)*2+1;
             });
             const animate = () => {
-              if (window.isGlobalAnimating) {
+              if (isGlobalAnimating) {
                 group.rotation.x += 0.002 + my*0.01;
                 group.rotation.y += 0.002 + mx*0.01;
                 let vPos=0, cPos=0, con=0;
@@ -1583,7 +1584,7 @@ pointer-events: none;
             }, {passive: true});
 
             const animate = () => {
-              if (window.isGlobalAnimating) {
+              if (isGlobalAnimating) {
                 material.uniforms.uTime.value = clock.getElapsedTime();
                 // Interpolación más rápida en móvil para que se sienta responsive
                 material.uniforms.uMouse.value.lerp(mouse, 0.15);
@@ -1612,90 +1613,97 @@ pointer-events: none;
     });
 
 
-        // ==========================================
-    // NUEVO: LÓGICA DEL OBSERVATORIO (MAPBOX)
-    // ==========================================
+   // =========================================================
+    // LÓGICA DE MAPBOX (OBSERVATORIO TERRITORIAL) - CORREGIDO
+    // =========================================================
     
     // Inyectar Iconos en el HTML del Radar (Si el HTML existe)
-    const iconFlora = document.getElementById('icon-flora');
-    if(iconFlora && window.puebloData.icons) {
-        if(window.puebloData.icons.flora) iconFlora.innerText = window.puebloData.icons.flora;
+    if(document.getElementById('icon-flora') && window.puebloData.icons) {
+        if(window.puebloData.icons.flora) document.getElementById('icon-flora').innerText = window.puebloData.icons.flora;
         if(window.puebloData.icons.fauna) document.getElementById('icon-fauna').innerText = window.puebloData.icons.fauna;
         if(window.puebloData.icons.sacred) document.getElementById('icon-sacred').innerText = window.puebloData.icons.sacred;
     }
 
-    mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ'; // Tu token
+    mapboxgl.accessToken = 'pk.eyJ1IjoidmlydHVhbGEiLCJhIjoiY21ranRzb2ZjMTlsYTNlcHpxZHNoNWM1dyJ9.9HAi74i0jwxPX-FckHFOoQ';
     let map;
+    let isAutoRotating = true; // Variable para controlar la rotación
 
-    // Funciones Globales para onclick
-  window.openMapModal = function() {
+    // Funciones Globales
+    window.openMapModal = function() {
         document.getElementById('mapbox-modal').classList.add('open');
-        isGlobalAnimating = false;
+        isGlobalAnimating = false; // PAUSA EL FONDO
         
         if (!map) {
             setTimeout(() => initMap(), 500);
         } else {
-            // Si el mapa ya existe, redimensiónalo al abrir
             setTimeout(() => map.resize(), 600);
         }
     };
-     
+
     window.closeMapModal = function() {
         document.getElementById('mapbox-modal').classList.remove('open');
-        window.isGlobalAnimating = true; // REANUDA TODO EL FONDO 3D
+        isGlobalAnimating = true; // REANUDA EL FONDO
     };
 
     function initMap() {
         if(map) return;
 
-        // PROTECCIÓN: Si no hay datos cargados, usar coordenadas de La Guajira por defecto
-        const defaultLat = 11.95;
-        const defaultLon = -71.80;        
-       
-        const lng = (window.puebloData && window.puebloData.lon) ? window.puebloData.lon : defaultLon;
-        const lat = (window.puebloData && window.puebloData.lat) ? window.puebloData.lat : defaultLat;
-
-        console.log("Iniciando mapa en:", lat, lng); // Para verificar en consola
+        // Protección de datos
+        const lng = (window.puebloData && window.puebloData.lon) ? window.puebloData.lon : -71.80; 
+        const lat = (window.puebloData && window.puebloData.lat) ? window.puebloData.lat : 11.95;
 
         map = new mapboxgl.Map({
             container: 'map-container',
-            style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satélite
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
             center: [lng, lat],
             zoom: 9, 
             pitch: 60, 
             bearing: -20, 
             projection: 'globe',
-            maxZoom: 16,     // Zoom permitido
-            dragPan: true,   // Mover habilitado
-            scrollZoom: true
+            maxZoom: 16,
+            dragPan: true,
+            scrollZoom: true,
+            touchZoomRotate: true
         });
 
         map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+        // Detener rotación al interactuar
+        const stopRot = () => { isAutoRotating = false; };
+        map.on('mousedown', stopRot);
+        map.on('touchstart', stopRot);
 
         map.on('style.load', () => {
             map.addSource('mapbox-dem', { 'type': 'raster-dem', 'url': 'mapbox://mapbox.mapbox-terrain-dem-v1', 'tileSize': 512, 'maxzoom': 14 });
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
             map.setFog({ 'range': [0.5, 10], 'color': '#050200', 'horizon-blend': 0.1 });
 
-            // Generar Puntos y Capas
-            const floraData = generatePoints(lng, lat, 400, 0.2); 
-            const faunaData = generatePoints(lng, lat, 300, 0.3); 
-            const sacredData = generatePoints(lng + 0.05, lat + 0.05, 150, 0.05);
+            // Generar Puntos (CORREGIDO: Nombre de función coincidente)
+            const floraData = generateRandomPoints(lng, lat, 400, 0.2); 
+            const faunaData = generateRandomPoints(lng, lat, 300, 0.3); 
+            const sacredData = generateRandomPoints(lng + 0.05, lat + 0.05, 150, 0.05);
 
-            addLayer('flora', floraData, '#69f0ae', '#00ff00');
-            addLayer('fauna', faunaData, '#00f3ff', '#0044ff');
-            addLayer('sacred', sacredData, '#ff0055', '#ffaa00');
+            // Capas
+            addHeatmapLayer('flora', floraData, '#69f0ae', '#00ff00');
+            addHeatmapLayer('fauna', faunaData, '#00f3ff', '#0044ff');
+            addHeatmapLayer('sacred', sacredData, '#ff0055', '#ffaa00');
 
             window.toggleLayer('flora');
             rotateCamera();
         });
-
-        map.on('load', function() {
-            map.resize();
-        });
         
+        map.on('load', function() { map.resize(); });
     }
 
+    // Función faltante en tu código anterior
+    function rotateCamera() {
+        if(map && isAutoRotating) {
+            map.rotateTo((map.getBearing() + 0.05) % 360, { duration: 0 });
+            requestAnimationFrame(rotateCamera);
+        }
+    }
+
+    // Función faltante en tu código anterior
     window.toggleLayer = function(layer) {
         if(!map) return;
         document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
@@ -1706,12 +1714,14 @@ pointer-events: none;
         
         if(map.getLayer(`${layer}-heat`)) {
             map.setLayoutProperty(`${layer}-heat`, 'visibility', 'visible');
-            const btn = document.querySelector(`.btn-${layer}`);
+            // Buscar botón por clase específica o selector genérico
+            const btn = document.querySelector(`.btn-${layer}`) || document.querySelector(`.layer-btn[onclick*="${layer}"]`);
             if(btn) btn.classList.add('active');
         }
     };
 
-    function generatePoints(cx, cy, count, spread) {
+    // Helper (Renombrado para coincidir con la llamada)
+    function generateRandomPoints(cx, cy, count, spread) {
         const points = [];
         for(let i=0; i<count; i++) {
             points.push({ "type": "Feature", "properties": { "density": Math.random() }, "geometry": { "type": "Point", "coordinates": [cx + (Math.random()-0.5)*spread, cy + (Math.random()-0.5)*spread] } });
@@ -1719,7 +1729,7 @@ pointer-events: none;
         return { "type": "FeatureCollection", "features": points };
     }
 
-    function addLayer(id, data, c1, c2) {
+    function addHeatmapLayer(id, data, c1, c2) {
         map.addSource(id, { type: 'geojson', data: data });
         map.addLayer({
             id: `${id}-heat`, type: 'heatmap', source: id, layout: { 'visibility': 'none' },
