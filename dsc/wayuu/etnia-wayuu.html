@@ -516,6 +516,42 @@ pointer-events: none;
     z-index: 1; /* Detrás del HUD pero dentro del modal */
 }
 
+
+ /* --- PERSONALIZACIÓN CONTROLES MAPBOX (Zoom/Brújula) --- */
+    
+    /* El contenedor de los botones */
+    .mapboxgl-ctrl-group {
+        /* Borde Dorado */
+        border: 1px solid var(--c-sand) !important; 
+        
+        /* Fondo Oscuro (Para que combine con tu HUD) */
+        background-color: rgba(5, 2, 0, 0.9) !important; 
+        
+        /* Resplandor suave dorado */
+        box-shadow: 0 0 20px rgba(200, 159, 101, 0.2) !important;
+        
+        /* Redondear esquinas */
+        border-radius: 8px !important;
+    }
+
+    /* Los iconos (+, -, brújula) */
+    .mapboxgl-ctrl-icon {
+        /* Invertimos el color: de negro (default) a blanco para que se vean en el fondo oscuro */
+        filter: invert(1) !important;
+        transition: transform 0.2s ease;
+    }
+
+    /* Efecto al pasar el mouse por los botones */
+    .mapboxgl-ctrl-group button:hover .mapboxgl-ctrl-icon {
+        /* Al hacer hover, el icono se vuelve ligeramente dorado/amarillo */
+        filter: invert(1) sepia(1) saturate(5) hue-rotate(0deg) !important; 
+        transform: scale(1.1);
+    }
+
+    /* Línea divisoria entre los botones (opcional, para hacerla dorada tenue) */
+    .mapboxgl-ctrl-group > button + button {
+        border-top: 1px solid rgba(200, 159, 101, 0.3) !important;
+    }
         
 </style>
 
