@@ -827,7 +827,12 @@ pointer-events: none;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
 
     <script type="module">
-    
+
+         // 1. IMPORTS (Siempre van arriba)
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { pueblosData } from '../../data_pueblos.js'; 
+        
     // ==========================================
     // 1. VARIABLES Y FUNCIONES GLOBALES
     // ==========================================
